@@ -11,7 +11,7 @@ Base =declarative_base()
 class User(Base):
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
-    email = Column(String(30), unique=True, nullable=False)
+    email = Column(String(50), unique=True, nullable=False)
     nombre = Column(String(20), nullable=False)
     apellido = Column(String(20), nullable=False)
     password = Column(String(10), nullable=False)
@@ -53,7 +53,7 @@ class Form(Base):
     
 class Stock(Base):
     id = Column(Integer, primary_key=True)
-    descripcion = Column(String(30), unique=True, nullable=False)
+    descripcion = Column(String(30), nullable=False)
     cantidad = Column(Integer(4), nullable=False)
     def __repr__(self):
             return f'<Stock {self.id}>'
@@ -68,9 +68,9 @@ class Stock(Base):
     
 class detalleForm(Base):
     id = Column(Integer, primary_key=True)
-    formId = Column(Integer,ForeignKey('Form.id') , nullable=False)
+    formId = Column(Integer,ForeignKey('form.id') , nullable=False)
     form=relationship(Form)
-    stockId = Column(Integer,ForeignKey('Stock.id') , nullable=False)
+    stockId = Column(Integer,ForeignKey('stock.id') , nullable=False)
     stock=relationship(Stock)
     descripcion = Column(String(30), unique=True, nullable=False)
     cantidad = Column(Integer(4), nullable=False)
