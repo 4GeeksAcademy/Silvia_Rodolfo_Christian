@@ -3,7 +3,6 @@ import sys
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Date
 from sqlalchemy.orm import relationship, declarative_base
 from sqlalchemy import create_engine
-from eralchemy import render_er
 from flask_sqlalchemy import SQLAlchemy
 Base =declarative_base()
 # db = SQLAlchemy()
