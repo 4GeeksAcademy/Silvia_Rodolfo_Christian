@@ -1,21 +1,16 @@
-import os
-import sys
-from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Date
-from sqlalchemy.orm import relationship, declarative_base
-from sqlalchemy import create_engine
 from flask_sqlalchemy import SQLAlchemy
-Base =declarative_base()
-# db = SQLAlchemy()
 
-class User(Base):
-    __tablename__ = 'user'
-    id = Column(Integer, primary_key=True)
-    email = Column(String(30), unique=True, nullable=False)
-    nombre = Column(String(20), nullable=False)
-    apellido = Column(String(20), nullable=False)
-    password = Column(String(10), nullable=False)
-    user_type= Column(String(10), nullable=False)
-    is_active = Column(Boolean(), nullable=False)
+db = SQLAlchemy()
+
+class User(db.Model):
+    __tablename__='user'
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(30), unique=True, nullable=False)
+    firstName = db.Column(db.String(20), nullable=False)
+    lastName = db.Column(db.String(20), nullable=False)
+    password = db.Column(db.String(80), unique=False, nullable=False)
+    isActive = db.Column(db.Boolean(), unique=False, nullable=False)
+    userType= db.Column(db.String(10), nullable=False)
 
     def __repr__(self):
         return f'<User {self.email}>'
@@ -24,64 +19,74 @@ class User(Base):
         return {
             "id": self.id,
             "email": self.email,
-            "nombre":self.nombre,
-            "apellido":self.apellido,
+            "nombre": self.nombre,
+            "apellido": self.apellido,
             "password":self.password,
-            "user_type":self.user_type,
-            "is_active":self.is_active,
+            "isActive":self.isActive,
+            "userType": self.userType
             # do not serialize the password, its a security breach
         }
-
-
-class Form(Base):
-    id = Column(Integer, primary_key=True)
-    fecha = Column(Date(), nullable=False)
-    userId = Column(Integer,ForeignKey('user.id') , nullable=False)
-    user=relationship(User)
+    
+class Stock(db.Model):
+    __tablename__='stock'
+    id = db.Column(db.Integer, primary_key=True)
+    description = db.Column(db.String(30), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    type=db.Column(db.Integer, nullable=False)
+    image= db.Column(db.String(250), nullable=False)
     def __repr__(self):
         return f'<Stock {self.id}>'
 
     def serialize(self):
         return {
             "id": self.id,
-            "fecha": self.fecha,
-            "userId":self.userId,
-
-            # do not serialize the password, its a security breach
+            "description": self.description,
+            "quantity": self.quantity,
+            "type": self.type,
+            "image": self.image,
         }
     
-class Stock(Base):
-    id = Column(Integer, primary_key=True)
-    descripcion = Column(String(30), unique=True, nullable=False)
-    cantidad = Column(Integer(4), nullable=False)
-    def __repr__(self):
-            return f'<Stock {self.id}>'
-
-    def serialize(self):
-            return {
-                "id": self.id,
-                "descripcion": self.descripcion,
-                "cantidad":self.cantidad,
-                # do not serialize the password, its a security breach
-            }
+class Form(db.Model):
+    __tablename__='form'
+    id = db.Column(db.Integer, primary_key=True)
+    initialDate = db.Column(db.Date, nullable=False)
+    finalDate = db.Column(db.Date, nullable=False)
+    userId = db.Column(db.Integer, db.ForeignKey('user.id'),nullable=False)
+    user_relationship =db.relationship("User")
     
-class detalleForm(Base):
-    id = Column(Integer, primary_key=True)
-    formId = Column(Integer,ForeignKey('Form.id') , nullable=False)
-    form=relationship(Form)
-    stockId = Column(Integer,ForeignKey('Stock.id') , nullable=False)
-    stock=relationship(Stock)
-    descripcion = Column(String(30), unique=True, nullable=False)
-    cantidad = Column(Integer(4), nullable=False)
     def __repr__(self):
-            return f'<Stock {self.id}>'
+        return f'<form {self.id}>'
 
     def serialize(self):
-            return {
-                "id": self.id,
-                "descripcion": self.descripcion,
-                "cantidad":self.cantidad,
-                "formId":Form.id,
-                "stockId":Stock.id
-                # do not serialize the password, its a security breach
-            }    
+        return {
+            "id": self.id,
+            "initialDate": self.initialDate,
+            "finalDate": self.finalDate,
+            "type": self.type,
+            "userId": User.id,
+        }
+    
+class DetailForm(db.Model):
+    __tablename__='detailForm'
+    id = db.Column(db.Integer, primary_key=True)
+    formId = db.Column(db.Integer, db.ForeignKey('form.id'),nullable=False)
+    form_relationship =db.relationship("Form")
+    stockId = db.Column(db.Integer, db.ForeignKey('stock.id'),nullable=False)
+    stock_relationship =db.relationship("Stock")
+    description = db.Column(db.String(30), nullable=False)
+    quantity = db.Column(db.String(30), nullable=False)
+    type = db.Column(db.String(30), nullable=False)
+    
+    
+    def __repr__(self):
+        return f'<detailForm {self.id}>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "formId": self.formId,
+            "stockId": self.stockId,
+            "description": self.description,
+            "quantity": self.quantity,
+            "type": self.type,
+        }
