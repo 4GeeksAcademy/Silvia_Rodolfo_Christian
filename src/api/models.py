@@ -32,8 +32,8 @@ class Stock(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(30), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
-    type=db.Column(db.Integer, nullable=False)
-    image= db.Column(db.String(250), nullable=False)
+    stockType = db.Column(db.String(30), nullable=False)
+    image = db.Column(db.String(250), nullable=False)
     def __repr__(self):
         return f'<Stock {self.id}>'
 
@@ -42,8 +42,8 @@ class Stock(db.Model):
             "id": self.id,
             "description": self.description,
             "quantity": self.quantity,
-            "type": self.type,
-            "image": self.image,
+            "type": self.stockType,
+            "image": self.image
         }
     
 class Form(db.Model):
@@ -55,15 +55,14 @@ class Form(db.Model):
     user_relationship =db.relationship("User")
     
     def __repr__(self):
-        return f'<form {self.id}>'
+        return f'<form:{self.id},Initial Date:{self.initialDate},Final Date:{self.finalDate},User:{self.userId}>'
 
     def serialize(self):
         return {
             "id": self.id,
             "initialDate": self.initialDate,
             "finalDate": self.finalDate,
-            "type": self.type,
-            "userId": User.id,
+            "userId": self.id
         }
     
 class DetailForm(db.Model):
@@ -75,7 +74,7 @@ class DetailForm(db.Model):
     stock_relationship =db.relationship("Stock")
     description = db.Column(db.String(30), nullable=False)
     quantity = db.Column(db.String(30), nullable=False)
-    type = db.Column(db.String(30), nullable=False)
+    stockType = db.Column(db.String(30), nullable=False)
     
     
     def __repr__(self):
@@ -88,5 +87,5 @@ class DetailForm(db.Model):
             "stockId": self.stockId,
             "description": self.description,
             "quantity": self.quantity,
-            "type": self.type,
+            "type": self.stockType,
         }

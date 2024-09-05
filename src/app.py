@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db
+from api.models import db, Form
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
@@ -50,11 +50,11 @@ def handle_invalid_usage(error):
 # generate sitemap with all your endpoints
 
 
-@app.route('/')
-def sitemap():
-    if ENV == "development":
-        return generate_sitemap(app)
-    return send_from_directory(static_file_dir, 'index.html')
+# @app.route('/')
+# def sitemap():
+#     if ENV == "development":
+#         return generate_sitemap(app)
+#     return send_from_directory(static_file_dir, 'index.html')
 
 # any other endpoint will try to serve it like a static file
 
@@ -66,7 +66,21 @@ def serve_any_other_file(path):
     response = send_from_directory(static_file_dir, path)
     response.cache_control.max_age = 0  # avoid cache memory
     return response
-
+@app.route('/forms', methods=['GET'])
+def get_forms():
+    try:
+        all_forms = Form.query.()  # Obtiene todos los registros de la tabla Form
+        # Aplica el método to_dict() a cada objeto Form en la lista
+        all_forms_serialize=[]
+        for form in all_forms:
+            all_forms_serialize.append(form.serialize())
+        
+        response_body = {
+            "data": all_forms_serialize
+        }
+        return jsonify(response_body), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
