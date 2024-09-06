@@ -33,8 +33,8 @@ class User(db.Model):
         return {
             "id": self.id,
             "email": self.email,
-            "firstName": self.nombre,
-            "lastName": self.apellido,
+            "firstName": self.firstName,
+            "lastName": self.lastName,
             "password":self.password,
             "isActive":self.isActive,
             "userType": self.userType.value  # Convertir el Enum a su valor (cadena)
