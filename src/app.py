@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db, User
+from api.models import db, User, UserTypeEnum
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
@@ -97,14 +97,16 @@ def register():
     user = User.query.filter_by(email=body['email']).first() #Buscamos el primer(.first()) usuario por email.
     if user:
         return jsonify({"msg": "The user already exists"}), 400
-    pw_hash = bcrypt.generate_password_hash(body['password']).decode('utf-8') #Encriptamos la contraseña.
-    new_user = User()
-    new_user.firstName = body['firstName']
-    new_user.lastName = body['lastName']
-    new_user.email = body['email']
-    new_user.password = pw_hash
-    new_user.isActive = True
-    new_user.userType = 'cliente'
+    pw_hash = bcrypt.generate_password_hash(body['password']).decode('utf-8')
+    
+    new_user = User(
+        firstName=body['firstName'],
+        lastName=body['lastName'],
+        email=body['email'],
+        password=pw_hash,
+        isActive=True,
+        userType=UserTypeEnum.usuario  # Asegúrate de que esto sea correcto
+    )
     db.session.add(new_user)
     db.session.commit()
     return jsonify ({'msg': 'New User Created'}), 201
