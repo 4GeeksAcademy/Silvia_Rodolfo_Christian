@@ -69,7 +69,7 @@ def serve_any_other_file(path):
 @app.route('/forms', methods=['GET'])
 def get_forms():
     try:
-        all_forms = Form.query.()  # Obtiene todos los registros de la tabla Form
+        all_forms = Form.query.all()  # Obtiene todos los registros de la tabla Form
         # Aplica el método to_dict() a cada objeto Form en la lista
         all_forms_serialize=[]
         for form in all_forms:

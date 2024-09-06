@@ -1,6 +1,19 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Enum
+import enum
 
 db = SQLAlchemy()
+# Definir el Enum en Python para UserType
+class UserTypeEnum(enum.Enum):
+    tecnico = "tecnico"
+    usuario = "usuario"
+
+class StockTypeEnum(enum.Enum):
+    monitor = "monitor"
+    teclado = "teclado"
+    cable = "cable"
+    mouse = "mouse"
+    camara= "camara"
 
 class User(db.Model):
     __tablename__='user'
@@ -10,7 +23,8 @@ class User(db.Model):
     lastName = db.Column(db.String(20), nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
     isActive = db.Column(db.Boolean(), unique=False, nullable=False)
-    userType= db.Column(db.String(10), nullable=False)
+    # Definir userType como Enum con opciones "tecnico" y "usuario"
+    userType = db.Column(Enum(UserTypeEnum), nullable=False)
 
     def __repr__(self):
         return f'<User {self.email}>'
@@ -19,11 +33,11 @@ class User(db.Model):
         return {
             "id": self.id,
             "email": self.email,
-            "nombre": self.nombre,
-            "apellido": self.apellido,
+            "firstName": self.firstName,
+            "lastName": self.lastName,
             "password":self.password,
             "isActive":self.isActive,
-            "userType": self.userType
+            "userType": self.userType.value  # Convertir el Enum a su valor (cadena)
             # do not serialize the password, its a security breach
         }
     
@@ -32,8 +46,8 @@ class Stock(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(30), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
-    stockType = db.Column(db.String(30), nullable=False)
-    image = db.Column(db.String(250), nullable=False)
+    type=db.Column(Enum(StockTypeEnum), nullable=False)
+    image= db.Column(db.String(250), nullable=False)
     def __repr__(self):
         return f'<Stock {self.id}>'
 
@@ -42,7 +56,7 @@ class Stock(db.Model):
             "id": self.id,
             "description": self.description,
             "quantity": self.quantity,
-            "type": self.stockType,
+            "type": self.stockType.value,  # Convertir el Enum a su valor (cadena)
             "image": self.image
         }
     
@@ -62,7 +76,7 @@ class Form(db.Model):
             "id": self.id,
             "initialDate": self.initialDate,
             "finalDate": self.finalDate,
-            "userId": self.id
+            "userId": self.id,
         }
     
 class DetailForm(db.Model):
@@ -74,7 +88,7 @@ class DetailForm(db.Model):
     stock_relationship =db.relationship("Stock")
     description = db.Column(db.String(30), nullable=False)
     quantity = db.Column(db.String(30), nullable=False)
-    stockType = db.Column(db.String(30), nullable=False)
+    type = type=db.Column(Enum(StockTypeEnum), nullable=False)
     
     
     def __repr__(self):
@@ -87,5 +101,5 @@ class DetailForm(db.Model):
             "stockId": self.stockId,
             "description": self.description,
             "quantity": self.quantity,
-            "type": self.stockType,
+            "type": self.stockType.value,  # Convertir el Enum a su valor (cadena)
         }
