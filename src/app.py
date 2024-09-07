@@ -84,54 +84,70 @@ def serve_any_other_file(path):
 @app.route('/register', methods=['POST'])
 def register():
     body = request.get_json(silent=True)
+    
     if body is None:
-        return jsonify ({'msg': 'Fields cannot be left empty'}), 400 #Verificamos que los campos no estén vacíos body['campo']
-    if not body['firstName']:
+        return jsonify({'msg': 'Fields cannot be left empty'}), 400
+    
+    first_name = body.get('firstName')
+    last_name = body.get('lastName')
+    email = body.get('email')
+    password = body.get('password')
+    
+    if not first_name:
         return jsonify({'msg': 'The firstName field cannot be empty'}), 400
-    if not body['lastName']:
+    if not last_name:
         return jsonify({'msg': 'The lastName field cannot be empty'}), 400
-    if not body['email']:
+    if not email:
         return jsonify({'msg': 'The email field cannot be empty'}), 400
-    if not body['password']:
+    if not password:
         return jsonify({'msg': 'The password field cannot be empty'}), 400
-    user = User.query.filter_by(email=body['email']).first() #Buscamos el primer(.first()) usuario por email.
+
+    user = User.query.filter_by(email=email).first()
     if user:
         return jsonify({"msg": "The user already exists"}), 400
-    pw_hash = bcrypt.generate_password_hash(body['password']).decode('utf-8')
+
+    pw_hash = bcrypt.generate_password_hash(password).decode('utf-8') #Hasheamos la contraseña del usuario.
     
     new_user = User(
-        firstName=body['firstName'],
-        lastName=body['lastName'],
-        email=body['email'],
+        firstName=first_name,
+        lastName=last_name,
+        email=email,
         password=pw_hash,
         isActive=True,
-        userType=UserTypeEnum.usuario  # Asegúrate de que esto sea correcto
+        userType=UserTypeEnum.usuario
     )
     db.session.add(new_user)
     db.session.commit()
-    return jsonify ({'msg': 'New User Created'}), 201
+    return jsonify({'msg': 'New User Created'}), 201
+
 
 @app.route('/login', methods=['POST'])
 def login():
     body = request.get_json(silent=True)
+    
     if body is None:
-        return jsonify ({'msg': 'Fields cannot be left empty'}), 400 #Verificamos que los campos no estén vacíos body['campo']
-    if not body['email']:
-        return jsonify ({'msg': 'The email field cannot be empty'}), 400
-    if not body['password']:
-        return jsonify ({'msg': 'The password field cannot be empty'}), 400
-    user= User.query.filter_by(email=body['email']).first() #Buscamos al usuario mediante su email.
+        return jsonify({'msg': 'Fields cannot be left empty'}), 400
+    
+    email = body.get('email')#.get() para acceder a una clave en un diccionario que no existe, devolverá None en lugar de lanzar una excepción.
+    password = body.get('password')
+    #Si lanza None el condicional no dejará que el campo esté vacío(buenas prácticas la combinación)
+    if not email:
+        return jsonify({'msg': 'The email field cannot be empty'}), 400
+    if not password:
+        return jsonify({'msg': 'The password field cannot be empty'}), 400
+
+    user = User.query.filter_by(email=email).first() #Buscamos al usuario mediante su email:
     if user is None:
-        return jsonify ({'msg': 'User o password invalids'}), 400
-    password_db = user.password #accedemos a la contraseña del usuario.
-    password_true = bcrypt.check_password_hash(password_db, body['password']) #Comparamos la contraseña de la BD(encriptada) con la que ingresó el usuario.
-    if password_true is False: #Si las contraseñas no son iguales retornamos un mensaje de error:
-        return jsonify ({'msg': 'User o password invalids'}), 400
-    #Si todo es ok se genera el token y se le entrega al usuario:
+        return jsonify({'msg': 'User or password invalids'}), 400
+
+    password_db = user.password #Recuperamos el hash de la contraseña del usuario desde la base de datos. Este hash es el que se generó cuando el usuario creó su cuenta.
+    password_true = bcrypt.check_password_hash(password_db, password) #Compara la contraseña ingresada con el hash almacenado.
+    if not password_true: #Si no coinciden la contraseña con el hash, retorna el mensaje:
+        return jsonify({'msg': 'User or password invalids'}), 400
+
     expires = timedelta(hours=1) #Tiempo de expiración del token.
-    acces_token = create_access_token(identity = user.email, expires_delta = expires) #Creamos el token con la configuración de expiración.
-    return jsonify ({'msg': 'ok',
-                     'jwt_token': acces_token}), 200
+    access_token = create_access_token(identity=user.email, expires_delta=expires)#Creamos el token y usamos el email como identidad.
+    return jsonify({'msg': 'ok', 'jwt_token': access_token}), 200
 
 
 # this only runs if `$ python src/main.py` is executed
