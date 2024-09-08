@@ -57,6 +57,7 @@ export const Home = () => {
 						<button type="button" className="btn btn-primary fw-light" style={{ backgroundColor: "#4F9CF9", border: "none" }}>
 							Sign up <i className="fa-solid fa-arrow-right fa-sm" />
 						</button>
+
 					</div>
 				</div>
 				<img src={yeti} style={{ zIndex: 0, width: "300px", bottom: "200px", left: "550px" }} className="position-absolute" />
