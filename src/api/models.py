@@ -88,7 +88,7 @@ class DetailForm(db.Model):
     stock_relationship =db.relationship("Stock")
     description = db.Column(db.String(30), nullable=False)
     quantity = db.Column(db.String(30), nullable=False)
-    type = type=db.Column(Enum(StockTypeEnum), nullable=False)
+    type = type=db.Column(Enum(StockTypeEnum), nullable=False) #Endpoint PUT (usuario)
     
     
     def __repr__(self):

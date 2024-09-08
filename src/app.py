@@ -149,6 +149,17 @@ def login():
     access_token = create_access_token(identity=user.email, expires_delta=expires)#Creamos el token y usamos el email como identidad.
     return jsonify({'msg': 'ok', 'jwt_token': access_token}), 200
 
+@app.route('/form', methods=['PUT'])
+@jwt_required()
+def update_form():
+    current_user = get_jwt_identity()
+    body = request.get_json(silent=True)
+    user = User.query.filter_by(email=current_user).first()
+
+    if body is None:
+        return jsonify ({'msg': 'Fields cannot be left empty'})
+    
+
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
