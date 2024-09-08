@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db, User, UserTypeEnum, DetailForm, StockTypeEnum
+from api.models import db, User, UserTypeEnum, DetailForm, StockTypeEnum, Form
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
@@ -158,9 +158,9 @@ def update_form(detail_id): #detail_id es el identificador único del detalle de
     
     if user is None: #Validamos la existencia del usuario.
         return jsonify ({'msg': 'User Not Found'}), 404
-
-    if body is None:
-        return jsonify({'msg': 'Fields cannot be left empty'}), 400
+    
+    if not body: #verificamos si body es None o un diccionario vacío.
+        return jsonify({'msg': 'Fields cannot be left empty'}), 400 
     #formId enviado en la solicitud para saber qué formulario está asociado con el detalle del producto que estoy actualizando. 
     form_id = body.get('formId') 
     quantity_value = body.get('quantity')
@@ -173,10 +173,9 @@ def update_form(detail_id): #detail_id es el identificador único del detalle de
     if detail_form is None: #Validamos la existencia del id del detalle del producto.
         return jsonify ({'msg': 'DetailForm does not exist'}), 404
     
-    form = form.query.get(form_id) 
+    form = Form.query.get(form_id) #Verificamos que el form_Id (que se refiere a la columna id en Form) sea válido en la tabla Form:
     if form is None:
         return jsonify ({'msg': 'Form does not exist'}), 404
-
     if not quantity_value:
         return jsonify ({'msg': 'You have to place an amount'}), 400
     if not type_value:
