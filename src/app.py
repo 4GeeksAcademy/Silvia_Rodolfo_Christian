@@ -119,6 +119,7 @@ def register():
     db.session.add(new_user)
     db.session.commit()
     return jsonify({'msg': 'New User Created'}), 201
+
 @app.route('/stock', methods=['GET'])
 def get_stock():
     try:
@@ -149,6 +150,22 @@ def get_stock():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+    
+@app.route('/stock/available', methods=['GET'])
+def get_available_stock():
+    try:
+        # Filtrar los stocks que tengan quantity mayor a 0
+        available_stock = Stock.query.filter(Stock.quantity > 0).all()
+
+        # Si no hay resultados
+        if not available_stock:
+            return jsonify({"message": "No items found"}), 404
+
+        # Devolver los resultados en formato JSON
+        return jsonify([stock.serialize() for stock in available_stock]), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400    
 
 @app.route('/login', methods=['POST'])
 def login():
