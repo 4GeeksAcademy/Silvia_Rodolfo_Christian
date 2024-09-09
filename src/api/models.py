@@ -68,7 +68,7 @@ class Form(db.Model):
     user_relationship =db.relationship("User")
     
     def __repr__(self):
-        return f'<form {self.id}>'
+        return f'<form:{self.id},Initial Date:{self.initialDate},Final Date:{self.finalDate},User:{self.userId}>'
 
     def serialize(self):
         return {
