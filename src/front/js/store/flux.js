@@ -13,7 +13,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 					background: "white",
 					initial: "white"
 				}
-			]
+			],
+			cart: []
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -46,6 +47,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 				//reset the global store
 				setStore({ demo: demo });
+			},
+			deleteItem: (name) => {
+				const store = getStore();
+				setStore({ cart: store.cart.filter(item => item[0] !== name) });
 			}
 		}
 	};

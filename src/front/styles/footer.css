@@ -1,0 +1,29 @@
+.footer {
+    background-color: #043873; /* Color de fondo similar */
+    color: white;
+    padding: 20px 0;
+}
+.footer-logo {
+    text-align: center;
+}
+.footer .social-icons {
+    margin-left: 20px;
+}
+.footer h6, li {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.footer i {
+    margin: 0px 5px;
+}
+.footer a {
+    color: white;
+}
+.footer li {
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
+.footer .name {
+flex-grow: 1; /* Ocupa el espacio disponible */
+}

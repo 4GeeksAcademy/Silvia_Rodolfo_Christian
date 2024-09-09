@@ -63,8 +63,7 @@ class Stock(db.Model):
 class Form(db.Model):
     __tablename__='form'
     id = db.Column(db.Integer, primary_key=True)
-    initialDate = db.Column(db.Date, nullable=False)
-    finalDate = db.Column(db.Date, nullable=False)
+    date=db.Column(db.Date, nullable=False)
     userId = db.Column(db.Integer, db.ForeignKey('user.id'),nullable=False)
     user_relationship =db.relationship("User")
     
@@ -77,6 +76,7 @@ class Form(db.Model):
             "initialDate": self.initialDate,
             "finalDate": self.finalDate,
             "userId": self.id,
+            "date":self.date
         }
     
 class DetailForm(db.Model):
@@ -89,6 +89,8 @@ class DetailForm(db.Model):
     description = db.Column(db.String(30), nullable=False)
     quantity = db.Column(db.String(30), nullable=False)
     type = type=db.Column(Enum(StockTypeEnum), nullable=False)
+    initialDate = db.Column(db.Date, nullable=False)
+    finalDate = db.Column(db.Date, nullable=False)
     
     
     def __repr__(self):
