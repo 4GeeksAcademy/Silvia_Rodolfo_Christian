@@ -30,7 +30,7 @@ export const Navbar = () => {
 		<nav className="navbar" style={{ backgroundColor: "#043873" }}>
 			<div className="container d-flex">
 				<Link to="/">
-					<img src={logoNavbar} />
+					<img src={logoNavbar} style={{width: "200px"}} />
 				</Link>
 				<div className="d-flex align-items-center ms-auto gap-2">
 					<button onClick={handleLogin} type="button" className="btn ms-auto" style={{ backgroundColor: "#FFE492" }}>
