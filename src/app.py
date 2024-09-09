@@ -203,19 +203,4 @@ def update_form(detail_id): #detail_id es el identificador único del detalle de
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))
     app.run(host='0.0.0.0', port=PORT, debug=True)
-    '''@app.route('/promote_to_admin', methods=['POST'])
-def promote_to_admin():
-    if current_user.user_type != "admin":  # Solo un admin puede promover
-        return jsonify({"msg": "Access denied"}), 403
-
-    data = request.get_json()
-    user_id = data.get('user_id')
-
-    user = User.query.get(user_id)
-    if not user:
-        return jsonify({"msg": "User not found"}), 404
-
-    user.user_type = "admin"
-    db.session.commit()
-
-    return jsonify({"msg": f"User {user.email} promoted to admin"}), 200'''
+   

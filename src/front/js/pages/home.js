@@ -54,10 +54,11 @@ export const Home = () => {
 					<h3 className="px-5 fw-normal">Book your material</h3>
 					<h6 className="px-5 fw-light" style={{ marginTop: "80px" }}>If you do not yet have an account</h6>
 					<div className="px-5">
-						<button type="button" className="btn btn-primary fw-light" style={{ backgroundColor: "#4F9CF9", border: "none" }}>
-							Sign up <i className="fa-solid fa-arrow-right fa-sm" />
-						</button>
-
+						<Link to='/register'>
+							<button type="button" className="btn btn-primary fw-light" style={{ backgroundColor: "#4F9CF9", border: "none" }}>
+								Sign up <i className="fa-solid fa-arrow-right fa-sm" />
+							</button>
+						</Link>
 					</div>
 				</div>
 				<img src={yeti} style={{ zIndex: 0, width: "300px", bottom: "200px", left: "550px" }} className="position-absolute" />
