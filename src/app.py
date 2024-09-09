@@ -7,13 +7,12 @@ from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
 from api.models import db, User, UserTypeEnum, Stock,StockTypeEnum,Form,DetailForm
-from api.models import db, User, UserTypeEnum, Stock, StockTypeEnum, Form, DetailForm
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
 
 from flask_cors import CORS
-from flask_jwt_extended import create_access_token #Importamos las librerias necesarias.
+from flask_jwt_extended import create_access_token #Importamos las librerias necesarias del token.
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
