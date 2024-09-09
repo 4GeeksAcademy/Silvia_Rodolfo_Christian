@@ -66,10 +66,10 @@ def serve_any_other_file(path):
     response = send_from_directory(static_file_dir, path)
     response.cache_control.max_age = 0  # avoid cache memory
     return response
-@app.route('/forms', methods=['GET'])
+@app.route('/allforms', methods=['GET'])
 def get_forms():
     try:
-        all_forms = Form.query.all()  # Obtiene todos los registros de la tabla Form
+        all_forms = Form.query.allgit()  # Obtiene todos los registros de la tabla Form
         # Aplica el método to_dict() a cada objeto Form en la lista
         all_forms_serialize=[]
         for form in all_forms:
