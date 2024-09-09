@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import linea from "../../img/linea.png"
 import yeti from "../../img/yeti.png"
-import "../../styles/home.css";
+import React, { useState } from 'react'; //Permite manejar el estado (variables que cambian).
 import { Link, useNavigate } from "react-router-dom";
+import "../../styles/home.css";
+
 
 export const Home = () => {
 	const [email, setEmail] = useState(""); //Estado para guardar el valor del email que el usuario ingresa. setemail es la función para actualizar este valor.
 	const [password, setPassword] = useState(""); //Crea un estado similar para la contraseña.
 	const navigate = useNavigate(); //Crea una función que se puede usar para redirigir a otras páginas.
 	const apiUrl = process.env.BACKEND_URL; //Obtiene la URL base de la API desde las variables de entorno.
+
 
 	const handleSubmit = async (event) => { //Función que se ejecuta cuando el usuario envía el formulario.
 		event.preventDefault(); //Evita que el formulario se envíe de manera predeterminada, lo cual recargaría la página.
@@ -63,10 +66,10 @@ export const Home = () => {
 				<form onSubmit={handleSubmit}>
 					<h2 className="fw-light mb-3">Sign in</h2>
 					<div className="mb-5">
-						<input type="email" className="form-control form-control-lg fw-light fs-6 input" style={{ backgroundColor: "#D3E7FF" }} id="email" placeholder="Enter email" onChange={(e) => setEmail(e.target.value)} />
+						<input value={email} onChange={(e) => setEmail(e.target.value)} type="email" className="form-control form-control-lg fw-light fs-6 input" style={{ backgroundColor: "#D3E7FF" }} id="email" placeholder="Enter email" />
 					</div>
 					<div className="mb-3">
-						<input type="password" className="form-control form-control-lg fw-light fs-6 input" style={{ backgroundColor: "#D3E7FF" }} id="password" placeholder="Enter password" onChange={(e) => setPassword(e.target.value)} />
+						<input value={password} onChange={(e) => setPassword(e.target.value)} type="password" className="form-control form-control-lg fw-light fs-6 input" style={{ backgroundColor: "#D3E7FF" }} id="password" placeholder="Enter password" />
 						<div id="forgotPassword" className="form-text text-end">Forgot your password?</div>
 					</div>
 					<button type="submit" className="btn btn-primary btn-lg fw-light mt-3 btn-login" style={{ backgroundColor: "#4F9CF9", border: "none", width: "100%" }}>Login</button>
