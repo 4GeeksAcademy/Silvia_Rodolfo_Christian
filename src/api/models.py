@@ -88,7 +88,7 @@ class DetailForm(db.Model):
     stock_relationship =db.relationship("Stock")
     description = db.Column(db.String(30), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
-    stocktype = type=db.Column(Enum(StockTypeEnum), nullable=False)
+    stocktype = db.Column(Enum(StockTypeEnum), nullable=False)
     initialDate = db.Column(db.Date, nullable=False)
     finalDate = db.Column(db.Date, nullable=False)
     
