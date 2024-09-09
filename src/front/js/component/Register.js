@@ -37,7 +37,7 @@ const Register = () => {
             }
             const data = await response.json(); //Convierte la respuesta de la API en formato JSON.
 
-            if (data.msg === "Nuevo usuario creado") { //Si la respuesta indica que el usuario fue creado:
+            if (data.msg === "New User Created") { //Si la respuesta indica que el usuario fue creado:
                 navigate('/login'); //Redirige al usuario a la página de inicio de sesión.
             } else {
                 alert("Error al crear usuario"); //Si algo salió mal, muestra una alerta.
