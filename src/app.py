@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db, User, UserTypeEnum
+from api.models import db, User, UserTypeEnum, StockTypeEnum, Form, DetailForm
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
@@ -124,19 +124,19 @@ def register():
 def create_form():
         
          # Extraer datos del cuerpo de la solicitud
-         data = request.get_json()
+         body = request.get_json(silent=True)
 
         # Crear la instancia de Form
          new_form = Form(
-             initialDate=data['initialDate'],
-             finalDate=data['finalDate'],
-             userId=data['userId']
+             initialDate=body.get('initialDate'),
+             finalDate=body.get('finalDate'),
+             userId=body.get('userId')
          )
          db.session.add(new_form)
          db.session.commit()  # Necesario para generar el id del form antes de añadir los detalles
 
          # Agregar los DetailForm
-         for detail in data.get('details', []):
+         for detail in body.get('details', []):
              new_detail = DetailForm(
                  formId=new_form.id,
                  stockId=detail['stockId'],
