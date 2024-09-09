@@ -6,7 +6,9 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
+
 from api.models import db, User, UserTypeEnum, Stock, StockTypeEnum, Form, DetailForm
+
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
@@ -120,6 +122,44 @@ def register():
     db.session.commit()
     return jsonify({'msg': 'New User Created'}), 201
 
+
+@app.route('/form', methods=['POST'])
+def create_form():
+        
+         # Extraer datos del cuerpo de la solicitud
+         body = request.get_json(silent=True)
+
+        # Crear la instancia de Form
+         new_form = Form(
+             initialDate=body.get('initialDate'),
+             finalDate=body.get('finalDate'),
+             userId=body.get('userId')
+         )
+         db.session.add(new_form)
+         db.session.commit()  # Necesario para generar el id del form antes de añadir los detalles
+
+         # Agregar los DetailForm
+         for detail in body.get('details', []):
+             new_detail = DetailForm(
+                 formId=new_form.id,
+                 stockId=detail['stockId'],
+                 description=detail['description'],
+                 quantity=detail['quantity'],
+                 type=StockTypeEnum(detail['type'])  # Usamos el Enum para asignar el tipo
+            )
+             db.session.add(new_detail)
+
+         # Confirmar la transacción para los DetailForm
+         db.session.commit()
+
+         # Devolver la respuesta con los datos del Form creado
+         return jsonify({
+             "message": "Form and details created successfully",
+             "form": new_form.serialize(),
+             "details": [detail.serialize() for detail in new_form.form_relationship]  # Devolver los detalles del form
+         }), 201
+
+
 @app.route('/stock', methods=['GET'])
 def get_stock():
     try:
@@ -166,6 +206,7 @@ def get_available_stock():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 400    
+
 
 @app.route('/login', methods=['POST'])
 def login():
