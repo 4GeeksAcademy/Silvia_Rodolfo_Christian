@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db, User, UserTypeEnum, DetailForm, StockTypeEnum, Form
+from api.models import db, User, UserTypeEnum, Stock, StockTypeEnum, Form, DetailForm
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
@@ -64,11 +64,11 @@ def handle_invalid_usage(error):
 # generate sitemap with all your endpoints
 
 
-@app.route('/')
-def sitemap():
-    if ENV == "development":
-        return generate_sitemap(app)
-    return send_from_directory(static_file_dir, 'index.html')
+# @app.route('/')
+# def sitemap():
+#     if ENV == "development":
+#         return generate_sitemap(app)
+#     return send_from_directory(static_file_dir, 'index.html')
 
 # any other endpoint will try to serve it like a static file
 
@@ -80,6 +80,23 @@ def serve_any_other_file(path):
     response = send_from_directory(static_file_dir, path)
     response.cache_control.max_age = 0  # avoid cache memory
     return response
+
+@app.route('/allforms', methods=['GET'])
+def get_forms():
+    try:
+        all_forms = Form.query.allgit()  # Obtiene todos los registros de la tabla Form
+        # Aplica el método to_dict() a cada objeto Form en la lista
+        all_forms_serialize=[]
+        for form in all_forms:
+            all_forms_serialize.append(form.serialize())
+        
+        response_body = {
+            "data": all_forms_serialize
+        }
+        return jsonify(response_body), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -121,6 +138,91 @@ def register():
     return jsonify({'msg': 'New User Created'}), 201
 
 
+@app.route('/form', methods=['POST'])
+def create_form():
+        
+         # Extraer datos del cuerpo de la solicitud
+         body = request.get_json(silent=True)
+
+        # Crear la instancia de Form
+         new_form = Form(
+             initialDate=body.get('initialDate'),
+             finalDate=body.get('finalDate'),
+             userId=body.get('userId')
+         )
+         db.session.add(new_form)
+         db.session.commit()  # Necesario para generar el id del form antes de añadir los detalles
+
+         # Agregar los DetailForm
+         for detail in body.get('details', []):
+             new_detail = DetailForm(
+                 formId=new_form.id,
+                 stockId=detail['stockId'],
+                 description=detail['description'],
+                 quantity=detail['quantity'],
+                 type=StockTypeEnum(detail['type'])  # Usamos el Enum para asignar el tipo
+            )
+             db.session.add(new_detail)
+
+         # Confirmar la transacción para los DetailForm
+         db.session.commit()
+
+         # Devolver la respuesta con los datos del Form creado
+         return jsonify({
+             "message": "Form and details created successfully",
+             "form": new_form.serialize(),
+             "details": [detail.serialize() for detail in new_form.form_relationship]  # Devolver los detalles del form
+         }), 201
+
+
+@app.route('/stock', methods=['GET'])
+def get_stock():
+    try:
+        # Obtener parámetros de consulta
+        stock_id = request.args.get('id')
+        description = request.args.get('description')
+        stock_type = request.args.get('type')
+
+        # Construir la consulta con filtros opcionales
+        query = Stock.query
+
+        if stock_id:
+            query = query.filter_by(id=stock_id)
+        if description:
+            query = query.filter(Stock.description.like(f'%{description}%'))  # Filtrado por descripción parcial
+        if stock_type:
+            query = query.filter_by(type=StockTypeEnum(stock_type))
+
+        # Ejecutar la consulta
+        stock_items = query.all()
+
+        # Si no hay resultados
+        if not stock_items:
+            return jsonify({"message": "No items found"}), 404
+
+        # Devolver los resultados en formato JSON
+        return jsonify([stock.serialize() for stock in stock_items]), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+    
+@app.route('/stock/available', methods=['GET'])
+def get_available_stock():
+    try:
+        # Filtrar los stocks que tengan quantity mayor a 0
+        available_stock = Stock.query.filter(Stock.quantity > 0).all()
+
+        # Si no hay resultados
+        if not available_stock:
+            return jsonify({"message": "No items found"}), 404
+
+        # Devolver los resultados en formato JSON
+        return jsonify([stock.serialize() for stock in available_stock]), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400    
+
+
 @app.route('/login', methods=['POST'])
 def login():
     body = request.get_json(silent=True)
@@ -149,54 +251,6 @@ def login():
     access_token = create_access_token(identity=user.email, expires_delta=expires)#Creamos el token y usamos el email como identidad.
     return jsonify({'msg': 'ok', 'jwt_token': access_token}), 200
 
-@app.route('/form/<int:detail_id>', methods=['PUT'])
-@jwt_required()
-def update_form(detail_id): #detail_id es el identificador único del detalle de un producto específico en la tabla DetailForm.
-    current_user = get_jwt_identity()  #Obtenemos la identidad del usuario autenticado:
-    user = User.query.filter_by(email=current_user).first() #Mediante su email.
-    body = request.get_json(silent=True) #Obtenemos datos en formato JSON del body del fetch y devuelve un diccionario en Python.
-    
-    if user is None: #Validamos la existencia del usuario.
-        return jsonify ({'msg': 'User Not Found'}), 404
-    
-    if not body: #verificamos si body es None o un diccionario vacío.
-        return jsonify({'msg': 'Fields cannot be left empty'}), 400 
-    #formId enviado en la solicitud para saber qué formulario está asociado con el detalle del producto que estoy actualizando. 
-    form_id = body.get('formId') 
-    quantity_value = body.get('quantity')
-    type_value = body.get('type')
-    initial_date = body.get('initialDate')
-    final_date = body.get('finalDate')
-
- #Hacemos una consulta a DetailForm y buscamos un registro que coincida con detail_id (DetailForm.Id)
-    detail_form = DetailForm.query.get(detail_id) 
-    if detail_form is None: #Validamos la existencia del id del detalle del producto.
-        return jsonify ({'msg': 'DetailForm does not exist'}), 404
-    
-    form = Form.query.get(form_id) #Verificamos que el form_Id (que se refiere a la columna id en Form) sea válido en la tabla Form:
-    if form is None:
-        return jsonify ({'msg': 'Form does not exist'}), 404
-    if not quantity_value:
-        return jsonify ({'msg': 'You have to place an amount'}), 400
-    if not type_value:
-        return jsonify ({'msg': 'You have to choose a type of product'}), 400
-    if not initial_date:
-        return jsonify ({'msg': 'You have to choose a initial date'}), 400
-    if not final_date:
-        return jsonify ({'msg': 'You have to choose a final date'}), 400
-#Después de obtener el form_id del body de la solicitud, asigno al registro detail_form, asociando así el detalle del producto con el formulario especificado.  
-    detail_form.formId = form_id 
-    detail_form.quantity = quantity_value
-    detail_form.type = type_value 
-    detail_form.initialDate = initial_date
-    detail_form.finalDate = final_date
-
-    db.session.commit()
-    return jsonify ({'msg': 'DetailForm updated successfully'}), 200
-
-#Type:Solamente muestra el tipo de periferico más no es modificable.????
-        
-    
 
 
 # this only runs if `$ python src/main.py` is executed
