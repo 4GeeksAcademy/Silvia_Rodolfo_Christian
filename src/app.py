@@ -6,7 +6,9 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db, User, UserTypeEnum, StockTypeEnum, Form, DetailForm
+
+from api.models import db, User, UserTypeEnum, Stock, StockTypeEnum, Form, DetailForm
+
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
@@ -120,6 +122,7 @@ def register():
     db.session.commit()
     return jsonify({'msg': 'New User Created'}), 201
 
+
 @app.route('/form', methods=['POST'])
 def create_form():
         
@@ -155,6 +158,54 @@ def create_form():
              "form": new_form.serialize(),
              "details": [detail.serialize() for detail in new_form.form_relationship]  # Devolver los detalles del form
          }), 201
+
+
+@app.route('/stock', methods=['GET'])
+def get_stock():
+    try:
+        # Obtener parámetros de consulta
+        stock_id = request.args.get('id')
+        description = request.args.get('description')
+        stock_type = request.args.get('type')
+
+        # Construir la consulta con filtros opcionales
+        query = Stock.query
+
+        if stock_id:
+            query = query.filter_by(id=stock_id)
+        if description:
+            query = query.filter(Stock.description.like(f'%{description}%'))  # Filtrado por descripción parcial
+        if stock_type:
+            query = query.filter_by(type=StockTypeEnum(stock_type))
+
+        # Ejecutar la consulta
+        stock_items = query.all()
+
+        # Si no hay resultados
+        if not stock_items:
+            return jsonify({"message": "No items found"}), 404
+
+        # Devolver los resultados en formato JSON
+        return jsonify([stock.serialize() for stock in stock_items]), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+    
+@app.route('/stock/available', methods=['GET'])
+def get_available_stock():
+    try:
+        # Filtrar los stocks que tengan quantity mayor a 0
+        available_stock = Stock.query.filter(Stock.quantity > 0).all()
+
+        # Si no hay resultados
+        if not available_stock:
+            return jsonify({"message": "No items found"}), 404
+
+        # Devolver los resultados en formato JSON
+        return jsonify([stock.serialize() for stock in available_stock]), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400    
 
 
 @app.route('/login', methods=['POST'])
