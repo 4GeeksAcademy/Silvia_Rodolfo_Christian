@@ -1,6 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Enum
+from sqlalchemy.dialects.postgresql import UUID
 import enum
+import uuid
 
 db = SQLAlchemy()
 # Definir el Enum en Python para UserType
@@ -106,4 +108,22 @@ class DetailForm(db.Model):
             "initialDate": self.initialDate,
             "finalDate": self.finalDate,
             "stocktype": self.stockType.value,  # Convertir el Enum a su valor (cadena)
+        }
+
+# Modelo UserUUID
+class UserUUID(db.Model):
+    __tablename__ = 'user_uuid'
+    id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(UUID(as_uuid=True), default=uuid.uuid4, unique=True, nullable=False)
+    userId = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_relationship = db.relationship('User', backref=db.backref('uuids', lazy=True))
+
+    def __repr__(self):
+        return f'<UserUUID {self.uuid}>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "uuid": str(self.uuid),  # Convertir UUID a cadena
+            "userId": self.userId
         }

@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db, User, UserTypeEnum, Stock,StockTypeEnum,Form,DetailForm
+from api.models import db, User, UserTypeEnum, Stock,StockTypeEnum,Form,DetailForm,UserUUID
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
@@ -205,7 +205,50 @@ def get_stock():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+@app.route('/stock/<int:id>', methods=['PUT'])
+def update_stock(id):
+    stock = Stock.query.get(id)
+    if not stock:
+        return jsonify({"message": "Stock not found"}), 404
     
+    data = request.get_json()
+    stock.description = data.get('description', stock.description)
+    stock.quantity = data.get('quantity', stock.quantity)
+    stock.type = StockTypeEnum(data['type']) if 'type' in data else stock.type
+    stock.image = data.get('image', stock.image)
+
+    db.session.commit()
+    return jsonify(stock.serialize()), 200
+
+# Ruta GET para obtener todos o uno específico de UserUUID
+@app.route('/user_uuid', methods=['GET'])
+@app.route('/user_uuid/<int:id>', methods=['GET'])
+def get_user_uuid(id=None):
+    if id:
+        user_uuid = UserUUID.query.get(id)
+        if not user_uuid:
+            return jsonify({"message": "UUID not found"}), 404
+        return jsonify(user_uuid.serialize()), 200
+    else:
+        user_uuids = UserUUID.query.all()
+        return jsonify([uuid.serialize() for uuid in user_uuids]), 200
+
+# Ruta POST para crear un nuevo UserUUID
+@app.route('/user_uuid', methods=['POST'])
+def create_user_uuid():
+    data = request.get_json()
+    user_id = data.get('userId')
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    new_uuid = UserUUID(userId=user_id)
+    db.session.add(new_uuid)
+    db.session.commit()
+
+    return jsonify(new_uuid.serialize()), 201
+
 @app.route('/stock/available', methods=['GET'])
 def get_available_stock():
     try:
