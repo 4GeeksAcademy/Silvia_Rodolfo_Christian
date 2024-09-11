@@ -14,7 +14,7 @@ from api.commands import setup_commands
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token #Importamos las librerias necesarias.
 from flask_jwt_extended import get_jwt_identity
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_jwt_extended import JWTManager
 from datetime import timedelta #Importamos "timedelta" de datetime para modificar el tiempo de expiración de nuestro token.
 from flask_bcrypt import Bcrypt
@@ -82,6 +82,7 @@ def serve_any_other_file(path):
     return response
 
 @app.route('/allforms', methods=['GET'])
+@jwt_required()
 def get_forms():
     try:
         all_forms = Form.query.allgit()  # Obtiene todos los registros de la tabla Form
@@ -139,22 +140,23 @@ def register():
 
 
 @app.route('/form', methods=['POST'])
+@jwt_required()
 def create_form():
-        
+        current_user_id = get_jwt_identity()  # Usuario autenticado
          # Extraer datos del cuerpo de la solicitud
-         body = request.get_json(silent=True)
+        body = request.get_json(silent=True)
 
         # Crear la instancia de Form
-         new_form = Form(
+        new_form = Form(
              initialDate=body.get('initialDate'),
              finalDate=body.get('finalDate'),
              userId=body.get('userId')
          )
-         db.session.add(new_form)
-         db.session.commit()  # Necesario para generar el id del form antes de añadir los detalles
+        db.session.add(new_form)
+        db.session.commit()  # Necesario para generar el id del form antes de añadir los detalles
 
          # Agregar los DetailForm
-         for detail in body.get('details', []):
+        for detail in body.get('details', []):
              new_detail = DetailForm(
                  formId=new_form.id,
                  stockId=detail['stockId'],
@@ -165,10 +167,10 @@ def create_form():
              db.session.add(new_detail)
 
          # Confirmar la transacción para los DetailForm
-         db.session.commit()
+        db.session.commit()
 
          # Devolver la respuesta con los datos del Form creado
-         return jsonify({
+        return jsonify({
              "message": "Form and details created successfully",
              "form": new_form.serialize(),
              "details": [detail.serialize() for detail in new_form.form_relationship]  # Devolver los detalles del form
@@ -176,7 +178,9 @@ def create_form():
 
 
 @app.route('/stock', methods=['GET'])
+@jwt_required()
 def get_stock():
+    current_user_id = get_jwt_identity()  # Usuario autenticado
     try:
         # Obtener parámetros de consulta
         stock_id = request.args.get('id')
@@ -207,15 +211,16 @@ def get_stock():
         return jsonify({"error": str(e)}), 400
 
 @app.route('/stock', methods=['POST'])
+@jwt_required()
 def create_stock():
-    data = request.get_json()
+    current_user_id = get_jwt_identity()  # Usuario autenticado
+    body = request.get_json(silent=True)
     
-    description = data.get('description')
-    quantity = data.get('quantity')
-    stock_type = data.get('type')
-    image = data.get('image')
+    description = body.get('description')
+    quantity = body.get('quantity')
+    stock_type = body.get('type')
+    image = body.get('image')
     
-    # Validación básica
     if not description or not quantity or not stock_type or not image:
         return jsonify({"message": "Missing required fields"}), 400
 
@@ -236,21 +241,24 @@ def create_stock():
 
 
 @app.route('/stock/<int:id>', methods=['PUT'])
+@jwt_required()
 def update_stock(id):
     stock = Stock.query.get(id)
+    current_user_id = get_jwt_identity()  # Usuario autenticado
     if not stock:
         return jsonify({"message": "Stock not found"}), 404
     
-    data = request.get_json()
-    stock.description = data.get('description', stock.description)
-    stock.quantity = data.get('quantity', stock.quantity)
-    stock.type = StockTypeEnum(data['type']) if 'type' in data else stock.type
-    stock.image = data.get('image', stock.image)
+    body = request.get_json(silent=True)
+    stock.description = body.get('description', stock.description)
+    stock.quantity = body.get('quantity', stock.quantity)
+    stock.type = StockTypeEnum(body['type']) if 'type' in body else stock.type
+    stock.image = body.get('image', stock.image)
 
     db.session.commit()
     return jsonify(stock.serialize()), 200
 
 @app.route('/stock/available', methods=['GET'])
+@jwt_required()
 def get_available_stock():
     try:
         # Filtrar los stocks que tengan quantity mayor a 0
@@ -266,34 +274,34 @@ def get_available_stock():
     except Exception as e:
         return jsonify({"error": str(e)}), 400    
     
-# Ruta GET para obtener todos o uno específico de UserUUID
+#Ruta GET para obtener todos o uno específico de UserUUID
 @app.route('/user_uuid', methods=['GET'])
 @app.route('/user_uuid/<int:id>', methods=['GET'])
 def get_user_uuid(id=None):
-    if id:
-        user_uuid = UserUUID.query.get(id)
-        if not user_uuid:
-            return jsonify({"message": "UUID not found"}), 404
-        return jsonify(user_uuid.serialize()), 200
-    else:
-        user_uuids = UserUUID.query.all()
-        return jsonify([uuid.serialize() for uuid in user_uuids]), 200
+     if id:
+         user_uuid = UserUUID.query.get(id)
+         if not user_uuid:
+             return jsonify({"message": "UUID not found"}), 404
+         return jsonify(user_uuid.serialize()), 200
+     else:
+         user_uuids = UserUUID.query.all()
+         return jsonify([uuid.serialize() for uuid in user_uuids]), 200
 
 # Ruta POST para crear un nuevo UserUUID
 @app.route('/user_uuid', methods=['POST'])
 def create_user_uuid():
-    data = request.get_json()
-    user_id = data.get('userId')
+     body = request.get_json(silent=True)
+     user_id = body.get('userId')
 
-    user = User.query.get(user_id)
-    if not user:
-        return jsonify({"message": "User not found"}), 404
+     user = User.query.get(user_id)
+     if not user:
+         return jsonify({"message": "User not found"}), 404
 
-    new_uuid = UserUUID(userId=user_id)
-    db.session.add(new_uuid)
-    db.session.commit()
+     new_uuid = UserUUID(userId=user_id)
+     db.session.add(new_uuid)
+     db.session.commit()
 
-    return jsonify(new_uuid.serialize()), 201
+     return jsonify(new_uuid.serialize()), 201
 
 
 
@@ -337,8 +345,8 @@ def promote_to_admin():
     if current_user.user_type != "admin":  # Solo un admin puede promover
         return jsonify({"msg": "Access denied"}), 403
 
-    data = request.get_json()
-    user_id = data.get('user_id')
+    body = request.get_json(silent=True)
+    user_id = body.get('user_id')
 
     user = User.query.get(user_id)
     if not user:
