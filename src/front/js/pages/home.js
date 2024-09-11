@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+
 import linea from "../../img/linea.png"
 import yeti from "../../img/yeti.png"
 import React, { useState } from 'react'; //Permite manejar el estado (variables que cambian).

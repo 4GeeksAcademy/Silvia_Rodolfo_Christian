@@ -102,7 +102,7 @@ def get_forms():
 def register():
     body = request.get_json(silent=True)
     
-    if body is None:
+    if not body:
         return jsonify({'msg': 'Fields cannot be left empty'}), 400
     
     first_name = body.get('firstName')
@@ -227,7 +227,7 @@ def get_available_stock():
 def login():
     body = request.get_json(silent=True)
     
-    if body is None:
+    if not body:
         return jsonify({'msg': 'Fields cannot be left empty'}), 400
     
     email = body.get('email')#.get() para acceder a una clave en un diccionario que no existe, devolverá None en lugar de lanzar una excepción.
@@ -239,7 +239,7 @@ def login():
         return jsonify({'msg': 'The password field cannot be empty'}), 400
 
     user = User.query.filter_by(email=email).first() #Buscamos al usuario mediante su email:
-    if user is None:
+    if not user:
         return jsonify({'msg': 'User or password invalids'}), 400
 
     password_db = user.password #Recuperamos el hash de la contraseña del usuario desde la base de datos. Este hash es el que se generó cuando el usuario creó su cuenta.
@@ -258,7 +258,7 @@ def update_form(detail_id): #detail_id es el identificador único del detalle de
     user = User.query.filter_by(email=current_user).first() #Mediante su email.
     body = request.get_json(silent=True) #Obtenemos datos en formato JSON del body del fetch y devuelve un diccionario en Python.
     
-    if user is None: #Validamos la existencia del usuario.
+    if not user: #Validamos la existencia del usuario.
         return jsonify ({'msg': 'User Not Found'}), 404
     
     if not body: #verificamos si body es None o un diccionario vacío.
@@ -272,11 +272,11 @@ def update_form(detail_id): #detail_id es el identificador único del detalle de
 
  #Hacemos una consulta a DetailForm y buscamos un registro que coincida con detail_id (DetailForm.Id)
     detail_form = DetailForm.query.get(detail_id) 
-    if detail_form is None: #Validamos la existencia del id del detalle del producto.
+    if not detail_form : #Validamos la existencia del id del detalle del producto.
         return jsonify ({'msg': 'DetailForm does not exist'}), 404
     
     form = Form.query.get(form_id) #Verificamos que el form_Id (que se refiere a la columna id en Form) sea válido en la tabla Form:
-    if form is None:
+    if not form :
         return jsonify ({'msg': 'Form does not exist'}), 404
     if not quantity_value:
         return jsonify ({'msg': 'You have to place an amount'}), 400
