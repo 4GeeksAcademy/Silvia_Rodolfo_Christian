@@ -205,6 +205,36 @@ def get_stock():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
+@app.route('/stock', methods=['POST'])
+def create_stock():
+    data = request.get_json()
+    
+    description = data.get('description')
+    quantity = data.get('quantity')
+    stock_type = data.get('type')
+    image = data.get('image')
+    
+    # Validación básica
+    if not description or not quantity or not stock_type or not image:
+        return jsonify({"message": "Missing required fields"}), 400
+
+    try:
+        new_stock = Stock(
+            description=description,
+            quantity=quantity,
+            type=StockTypeEnum(stock_type),
+            image=image
+        )
+        db.session.add(new_stock)
+        db.session.commit()
+
+        return jsonify(new_stock.serialize()), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": f"Error creating stock: {str(e)}"}), 500
+
+
 @app.route('/stock/<int:id>', methods=['PUT'])
 def update_stock(id):
     stock = Stock.query.get(id)
@@ -220,6 +250,22 @@ def update_stock(id):
     db.session.commit()
     return jsonify(stock.serialize()), 200
 
+@app.route('/stock/available', methods=['GET'])
+def get_available_stock():
+    try:
+        # Filtrar los stocks que tengan quantity mayor a 0
+        available_stock = Stock.query.filter(Stock.quantity > 0).all()
+
+        # Si no hay resultados
+        if not available_stock:
+            return jsonify({"message": "No items found"}), 404
+
+        # Devolver los resultados en formato JSON
+        return jsonify([stock.serialize() for stock in available_stock]), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400    
+    
 # Ruta GET para obtener todos o uno específico de UserUUID
 @app.route('/user_uuid', methods=['GET'])
 @app.route('/user_uuid/<int:id>', methods=['GET'])
@@ -249,21 +295,7 @@ def create_user_uuid():
 
     return jsonify(new_uuid.serialize()), 201
 
-@app.route('/stock/available', methods=['GET'])
-def get_available_stock():
-    try:
-        # Filtrar los stocks que tengan quantity mayor a 0
-        available_stock = Stock.query.filter(Stock.quantity > 0).all()
 
-        # Si no hay resultados
-        if not available_stock:
-            return jsonify({"message": "No items found"}), 404
-
-        # Devolver los resultados en formato JSON
-        return jsonify([stock.serialize() for stock in available_stock]), 200
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400    
 
 
 @app.route('/login', methods=['POST'])
