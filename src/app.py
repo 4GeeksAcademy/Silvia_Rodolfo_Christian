@@ -138,6 +138,60 @@ def register():
     db.session.commit()
     return jsonify({'msg': 'New User Created'}), 201
 
+@app.route('/login', methods=['POST'])
+def login():
+    body = request.get_json(silent=True)
+    
+    if body is None:
+        return jsonify({'msg': 'Fields cannot be left empty'}), 400
+    
+    email = body.get('email')#.get() para acceder a una clave en un diccionario que no existe, devolverá None en lugar de lanzar una excepción.
+    password = body.get('password')
+    #Si lanza None el condicional no dejará que el campo esté vacío(buenas prácticas la combinación)
+    if not email:
+        return jsonify({'msg': 'The email field cannot be empty'}), 400
+    if not password:
+        return jsonify({'msg': 'The password field cannot be empty'}), 400
+
+    user = User.query.filter_by(email=email).first() #Buscamos al usuario mediante su email:
+    if user is None:
+        return jsonify({'msg': 'User or password invalids'}), 400
+
+    password_db = user.password #Recuperamos el hash de la contraseña del usuario desde la base de datos. Este hash es el que se generó cuando el usuario creó su cuenta.
+    password_true = bcrypt.check_password_hash(password_db, password) #Compara la contraseña ingresada con el hash almacenado.
+    if not password_true: #Si no coinciden la contraseña con el hash, retorna el mensaje:
+        return jsonify({'msg': 'User or password invalids'}), 400
+
+    expires = timedelta(hours=1) #Tiempo de expiración del token.
+    access_token = create_access_token(identity=user.email, expires_delta=expires)#Creamos el token y usamos el email como identidad.
+    return jsonify({'msg': 'ok', 'jwt_token': access_token}), 200
+
+@app.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    body = request.get_json(silent=True)
+    email = body.get('email')
+
+    if not email:
+        return jsonify({"msg": "Email is required"}), 400
+
+    user = User.query.filter_by(email=email).first()
+    
+    if not user:
+        return jsonify({"msg": "User with this email does not exist"}), 404
+
+    # Generar un UUID para el token de restablecimiento
+    reset_token = str(uuid.uuid4())
+
+    # Crear una entrada en la tabla user_uuid
+    new_token = UserUUID(user_id=user.id, token=reset_token)
+    db.session.add(new_token)
+    db.session.commit()
+
+    # Aquí deberías enviar el correo electrónico con el token a través de un servicio de correo
+    # Pero, para propósitos de ejemplo, devolvemos el token en la respuesta
+    # En producción, deberías enviar el token por email y no devolverlo en la respuesta
+    return jsonify({"msg": "Reset link sent", "reset_token": reset_token}), 200
+
 
 @app.route('/form', methods=['POST'])
 @jwt_required()
@@ -304,35 +358,6 @@ def create_user_uuid():
      return jsonify(new_uuid.serialize()), 201
 
 
-
-
-@app.route('/login', methods=['POST'])
-def login():
-    body = request.get_json(silent=True)
-    
-    if body is None:
-        return jsonify({'msg': 'Fields cannot be left empty'}), 400
-    
-    email = body.get('email')#.get() para acceder a una clave en un diccionario que no existe, devolverá None en lugar de lanzar una excepción.
-    password = body.get('password')
-    #Si lanza None el condicional no dejará que el campo esté vacío(buenas prácticas la combinación)
-    if not email:
-        return jsonify({'msg': 'The email field cannot be empty'}), 400
-    if not password:
-        return jsonify({'msg': 'The password field cannot be empty'}), 400
-
-    user = User.query.filter_by(email=email).first() #Buscamos al usuario mediante su email:
-    if user is None:
-        return jsonify({'msg': 'User or password invalids'}), 400
-
-    password_db = user.password #Recuperamos el hash de la contraseña del usuario desde la base de datos. Este hash es el que se generó cuando el usuario creó su cuenta.
-    password_true = bcrypt.check_password_hash(password_db, password) #Compara la contraseña ingresada con el hash almacenado.
-    if not password_true: #Si no coinciden la contraseña con el hash, retorna el mensaje:
-        return jsonify({'msg': 'User or password invalids'}), 400
-
-    expires = timedelta(hours=1) #Tiempo de expiración del token.
-    access_token = create_access_token(identity=user.email, expires_delta=expires)#Creamos el token y usamos el email como identidad.
-    return jsonify({'msg': 'ok', 'jwt_token': access_token}), 200
 
 
 
