@@ -170,7 +170,7 @@ def login():
 def forgot_password():
     body = request.get_json(silent=True)
     email = body.get('email')
-
+    
     if not email:
         return jsonify({"msg": "Email is required"}), 400
 

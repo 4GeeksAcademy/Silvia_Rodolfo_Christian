@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Para la navegación
-import linea from "../path/to/linea-image"; // Actualiza la ruta según corresponda
-import yeti from "../path/to/yeti-image";  // Actualiza la ruta según corresponda
-
+import linea from "../../img/linea.png"
+import yeti from "../../img/yeti.png"
 const ForgotPassword = () => {
     const [email, setEmail] = useState(""); // Estado para el email del usuario
     const [message, setMessage] = useState(""); // Estado para mensajes de éxito o error
@@ -15,6 +14,7 @@ const ForgotPassword = () => {
         try {
             const response = await fetch(`${apiUrl}/forgot-password`, { // Ruta para restablecer contraseña
                 method: "POST",
+                mode: "no-cors",
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -80,4 +80,3 @@ const ForgotPassword = () => {
 };
 
 export default ForgotPassword;
-    
