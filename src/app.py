@@ -82,7 +82,7 @@ def serve_any_other_file(path):
     return response
 
 @app.route('/allforms', methods=['GET'])
-@jwt_required()
+
 def get_forms():
     try:
         all_forms = Form.query.allgit()  # Obtiene todos los registros de la tabla Form
@@ -194,9 +194,9 @@ def forgot_password():
 
 
 @app.route('/form', methods=['POST'])
-@jwt_required()
+
 def create_form():
-        current_user_id = get_jwt_identity()  # Usuario autenticado
+       
          # Extraer datos del cuerpo de la solicitud
         body = request.get_json(silent=True)
 
@@ -232,9 +232,9 @@ def create_form():
 
 
 @app.route('/stock', methods=['GET'])
-@jwt_required()
+
 def get_stock():
-    current_user_id = get_jwt_identity()  # Usuario autenticado
+   
     try:
         # Obtener parámetros de consulta
         stock_id = request.args.get('id')
@@ -265,9 +265,9 @@ def get_stock():
         return jsonify({"error": str(e)}), 400
 
 @app.route('/stock', methods=['POST'])
-@jwt_required()
+
 def create_stock():
-    current_user_id = get_jwt_identity()  # Usuario autenticado
+   
     body = request.get_json(silent=True)
     
     description = body.get('description')
@@ -295,10 +295,10 @@ def create_stock():
 
 
 @app.route('/stock/<int:id>', methods=['PUT'])
-@jwt_required()
+
 def update_stock(id):
     stock = Stock.query.get(id)
-    current_user_id = get_jwt_identity()  # Usuario autenticado
+   
     if not stock:
         return jsonify({"message": "Stock not found"}), 404
     
@@ -312,7 +312,7 @@ def update_stock(id):
     return jsonify(stock.serialize()), 200
 
 @app.route('/stock/available', methods=['GET'])
-@jwt_required()
+
 def get_available_stock():
     try:
         # Filtrar los stocks que tengan quantity mayor a 0
@@ -357,6 +357,30 @@ def create_user_uuid():
 
      return jsonify(new_uuid.serialize()), 201
 
+# Ruta POST para solicitar el restablecimiento de la contraseña
+@app.route('/password-reset-request', methods=['POST'])
+def request_password_reset():
+    body = request.get_json(silent=True)
+    email = body.get('email')  # Get the user's email from the request body
+
+    # Buscar el usuario por email
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    # Generar un nuevo UUID para el restablecimiento de la contraseña
+    reset_uuid = str(uuid.uuid4())  # Generate a unique UUID
+
+    # Crear una nueva entrada en la tabla UserUUID (o tabla de restablecimiento)
+    new_uuid_entry = UserUUID(userId=user.id, uuid=reset_uuid)
+    db.session.add(new_uuid_entry)
+    db.session.commit()
+
+    # Aquí enviarías un correo electrónico con el enlace de restablecimiento, que incluirá el UUID generado
+    reset_link = f"{request.host_url}reset-password/{reset_uuid}"
+    # send_reset_email(user.email, reset_link)  # Implementar función de envío de correo
+
+    return jsonify({"message": "Password reset link sent", "reset_link": reset_link}), 201
 
 
 
