@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 const FrontPedido = () => {
   const [initialDate, setInitialDate] = useState("");
   const [finalDate, setFinalDate] = useState("");
+  const [quantity, setQuantity] = useState(0);
   const navigate = useNavigate();
   const { detail_id } = useParams(); //Accedemos a los parámetros dinámicos de la URL como "detail_id".
   const apiUrl = process.env.BACKEND_URL;
@@ -30,8 +31,7 @@ const FrontPedido = () => {
         body: JSON.stringify({
           initialDate,
           finalDate,
-          description: "description",
-          quantity //PREGUNTAR Y MODIFICAR(DEFINIR DESCRIPCIÓN EN LA BD SI SE VA A MOSTRAR EN EL FORM Y QUANTITY LO COLOCA EL USUARIO O SELECCIONA ARTICULO POR ARTICULO?)
+          quantity
         })
       });
       if (!response.ok) {
@@ -68,8 +68,7 @@ const FrontPedido = () => {
         body: JSON.stringify({
           initialDate,
           finalDate,
-          description: "description", //PREGUNTAR
-          quantity: "quantity" //PREGUNTAR Y MODIFICAR(DEFINIR DESCRIPCIÓN EN LA BD SI SE VA A MOSTRAR EN EL FORM Y QUANTITY LO COLOCA EL USUARIO O SELECCIONA ARTICULO POR ARTICULO?)
+          quantity
         })
       });
       if (!response.ok) {
@@ -86,8 +85,6 @@ const FrontPedido = () => {
       alert("Error al actualizar el formulario. Inténtalo de nuevo");
     }
   }
-
-  //ENDPOINTS DEL FORMULARIO Y STOCK NECESITAN REQUERIMIENTO DE TOKEN!
 
   return (
     <div>FrontPedido</div>

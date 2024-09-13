@@ -266,7 +266,6 @@ def update_form(detail_id): #detail_id es el identificador único del detalle de
     #formId enviado en la solicitud para saber qué formulario está asociado con el detalle del producto que estoy actualizando. 
     form_id = body.get('formId') 
     quantity_value = body.get('quantity')
-   #type_value = body.get('type')
     initial_date = body.get('initialDate')
     final_date = body.get('finalDate')
 
@@ -280,8 +279,6 @@ def update_form(detail_id): #detail_id es el identificador único del detalle de
         return jsonify ({'msg': 'Form does not exist'}), 404
     if not quantity_value:
         return jsonify ({'msg': 'You have to place an amount'}), 400
-   #if not type_value:
-       # return jsonify ({'msg': 'You have to choose a type of product'}), 400
     if not initial_date:
         return jsonify ({'msg': 'You have to choose a initial date'}), 400
     if not final_date:
@@ -289,7 +286,6 @@ def update_form(detail_id): #detail_id es el identificador único del detalle de
 #Después de obtener el form_id del body de la solicitud, asigno al registro detail_form, asociando así el detalle del producto con el formulario especificado.  
     detail_form.formId = form_id 
     detail_form.quantity = quantity_value
-    #detail_form.type = type_value 
     detail_form.initialDate = initial_date
     detail_form.finalDate = final_date
 
