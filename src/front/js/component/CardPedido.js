@@ -26,9 +26,9 @@ export const CardPedido = ({ descripcion, cantidad, onDelete, onCantidadChange }
                     <button className="btn me-2"><FontAwesomeIcon icon={faCalendar} /></button>
                     <span className="me-3">
                         Cantidad: {cantidad}
-                        <button onClick={incrementarCantidad} className="btn p-0 ms-2">
+                        <button onClick={incrementarCantidad} className="btn p-0 ms-2" style={{fontSize: "10px"}}>
                             <FontAwesomeIcon icon={faPlus} />
-                        </button>
+                        </button>/
                         <button onClick={decrementarCantidad} className="btn p-0 ms-2">
                             <FontAwesomeIcon icon={faMinus} />
                         </button>

@@ -24,70 +24,70 @@ export const FormPedido = () => {
 	};
 
 	// Función para eliminar un pedido de la lista
-    const eliminarPedido = (index) => {
-        // Filtrar los pedidos eliminando el que tiene el id que recibimos
-        const nuevosPedidos = pedidos.filter((_, i) => i !== index);
-        setPedidos(nuevosPedidos); // Actualizar el estado con la nueva lista
-    };
+	const eliminarPedido = (index) => {
+		// Filtrar los pedidos eliminando el que tiene el id que recibimos
+		const nuevosPedidos = pedidos.filter((_, i) => i !== index);
+		setPedidos(nuevosPedidos); // Actualizar el estado con la nueva lista
+	};
 
 	// Función para actualizar la cantidad de un pedido
 	const actualizarCantidad = (index, nuevaCantidad) => {
 		const nuevosPedidos = [...pedidos];
 		nuevosPedidos[index].cantidad = nuevaCantidad; // Actualizamos la cantidad directamente
 		setPedidos(nuevosPedidos); // Actualizar el estado con la nueva cantidad
-	  };
+	};
 
-	
+
 	// Función para el conteo de productos pedidos
-  function countPedidos() {
-    const totalPedidos = pedidos.reduce((total, pedido) => total + pedido.cantidad, 0);
-    let maxPedidos = 5;
-    let quedanTantosPedidos = maxPedidos - totalPedidos;
+	function countPedidos() {
+		const totalPedidos = pedidos.reduce((total, pedido) => total + pedido.cantidad, 0);
+		let maxPedidos = 5;
+		let quedanTantosPedidos = maxPedidos - totalPedidos;
 
-    if (quedanTantosPedidos === 0) {
-      return <span style={{ color: "red" }}>Has alcanzado el máximo de productos por pedir.</span>;
-    }
-    if (quedanTantosPedidos === 1) {
-      return <span style={{ color: "orange" }}>Queda 1 producto.</span>;
-    }
-    if (quedanTantosPedidos > 1) {
-      return <span>Quedan {quedanTantosPedidos} productos.</span>;
-    }
-  }
+		if (quedanTantosPedidos === 0) {
+			return <span style={{ color: "red" }}>Has alcanzado el máximo de productos por pedir.</span>;
+		}
+		if (quedanTantosPedidos === 1) {
+			return <span style={{ color: "orange" }}>Queda 1 producto.</span>;
+		}
+		if (quedanTantosPedidos > 1) {
+			return <span>Quedan {quedanTantosPedidos} productos.</span>;
+		}
+	}
 
 	return (
 		<div>
 			<div className="container mt-auto p-3 d-flex flex-column min-vh-100">
 
-				<div className="align-items-center row col-6" style={{ marginLeft: "100px" }}>
-
-					<h1 className="mb-n1 px-5" style={{ position: "relative", zIndex: 1, fontSize: "80px", fontWeight: "bold" }}>Order</h1>
-					<img className="mt-2" src={linea} />
-					<h3 className="px-5 fw-normal">Book your material</h3>
+				<div className="row justify-content-start text-start mb-4 col-6">
+					<div className="col-12">
+						<h1 className="mb-n1 px-5" style={{ position: "relative", zIndex: 1, fontSize: "80px", fontWeight: "bold" }}>Order</h1>
+						<img className="mt-2" src={linea} />
+					</div>
 				</div>
 
 				{/* Información de la orden */}
-				<div className="row align-items-center mt-4 mb-4 col-12 col-sm-10">
-					<div className="col-3">
-						<h6 style={{ color: "#043873" }}><strong>Order #XXXXXX</strong></h6>
+				<div className="row justify-content-center mb-4">
+					<div className="col-md-3 text-center">
+						<h6 style={{ color: "#043873" }}><strong>Order #XXXXXX</strong></h6> {/* -------------------- Conectar el número de Order con la BBDD*/}
 
 					</div>
-					<div className="col-3 text-center">
+					<div className="col-md-3 text-center">
 						<h6 style={{ color: "#043873" }}><strong>DATE</strong></h6>
 					</div>
-					<div className="col-2 text-end">
+					<div className="col-md-3 text-center">
 						<h6 style={{ color: "#043873" }}><strong>NAME LASTNAME</strong></h6>
 					</div>
 				</div>
 				<p style={{ color: "lightgray" }}>Recuerda que tienes un máximo de 5 productos. {countPedidos()}</p>
 
 				{/* Barra de búsqueda */}
-				<div className="row mb-3">
+				<div className="row justify-content-center mb-4">
 
-					<div className="col-10">
+					<div className="col-12 col-md-8">
 						<form onSubmit={handleSearch}>
-							<div className="input-group">
-								<input
+						<div className="input-group">
+						<input
 									value={search}
 									onChange={(e) => setSearch(e.target.value)}
 									type="search"
@@ -95,10 +95,10 @@ export const FormPedido = () => {
 									style={{ backgroundColor: "#D3E7FF" }}
 									id="search"
 									placeholder="Search here" />
-									{/* Icono de búsqueda con evento onClick */}
-								<span className="input-group-text" style={{ backgroundColor: "#D3E7FF", cursor: "pointer" }} onClick={handleSearch} >
+								{/* Icono de búsqueda con evento onClick */}
+								<button className="input-group-text" style={{ backgroundColor: "#4F9CF9", cursor: "pointer" }} onClick={handleSearch} >
 									<FontAwesomeIcon icon={faMagnifyingGlass} style={{ color: "#043873" }} />
-								</span>
+								</button>
 							</div>
 						</form>
 					</div>
@@ -110,12 +110,12 @@ export const FormPedido = () => {
 					</div>
 				</div>
 				{/* Lista de Artículos generados a partir de las búsquedas */}
-				<div>
-          {pedidos.map((pedido, index) => (
-            <CardPedido key={index} descripcion={pedido.descripcion} cantidad={pedido.cantidad} onDelete={() => eliminarPedido(index)}
-			onCantidadChange={(nuevaCantidad) => actualizarCantidad(index, nuevaCantidad)} />
-          ))}
-        </div>
+				<div className="col-12 mb-3" >
+					{pedidos.map((pedido, index) => (
+						<CardPedido key={index} descripcion={pedido.descripcion} cantidad={pedido.cantidad} onDelete={() => eliminarPedido(index)}
+							onCantidadChange={(nuevaCantidad) => actualizarCantidad(index, nuevaCantidad)} />
+					))}
+				</div>
 			</div >
 		</div>
 
