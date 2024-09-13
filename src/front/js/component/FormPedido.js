@@ -18,22 +18,42 @@ export const FormPedido = () => {
 	const handleSearch = (event) => {
 		event.preventDefault(); // Evita el comportamiento por defecto
 		if (search.trim() !== "") { // Solo agrega si el campo de búsqueda no está vacío
-			setPedidos([...pedidos, search]); // Agrega el valor de búsqueda al array de pedidos
+			setPedidos([...pedidos, { descripcion: search, cantidad: 1 }]); // Agregar pedido con cantidad inicial
 			setSearch(""); // Limpia el campo de búsqueda después de agregarlo
 		}
 	};
 
-	function countPedidos(){
-		let maxPedidos = 5;
-		let quedanTantosPedidos = maxPedidos - pedidos.length;
-		if (quedanTantosPedidos === 0) return <span style={{color: "red"}}>Has alcanzado el máximo de productos por pedir.</span>;
-		if (quedanTantosPedidos === 1) return <span style={{color: "orange"}}>Queda 1 producto.</span>;
-		if (quedanTantosPedidos > 1) return <span>Quedan {quedanTantosPedidos} productos.</span>;
-	};
+	// Función para eliminar un pedido de la lista
+    const eliminarPedido = (index) => {
+        // Filtrar los pedidos eliminando el que tiene el id que recibimos
+        const nuevosPedidos = pedidos.filter((_, i) => i !== index);
+        setPedidos(nuevosPedidos); // Actualizar el estado con la nueva lista
+    };
 
-	/* const handleOrder = (event) => {
-		
-	} */
+	// Función para actualizar la cantidad de un pedido
+	const actualizarCantidad = (index, nuevaCantidad) => {
+		const nuevosPedidos = [...pedidos];
+		nuevosPedidos[index].cantidad = nuevaCantidad; // Actualizamos la cantidad directamente
+		setPedidos(nuevosPedidos); // Actualizar el estado con la nueva cantidad
+	  };
+
+	
+	// Función para el conteo de productos pedidos
+  function countPedidos() {
+    const totalPedidos = pedidos.reduce((total, pedido) => total + pedido.cantidad, 0);
+    let maxPedidos = 5;
+    let quedanTantosPedidos = maxPedidos - totalPedidos;
+
+    if (quedanTantosPedidos === 0) {
+      return <span style={{ color: "red" }}>Has alcanzado el máximo de productos por pedir.</span>;
+    }
+    if (quedanTantosPedidos === 1) {
+      return <span style={{ color: "orange" }}>Queda 1 producto.</span>;
+    }
+    if (quedanTantosPedidos > 1) {
+      return <span>Quedan {quedanTantosPedidos} productos.</span>;
+    }
+  }
 
 	return (
 		<div>
@@ -92,7 +112,8 @@ export const FormPedido = () => {
 				{/* Lista de Artículos generados a partir de las búsquedas */}
 				<div>
           {pedidos.map((pedido, index) => (
-            <CardPedido key={index} descripcion={pedido} />
+            <CardPedido key={index} descripcion={pedido.descripcion} cantidad={pedido.cantidad} onDelete={() => eliminarPedido(index)}
+			onCantidadChange={(nuevaCantidad) => actualizarCantidad(index, nuevaCantidad)} />
           ))}
         </div>
 			</div >
