@@ -100,9 +100,10 @@ export const FormPedido = () => {
 				<p style={{ color: "lightgray" }}>Recuerda que tienes un máximo de 5 productos. {countPedidos()}</p>
 
 				{/* Barra de búsqueda */}
-				<div className="row justify-content-center mb-4">
+				<div className="row mb-4">
+					{/* Input de búsqueda */}
 
-					<div className="col-12 col-md-8">
+					<div className="col-12 col-md-9">
 						<form onSubmit={handleSearch}>
 						<div className="input-group">
 						<input
@@ -150,7 +151,7 @@ export const FormPedido = () => {
 						)}
 					</div>
 
-					<div className="col-2 text-end m-auto">
+					<div className="col-12 col-md-3 text-md-end text-center mt-3 mt-md-0">
 						<button type="submit" className="btn btn-primary fw-light align-text-center" style={{ backgroundColor: "#4F9CF9", border: "none", width: "150px" }} >
 							<strong>Order</strong>
 						</button>
