@@ -11,15 +11,33 @@ import { CardPedido } from "./CardPedido";
 export const FormPedido = () => {
 	const [search, setSearch] = useState(""); // Estado para el valor del buscador
 	const [pedidos, setPedidos] = useState([]); // Estado para guardar los pedidos (búsquedas)
+	const [showModal, setShowModal] = useState(false); // Estado para controlar la visibilidad del modal
+	const [pendingPedido, setPendingPedido] = useState(null); // Estado para el pedido pendiente
 	const navigate = useNavigate(); //Para redirigir a otras páginas
 	const apiUrl = process.env.BACKEND_URL; // URL base de la API desde las variables de entorno
+	const items = ["monitor", "teclado", "cable", "mouse", "camara"];
 
-	// Función que agrega la búsqueda a la lista de pedidos
+	// Función que abre el modal
+    const openModal = () => {
+        setShowModal(true); // Mostrar modal
+    };
+
+    // Función que cierra el modal y añade el pedido si el usuario confirma
+	const closeModal = (addPedido) => {
+		setShowModal(false); // Cerrar modal
+		if (addPedido && pendingPedido) {  // Añadir el pedido pendiente solo si el usuario lo confirma
+			setPedidos([...pedidos, { descripcion: pendingPedido, cantidad: 1 }]); // Agregar pedido
+		}
+		setPendingPedido(null); // Limpiar el pedido pendiente
+	};
+
+	// Función que maneja la búsqueda y muestra el modal
 	const handleSearch = (event) => {
-		event.preventDefault(); // Evita el comportamiento por defecto
-		if (search.trim() !== "") { // Solo agrega si el campo de búsqueda no está vacío
-			setPedidos([...pedidos, { descripcion: search, cantidad: 1 }]); // Agregar pedido con cantidad inicial
-			setSearch(""); // Limpia el campo de búsqueda después de agregarlo
+		event.preventDefault(); // Evita el comportamiento por defecto del submit
+
+		if (search.trim() !== "") { // Solo si hay texto en el campo de búsqueda
+			setPendingPedido(search); // Guardar el pedido pendiente
+			openModal(); // Mostrar modal
 		}
 	};
 
@@ -88,6 +106,7 @@ export const FormPedido = () => {
 						<form onSubmit={handleSearch}>
 						<div className="input-group">
 						<input
+						list="item-options"  
 									value={search}
 									onChange={(e) => setSearch(e.target.value)}
 									type="search"
@@ -95,12 +114,40 @@ export const FormPedido = () => {
 									style={{ backgroundColor: "#D3E7FF" }}
 									id="search"
 									placeholder="Search here" />
+									
+									{/* Lista de opciones */}
+									<datalist id="item-options">
+                                {items.map((item, index) => (
+                                    <option key={index} value={item} />
+                                ))}
+                            </datalist>
 								{/* Icono de búsqueda con evento onClick */}
 								<button className="input-group-text" style={{ backgroundColor: "#4F9CF9", cursor: "pointer" }} onClick={handleSearch} >
 									<FontAwesomeIcon icon={faMagnifyingGlass} style={{ color: "#043873" }} />
 								</button>
 							</div>
 						</form>
+						{/* Modal */}
+						{showModal && (
+							<div className="modal fade show" style={{ display: "block" }}>
+								<div className="modal-dialog">
+									<div className="modal-content">
+										<div className="modal-header">
+											<h1 className="modal-title fs-5" id="staticBackdropLabel">Resultado de la búsqueda</h1>
+											<button type="button" className="btn-close" onClick={() => closeModal(false)}></button>
+										</div>
+										<div className="modal-body">
+											Has buscado: <strong>{pendingPedido}</strong>
+											<p>¿Deseas añadir este producto a tu pedido?</p>
+										</div>
+										<div className="modal-footer">
+											<button type="button" className="btn btn-secondary" onClick={() => closeModal(false)}>Cerrar</button>
+											<button type="button" className="btn btn-primary" onClick={() => closeModal(true)}>Añadir a pedido</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						)}
 					</div>
 
 					<div className="col-2 text-end m-auto">
