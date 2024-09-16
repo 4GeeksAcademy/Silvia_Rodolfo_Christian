@@ -56,7 +56,7 @@ class Stock(db.Model):
             "id": self.id,
             "description": self.description,
             "quantity": self.quantity,
-            "type": self.stockType.value,  # Convertir el Enum a su valor (cadena)
+            "type": self.stocktype.value,  # Convertir el Enum a su valor (cadena)
             "image": self.image
         }
     
