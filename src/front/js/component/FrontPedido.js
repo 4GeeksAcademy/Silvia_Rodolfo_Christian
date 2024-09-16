@@ -8,10 +8,10 @@ const FrontPedido = () => {
   const navigate = useNavigate();
   const { detail_id } = useParams(); //Accedemos a los parámetros dinámicos de la URL como "detail_id".
   const apiUrl = process.env.BACKEND_URL;
+  const token = localStorage.getItem("jwt_token"); //Obtiene el token de autenticación almacenado.
 
   const addForm = async (event) => {
     event.preventDefault();
-    const token = localStorage.getItem("jwt_token"); //Obtiene el token de autenticación almacenado.
     console.log("Token:", token);
     if (!token) { //Si no hay token:
       navigate('/login'); //Redirige al usuario a la página de inicio de sesión.
@@ -48,8 +48,7 @@ const FrontPedido = () => {
       alert("Error al crear formulario. Inténtalo de nuevo");
     }
   };
-  const upDateForm = async () => {
-    const token = localStorage.getItem("jwt_token");
+  const updateForm = async () => {
     if (!token) {
       navigate('/login');
       return;
@@ -60,7 +59,7 @@ const FrontPedido = () => {
     }
     try {
       const response = await fetch(`${apiUrl}form/${detail_id}`, {
-        method: "POST",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}` //Autorizamos al usuario a hacer la solicitud

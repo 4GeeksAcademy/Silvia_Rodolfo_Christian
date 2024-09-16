@@ -292,6 +292,33 @@ def update_form(detail_id): #detail_id es el identificador único del detalle de
     db.session.commit()
     return jsonify ({'msg': 'DetailForm updated successfully'}), 200
 
+@app.route('/search', methods=['GET'])
+@jwt_required()
+def search():
+    current_user = get_jwt_identity()
+    types = request.args.get('type') #Obtenemos el valor del parámetro type de la consulta.
+    if types:
+        try:
+#Convierte la cadena types(lo que se envia en el front,ejem:"monitor") en el valor correspondiente de la tabla StockTypeEnum ("monitor")      
+            type_enum = StockTypeEnum[types]
+        except KeyError: #Si el tipo no es válido devolvemos un mensaje:
+            return jsonify ({'msg': 'invalid type'}), 400
+#Buscamos todos los artículos en la tabla Stock que coinciden con el tipo especificado(ejem:"monitor").     
+        results = Stock.query.filter_by(stockType=type_enum).all()
+    else: #Si no se proporciona "type" buscamos todos los articulos.
+        results = Stock.query.all()
+#Serializamos cada articulo que coincide con el tipo enum (monitor, teclado, etc):
+        articles_serialize = [] #Almacenamos los articulos en un array vacío. 
+#Iteramos sobre results ya que contiene las keywords con las que nos vamos a referir a los artículos.
+        for article in results:
+            articles_serialize.append(article.serialize()) #Serializamos cada artículo.
+            
+    return jsonify ({'article': articles_serialize}), 200
+            
+    
+    
+
+
 #Type:Solamente muestra el tipo de periferico más no es modificable.????
         
     
