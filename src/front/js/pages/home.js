@@ -1,6 +1,6 @@
 import linea from "../../img/linea.png"
 import yeti from "../../img/yeti.png"
-import { Link, useNavigate, useState } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../../styles/home.css";
 
 
@@ -9,6 +9,13 @@ export const Home = () => {
 	const [password, setPassword] = useState(""); //Crea un estado similar para la contraseña.
 	const navigate = useNavigate(); //Crea una función que se puede usar para redirigir a otras páginas.
 	const apiUrl = process.env.BACKEND_URL; //Obtiene la URL base de la API desde las variables de entorno.
+
+	useEffect(() => {
+		const token = localStorage.getItem("jwt_token")
+		if (token) {
+			navigate("/stock")
+		}
+	}, [navigate]);
 
 
 	const handleSubmit = async (event) => { //Función que se ejecuta cuando el usuario envía el formulario.
@@ -30,7 +37,7 @@ export const Home = () => {
 			const data = await response.json(); //Convierte la respuesta de la API en formato JSON.
 			if (data.jwt_token) { //Si jwt_token existe:
 				localStorage.setItem("jwt_token", data.jwt_token); //Guarda el token JWT en el almacenamiento local del navegador.
-				navigate('/register');
+				navigate('/stock');
 			} else {
 				alert('Error de autenticación'); //Muestra un mensaje si hay un problema con el inicio de sesión.
 			}
@@ -45,7 +52,7 @@ export const Home = () => {
 			<div className="d-flex vh-100 justify-content-center align-items-center container row col-6" style={{ marginLeft: "100px" }}>
 				<div>
 					<h1 className="mb-n1 px-5" style={{ position: "relative", zIndex: 1, fontSize: "80px", fontWeight: "bold" }}>Sign in</h1>
-					<img src={linea} style={{ zIndex: 0 }} />
+					<img src={linea} style={{ zIndex: 0 }} alt="Linea decorativa" />
 					<h3 className="px-5 fw-normal">Book your material</h3>
 					<h6 className="px-5 fw-light" style={{ marginTop: "80px" }}>If you do not yet have an account</h6>
 					<div className="px-5">
@@ -54,7 +61,6 @@ export const Home = () => {
 								Sign up <i className="fa-solid fa-arrow-right fa-sm" />
 							</button>
 						</Link>
-
 					</div>
 				</div>
 				<img src={yeti} style={{ zIndex: 0, width: "300px", bottom: "200px", left: "550px" }} className="position-absolute" />
