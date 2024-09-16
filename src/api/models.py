@@ -46,7 +46,7 @@ class Stock(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(30), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
-    stockType=db.Column(Enum(StockTypeEnum), nullable=False)
+    stocktype=db.Column(Enum(StockTypeEnum), nullable=False)
     image= db.Column(db.String(250), nullable=False)
     def __repr__(self):
         return f'<Stock {self.id}>'
