@@ -1,4 +1,4 @@
-import React, { Component, useState } from "react";
+import React, { Component, useState, useEffect } from "react";
 import { Link, useNavigate } from 'react-router-dom'; //Permite crear enlaces de navegación entre páginas.
 import linea from "./../../img/linea.png";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -13,9 +13,20 @@ export const FormPedido = () => {
 	const [pedidos, setPedidos] = useState([]); // Estado para guardar los pedidos (búsquedas)
 	const [showModal, setShowModal] = useState(false); // Estado para controlar la visibilidad del modal
 	const [pendingPedido, setPendingPedido] = useState(null); // Estado para el pedido pendiente
+	const [currentDate, setCurrentDate] = useState(""); // Estado para guardar la fecha actual
 	const navigate = useNavigate(); //Para redirigir a otras páginas
 	const apiUrl = process.env.BACKEND_URL; // URL base de la API desde las variables de entorno
 	const items = ["monitor", "teclado", "cable", "mouse", "camara"];
+
+	// Función para obtener la fecha actual y formatearla a dd.mm.yyyy
+	useEffect(() => {
+		const today = new Date();
+		const day = String(today.getDate()).padStart(2, '0');
+		const month = String(today.getMonth() + 1).padStart(2, '0'); // Los meses en JavaScript van de 0 a 11
+		const year = today.getFullYear();
+		const formattedDate = `${day}/${month}/${year}`;
+		setCurrentDate(formattedDate); // Guardamos la fecha formateada en el estado
+	}, []);
 
 	// Función que abre el modal
     const openModal = () => {
@@ -91,7 +102,7 @@ export const FormPedido = () => {
 
 					</div>
 					<div className="col-md-3 text-center">
-						<h6 style={{ color: "#043873" }}><strong>DATE</strong></h6>
+						<h6 style={{ color: "#043873" }}><strong>{currentDate}</strong></h6>
 					</div>
 					<div className="col-md-3 text-center">
 						<h6 style={{ color: "#043873" }}><strong>NAME LASTNAME</strong></h6>
