@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import linea from "../../img/linea.png"
-import axios from 'axios';
 import { Image } from 'cloudinary-react'
 
 
