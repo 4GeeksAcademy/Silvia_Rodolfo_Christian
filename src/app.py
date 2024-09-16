@@ -210,6 +210,14 @@ def get_stock():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
     
+@app.route('/stock/<int:id>', methods=['GET'])
+def get_single_article(id):
+    single_article = Stock.query.get(id) 
+    if not single_article:
+        return jsonify({'msg': f'El articulo con id {id} no existe'}), 400
+    return jsonify({'msg': 'Este es el artículo que buscas', 
+                    'data': single_article.serialize()}), 200
+    
 @app.route('/stock', methods=['POST'])
 def newArticle():
     body=request.get_json(silent=True)
