@@ -82,6 +82,7 @@ def serve_any_other_file(path):
     return response
 
 @app.route('/allforms', methods=['GET'])
+#técnico puede ver todos los pedidos
 def get_forms():
     try:
         all_forms = Form.query.allgit()  # Obtiene todos los registros de la tabla Form
@@ -176,6 +177,7 @@ def create_form():
 
 
 @app.route('/stock', methods=['GET'])
+@jwt_required()
 def get_stock():
     try:
         # Obtener parámetros de consulta
@@ -200,11 +202,82 @@ def get_stock():
         if not stock_items:
             return jsonify({"message": "No items found"}), 404
 
+        current_user = get_jwt_identity()
+        print(current_user)
         # Devolver los resultados en formato JSON
         return jsonify([stock.serialize() for stock in stock_items]), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+    
+@app.route('/stock', methods=['POST'])
+def newArticle():
+    body=request.get_json(silent=True)
+    #accede a los datos del formulario
+   
+    description=body['description']
+    stocktype=body['stocktype']
+    quantity=body['quantity']
+    image=body['image']
+    
+    #valida campos requeridos
+    if 'description' not in body:
+        return jsonify({'msg': 'El campo description es requerido'}), 400
+    if 'stocktype' not in body:
+        return jsonify({'msg': 'El campo stocktype es requerido'}), 400
+    if 'quantity' not in body:
+        return jsonify({'msg': 'El campo quantity es requerido'}), 400
+    if 'image' not in body:
+        return jsonify({'msg': 'El campo imagen es requerido'}), 400
+
+ 
+    #verifica si el artículo ya existe
+
+    if Stock.query.filter_by(description=description).first() is not None:
+        return jsonify({'msg': 'El artículo ya está en stock'}), 400
+
+    #crea el nuevo artículo
+    new_article = Stock(
+        description=description,
+        stocktype=stocktype,
+        quantity=quantity,
+        image=image  #guarda la ruta de la imagen en la BD
+    )
+
+    #guarda en la BD
+    db.session.add(new_article)
+    db.session.commit()
+    #return jsonify(new_article.serialize()), 201
+    return jsonify({'msg': 'Artículo creado con éxito'}), 200
+
+@app.route('/stock/<int:id>', methods=['PUT'])
+def edit_article(id):
+    body = request.get_json(silent=True)
+    if body is None:
+        return jsonify({'msg': 'El cuerpo de la solicitud debe ser un JSON válido'}), 400
+    article = Stock.query.get(id)
+    if not article:
+        return jsonify({'msg': f'El artículo con id {id} no ha sido encontrado'}), 404
+    if 'description' in body:
+        article.description = body['description']
+    if 'stocktype' in body:
+        article.stocktype = body['stocktype']
+    if 'quantity' in body:
+        article.quantity = body['quantity']
+    if 'image' in body:
+        article.image = body['image']
+    db.session.commit()
+    return jsonify({'msg': f'El artículo con id {id} ha sido modificado'}), 200
+
+@app.route('/stock/<int:id>', methods=['DELETE'])
+def delete_article(id):
+    article = Stock.query.get(id)
+    if not article:
+        return jsonify({'msg': f'El artículo con id {id} no ha sido encontrado'}),404
+    db.session.delete(article)
+    db.session.commit()
+    return jsonify({'msg': f'El artículo con id {id} ha sido eliminado'}), 200
+
     
 @app.route('/stock/available', methods=['GET'])
 def get_available_stock():
@@ -241,7 +314,7 @@ def login():
     user = User.query.filter_by(email=email).first() #Buscamos al usuario mediante su email:
     if user is None:
         return jsonify({'msg': 'User or password invalids'}), 400
-
+    
     password_db = user.password #Recuperamos el hash de la contraseña del usuario desde la base de datos. Este hash es el que se generó cuando el usuario creó su cuenta.
     password_true = bcrypt.check_password_hash(password_db, password) #Compara la contraseña ingresada con el hash almacenado.
     if not password_true: #Si no coinciden la contraseña con el hash, retorna el mensaje:
