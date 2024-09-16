@@ -14,7 +14,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 					initial: "white"
 				}
 			],
-			cart: []
+			apiUrl: process.env.BACKEND_URL,
+			article: [],
+			usertype: [],
+			selected: []
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -23,14 +26,14 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 
 			getMessage: async () => {
-				try{
+				try {
 					// fetching data from the backend
 					const resp = await fetch(process.env.BACKEND_URL + "/api/hello")
 					const data = await resp.json()
 					setStore({ message: data.message })
 					// don't forget to return something, that is how the async resolves
 					return data;
-				}catch(error){
+				} catch (error) {
 					console.log("Error loading message from backend", error)
 				}
 			},
@@ -48,40 +51,81 @@ const getState = ({ getStore, getActions, setStore }) => {
 				//reset the global store
 				setStore({ demo: demo });
 			},
-			deleteItem: (name) => {
+			deleteSelected: (description) => {
 				const store = getStore();
-				setStore({ cart: store.cart.filter(item => item[0] !== name) });
+				setStore({ selected: store.selected.filter(selected => selected[0] !== description) });
 			},
-			goStock: async () => {
-				//recupera el token
-				const token = localStorage.getItem("jwt-token");
-				if (!token) {
-					console.log("Token no encontrado");
-					//si no exixte el token devuelve false
-					return false;
-				}
-				try {
-					const response = await fetch(`${apiUrl}/stock`, {
-						method: "GET",
-						headers: {
-							"Content-Type": "application/json",
-							//la API requiere esta sintaxis
-							"Authorization": "Bearer " + token
-						},
-					});
-
-					if (!response.ok) {
-						throw Error("Hubo un problema en la solicitud");
+			addSelected: (elemento) => {
+				const store = getStore();
+				setStore({ selected: [...store.selected, elemento] });
+			},
+			getStock: () => {
+				const store = getStore();
+				const token = localStorage.getItem("jwt_token")
+				fetch(store.apiUrl + "/stock", {
+					method: 'GET',
+					headers: {
+						"Content-Type": "application/json",
+						'Authorization': 'Bearer ' + token // ⬅⬅⬅ authorization token
 					}
-					const data = await response.json();
-					console.log("Tienes acceso", data);
-					//devuelve "true" si tiene acceso
-					return true;
-					//si en algún punto del código de try falla, salta catch
-				} catch (err) {
-					console.log(err);
-				}
-			}
+				})
+
+					.then(response => response.json())
+					.then((data) => {
+						console.log(data);
+						setStore({ article: data })
+					})
+					.catch(() => { });
+			},
+			getUser: (usertype) => {
+				const store = getStore();
+				fetch(`${store.apiUrl}/user/${usertype}`)
+					.then(response => response.json())
+					.then((data) => {
+						setStore({ user: data.results })
+					})
+					.catch(() => { });
+			},
+			deleteArticle: (id) => {
+				console.log("Intentando eliminar artículo con ID:", id);
+
+				const store = getStore();
+				const actions = getActions();
+				fetch(`${store.apiUrl}/stock/${id}`, {
+					method: "DELETE",
+					headers: {
+						'Content-Type': 'application/json',
+						accept: "application/json",
+					},
+				})
+					.then(response => {
+						if (response.ok) {
+							console.log("Artículo eliminado exitosamente.");
+							actions.getStock(); // Actualiza la lista de artículos
+						} else {
+							console.error("Error al eliminar el artículo.");
+						}
+					})
+					.catch((err) => { err })
+
+			},
+			/*getArticle: (id) => {
+				const store = getStore();
+				fetch(store.apiUrl + "/stock/" + id)
+					.then(response => response.json())
+					.then(data => {
+						console.log(data);
+						data.stock.forEach((objeto) => {
+							if (objeto.id == idContact) {
+								document.getElementById("name").value = objeto.name;
+								document.getElementById("phone").value = objeto.phone;
+								document.getElementById("email").value = objeto.email;
+								document.getElementById("address").value = objeto.address;
+							}
+						});
+					})
+					.catch((err) => { err })
+			},*/
 		}
 	};
 };

@@ -9,29 +9,27 @@ export const Navbar = () => {
 	//determina si el usuario está logueado.
 	//"false" para que inicie como NO logueado
 	const [isLogged, setIsLogged] = useState(false);
-	const count = store.cart.length;
+	const count = store.selected.length;
+	const token = localStorage.getItem("jwt_token");
 
-		//comprueba si hay token
-		useEffect(() => {
-			const token = localStorage.getItem("jwt-token");
-			if (token) {
-				setIsLogged(true);
-			}
-		}, []);
+	//comprueba si hay token
+	useEffect(() => {
+		setIsLogged(!!token);
+	}, []);
 
 	//si está logueado cambia el estado y elimina el token, si no lo está envía a inicio para que lo haga
 	const handleLogin = () => {
 		if (isLogged) {
 			setIsLogged(false);
-			localStorage.removeItem("jwt-token");
+			localStorage.removeItem("jwt_token");
 			navigate("/");
 		} else {
-			navigate("/")
+			navigate("/");
 		}
 	};
 
-	const noCart = (name) => {
-		actions.deleteItem(name);
+	const noCart = (description) => {
+		actions.deleteSelected(description);
 	};
 
 	return (
@@ -43,36 +41,39 @@ export const Navbar = () => {
 				<div className="d-flex align-items-center ms-auto gap-2">
 					<button onClick={handleLogin} type="button" className="btn ms-auto" style={{ backgroundColor: "#FFE492" }}>
 						{/*cambia el texto del botón según el estado*/}
-						{isLogged ? "Logout" : "Login"}
+						{token ? "Logout" : "Login"}
 					</button>
 
-					{isLogged && (
-					<div className="btn-group top-50 end-0 me-5" style={{ zIndex: "1" }}>
-						<button type="button" className="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style={{ backgroundColor: "#4F9CF9" }}>
-							Order
-							<span className="badge" style={{ color: "black" }}>{count}</span>
-						</button>
+					{token && (
+						<div className="btn-group top-50 end-0 me-5" style={{ zIndex: "1" }}>
+							<button type="button" className="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style={{ backgroundColor: "#4F9CF9" }}>
+								Order
+								<span className="badge" style={{ color: "black" }}>{count}</span>
+							</button>
 
-						<ul className="dropdown-menu dropdown-menu-end dropdown-menu-dark">
-							{
-								store.cart.length > 0 ? (
-									store.cart.map((item, index) => (
-										<li className="dropdown-item d-flex" key={index}>
-											<div className="p-2" onClick={() => noCart(item[0])}>
-												<i className="fa-solid fa-trash" />
-											</div>
-											<button type="button" style={{ backgroundColor: "#4F9CF9" }}>
-												Order
-											</button>
-										</li>
+							<ul className="dropdown-menu dropdown-menu-end">
+								{
+									store.selected.length > 0 ? (
+										store.selected.map((selected, index) => (
+											<li className="dropdown-item d-flex" key={index}>
+												<div className="me-auto p-2">
+													{selected[0]}
+												</div>
+												<div className="p-2" onClick={() => noCart(selected[0])}>
+													<i className="fa-solid fa-trash" />
+												</div>
+												<button type="button" style={{ backgroundColor: "#4F9CF9" }}>
+													Order
+												</button>
+											</li>
 
-									))
-								) : (
-									<li className="dropdown-item">No items</li>
-								)
-							}
-						</ul>
-					</div>
+										))
+									) : (
+										<li className="dropdown-item">No items</li>
+									)
+								}
+							</ul>
+						</div>
 					)}
 				</div>
 			</div>
