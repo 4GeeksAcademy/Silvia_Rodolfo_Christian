@@ -14,7 +14,7 @@ class StockTypeEnum(enum.Enum):
     cable = "cable"
     mouse = "mouse"
     camara= "camara"
-
+    
 class User(db.Model):
     __tablename__='user'
     id = db.Column(db.Integer, primary_key=True)
@@ -46,7 +46,7 @@ class Stock(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(30), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
-    stocktype=db.Column(Enum(StockTypeEnum), nullable=False)
+    stockType=db.Column(Enum(StockTypeEnum), nullable=False)
     image= db.Column(db.String(250), nullable=False)
     def __repr__(self):
         return f'<Stock {self.id}>'
@@ -56,7 +56,7 @@ class Stock(db.Model):
             "id": self.id,
             "description": self.description,
             "quantity": self.quantity,
-            "type": self.stockType.value,  # Convertir el Enum a su valor (cadena)
+            "type": self.stocktype.value,  # Convertir el Enum a su valor (cadena)
             "image": self.image
         }
     

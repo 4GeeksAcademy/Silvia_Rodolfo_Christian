@@ -13,6 +13,9 @@ import { Footer } from "./component/footer";
 import { FormPedido } from "./component/FormPedido";
 
 import Register from "./component/Register";
+import Stock from "./pages/Stock";
+import NewArticle from "./pages/NewArticle";
+import EditArticle from "./pages/EditArticle";
 
 //create your first component
 const Layout = () => {
@@ -20,7 +23,7 @@ const Layout = () => {
     // you can set the basename on the .env file located at the root of this project, E.g: BASENAME=/react-hello-webapp/
     const basename = process.env.BASENAME || "";
 
-    if(!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL/ >;
+    if (!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL />;
 
     return (
         <div>
@@ -33,6 +36,9 @@ const Layout = () => {
                         <Route element={<FormPedido />} path="/formPedido" />
                         <Route element={<Single />} path="/single/:theid" />
                         <Route element={<Register />} path="/register" />
+                        <Route element={<Stock />} path="/stock" />
+                        <Route element={<NewArticle />} path="/new-article" />
+                        <Route element={<EditArticle />} path="/edit-article/:id" />
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
                     <Footer />
