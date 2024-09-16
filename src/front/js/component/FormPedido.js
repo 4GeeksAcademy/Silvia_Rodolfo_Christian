@@ -1,5 +1,5 @@
 import React, { Component, useState, useEffect } from "react";
-import { Link, useNavigate } from 'react-router-dom'; //Permite crear enlaces de navegación entre páginas.
+import { Link, useNavigate, useParams } from 'react-router-dom'; //Permite crear enlaces de navegación entre páginas.
 import linea from "./../../img/linea.png";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faTimesCircle, faCalendar, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
@@ -16,7 +16,88 @@ export const FormPedido = () => {
 	const [currentDate, setCurrentDate] = useState(""); // Estado para guardar la fecha actual
 	const navigate = useNavigate(); //Para redirigir a otras páginas
 	const apiUrl = process.env.BACKEND_URL; // URL base de la API desde las variables de entorno
+	const [initialDate, setInitialDate] = useState("");
+	const [finalDate, setFinalDate] = useState("");
+	const [quantity, setQuantity] = useState(0);
+	const { detail_id } = useParams(); //Accedemos a los parámetros dinámicos de la URL como "detail_id".
+	const token = localStorage.getItem("jwt_token"); //Obtiene el token de autenticación almacenado.
+
 	const items = ["monitor", "teclado", "cable", "mouse", "camara"];
+
+	const addForm = async (event) => {
+		event.preventDefault();
+		console.log("Token:", token);
+		if (!token) { //Si no hay token:
+		  navigate('/login'); //Redirige al usuario a la página de inicio de sesión.
+		  return; //Termina la ejecución de la función fetchData si no hay un token.
+		}
+		if (!initialDate || !finalDate) { //Validar ambas fechas.
+		  alert('Por favor selecciona ambas fechas.');
+		  return;
+		}
+		try {
+		  const response = await fetch(`${apiUrl}form`, {
+			method: "POST",
+			headers: {
+			  "Content-Type": "application/json",
+			  "Authorization": `Bearer ${token}` //Autorizamos al usuario a hacer la solicitud
+			},
+			body: JSON.stringify({
+			  initialDate,
+			  finalDate,
+			  quantity
+			})
+		  });
+		  if (!response.ok) {
+			throw new Error(`HTTP error! Status: ${response.status}`);
+		  }
+		  const data = await response.json();
+		  if (data.msg === "Form and details created successfully") {
+			navigate('/stock'); //PREGUNTAR Y MODIFICAR(PÁGINA PRINCIPAL?)
+		  } else {
+			alert("Error al crear formulario")
+		  }
+		} catch (error) {
+		  console.error("Error en la solicitud", error);
+		  alert("Error al crear formulario. Inténtalo de nuevo");
+		}
+	  };
+	  const updateForm = async () => {
+		if (!token) {
+		  navigate('/login');
+		  return;
+		}
+		if (!initialDate || !finalDate) { //Validar ambas fechas.
+		  alert('Por favor selecciona ambas fechas.');
+		  return;
+		}
+		try {
+		  const response = await fetch(`${apiUrl}form/${detail_id}`, {
+			method: "PUT",
+			headers: {
+			  "Content-Type": "application/json",
+			  "Authorization": `Bearer ${token}` //Autorizamos al usuario a hacer la solicitud
+			},
+			body: JSON.stringify({
+			  initialDate,
+			  finalDate,
+			  quantity
+			})
+		  });
+		  if (!response.ok) {
+			throw new Error(`HTTP error! Status: ${response.status}`);
+		  }
+		  const data = await response.json();
+		  if (data.msg === "DetailForm updated successfully") {
+			navigate('/stock'); //PREGUNTAR Y MODIFICAR(PÁGINA PRINCIPAL?)
+		  } else {
+			alert("Error al actualizar formulario")
+		  }
+		} catch (error) {
+		  console.error("Error en la solicitud", error);
+		  alert("Error al actualizar el formulario. Inténtalo de nuevo");
+		}
+	  }
 
 	// Función para obtener la fecha actual y formatearla a dd.mm.yyyy
 	useEffect(() => {
@@ -29,11 +110,11 @@ export const FormPedido = () => {
 	}, []);
 
 	// Función que abre el modal
-    const openModal = () => {
-        setShowModal(true); // Mostrar modal
-    };
+	const openModal = () => {
+		setShowModal(true); // Mostrar modal
+	};
 
-    // Función que cierra el modal y añade el pedido si el usuario confirma
+	// Función que cierra el modal y añade el pedido si el usuario confirma
 	const closeModal = (addPedido) => {
 		setShowModal(false); // Cerrar modal
 		if (addPedido && pendingPedido) {  // Añadir el pedido pendiente solo si el usuario lo confirma
@@ -116,9 +197,9 @@ export const FormPedido = () => {
 
 					<div className="col-12 col-md-9">
 						<form onSubmit={handleSearch}>
-						<div className="input-group">
-						<input
-						list="item-options"  
+							<div className="input-group">
+								<input
+									list="item-options"
 									value={search}
 									onChange={(e) => setSearch(e.target.value)}
 									type="search"
@@ -126,13 +207,13 @@ export const FormPedido = () => {
 									style={{ backgroundColor: "#D3E7FF" }}
 									id="search"
 									placeholder="Search here" />
-									
-									{/* Lista de opciones */}
-									<datalist id="item-options">
-                                {items.map((item, index) => (
-                                    <option key={index} value={item} />
-                                ))}
-                            </datalist>
+
+								{/* Lista de opciones */}
+								<datalist id="item-options">
+									{items.map((item, index) => (
+										<option key={index} value={item} />
+									))}
+								</datalist>
 								{/* Icono de búsqueda con evento onClick */}
 								<button className="input-group-text" style={{ backgroundColor: "#4F9CF9", cursor: "pointer" }} onClick={handleSearch} >
 									<FontAwesomeIcon icon={faMagnifyingGlass} style={{ color: "#043873" }} />
