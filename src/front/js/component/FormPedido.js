@@ -1,6 +1,6 @@
 import React, { Component, useState } from "react";
 import { Link, useNavigate } from 'react-router-dom'; //Permite crear enlaces de navegación entre páginas.
-import línea from "./../../img/línea.png";
+import linea from "../../img/linea.png"
 
 export const FormPedido = () => {
 	const [search, setSearch] = useState(""); //Estado para guardar el valor del buscador. setSearch es la función para actualizar este valor.
