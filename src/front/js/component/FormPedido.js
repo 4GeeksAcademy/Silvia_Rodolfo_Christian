@@ -14,6 +14,8 @@ export const FormPedido = () => {
 	const [showModal, setShowModal] = useState(false); // Estado para controlar la visibilidad del modal
 	const [pendingPedido, setPendingPedido] = useState(null); // Estado para el pedido pendiente
 	const [currentDate, setCurrentDate] = useState(""); // Estado para guardar la fecha actual
+	const [searchArticle, setSerachArticle] = useState("");
+	const [articles, setArticles] = useState([]); // Estado para guardar los artículos obtenidos
 	const navigate = useNavigate(); //Para redirigir a otras páginas
 	const apiUrl = process.env.BACKEND_URL; // URL base de la API desde las variables de entorno
 	const [initialDate, setInitialDate] = useState("");
@@ -24,6 +26,46 @@ export const FormPedido = () => {
 
 	const items = ["monitor", "teclado", "cable", "mouse", "camara"];
 
+	{/* Componente Search */}
+	const getArticlesByEnum = async () => {
+		const token = localStorage.getItem("jwt_token");
+		if (!token) {
+		  navigate("/login");
+		  return;
+		}
+		try {
+		  const response = await fetch(`${apiUrl}search`, {
+			headers: {
+			  "Content-Type": "application/json",
+			  "Authorization": `Bearer ${token}`
+			}
+		  });
+		  if (!response.ok) {
+			throw new Error(`HTTP error! Status: ${response.status}`);
+		  }
+		  const data = await response.json();
+		  setArticles(data.articles || []); // Guardamos los artículos obtenidos
+		}
+		catch (error) {
+		  console.log("Error en la solicitud", error);
+		  alert("Error al obtener los artículos");
+		}
+	  };
+	  const handlekeyDown = (event) => {
+		if (event.key === "Enter") {
+		  getArticlesByEnum();
+		}
+	  };
+
+	  useEffect(() => {
+        if (search.trim() !== "") {
+            getArticlesByEnum(); // Llamamos a la función cuando hay texto en el buscador
+        }
+    }, [search]);
+
+
+
+	{/* FrontPedido */}
 	const addForm = async (event) => {
 		event.preventDefault();
 		console.log("Token:", token);
@@ -210,10 +252,10 @@ export const FormPedido = () => {
 
 								{/* Lista de opciones */}
 								<datalist id="item-options">
-									{items.map((item, index) => (
-										<option key={index} value={item} />
-									))}
-								</datalist>
+                                    {articles.map((article, index) => (
+                                        <option key={index} value={article.name}>{article.name}</option>
+                                    ))}
+                                </datalist>
 								{/* Icono de búsqueda con evento onClick */}
 								<button className="input-group-text" style={{ backgroundColor: "#4F9CF9", cursor: "pointer" }} onClick={handleSearch} >
 									<FontAwesomeIcon icon={faMagnifyingGlass} style={{ color: "#043873" }} />
