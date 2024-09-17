@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";//Permite manejar el estado (variables que cambian).
 import linea from "../../img/linea.png"
 import yeti from "../../img/yeti.png"
 import { Link, useNavigate } from "react-router-dom";
 import "../../styles/home.css";
+import React, { useState, useEffect } from "react";
 
 
 export const Home = () => {

@@ -26,20 +26,39 @@ const EditArticle = () => {
         //petición GET al servidor para obtener los datos del artículo con el id
         try {
             const response = await fetch(`${store.apiUrl}/stock/${id}`);
+            console.log(response);
+            
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
-            setDescription(data.description);
-            setStocktype(data.stocktype);
-            setQuantity(data.quantity);        
-            setImageUrl(data.image);
+            console.log(data);
+            
+            setDescription(data.data.description);
+            setStocktype(data.data.type);
+            setQuantity(data.data.quantity);        
+            setImageUrl(data.data.image);
         } catch (error) {
             console.error("Error cargando el artículo:", error);
         }
     };
-
-
+    
+    //const [articleToEdit, setArticleToEdit] = useState({})
+    useEffect(() => {
+        if (id) {
+            loadArticle();
+            /*const findArticle = store.article.filter((article) => {
+                return article.id == id
+            })
+            
+            setArticleToEdit(findArticle[0])
+            setDescription(findArticle[0].description);
+            setStocktype(findArticle[0].type);
+            setQuantity(findArticle[0].quantity);        
+            setImageUrl(findArticle[0].image);*/
+        }
+    }, [id]);
+    
     const uploadImage = async () => {
         //añade la imagen seleccionada por el usuario (una nueva)
         const formData = new FormData();
