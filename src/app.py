@@ -10,7 +10,8 @@ from api.models import db, User, UserTypeEnum, Stock,StockTypeEnum,Form,DetailFo
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
-
+from flask_mail import Mail, Message
+import uuid
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token #Importamos las librerias necesarias.
 from flask_jwt_extended import get_jwt_identity
@@ -18,20 +19,35 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_jwt_extended import JWTManager
 from datetime import timedelta #Importamos "timedelta" de datetime para modificar el tiempo de expiración de nuestro token.
 from flask_bcrypt import Bcrypt
-
+from datetime import datetime
 # from models import Person
+
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../public/')
 app = Flask(__name__)
+app.config.update(dict(
+    DEBUG = False,
+    MAIL_SERVER = 'smtp.gmail.com',
+    MAIL_PORT = 587,
+    MAIL_USE_TLS = True,
+    MAIL_USE_SSL = False,
+    MAIL_USERNAME = os.getenv("MAIL_USERNAME"),
+    MAIL_PASSWORD = os.getenv("MAIL_PASSWORD"),
+    
+    
+))
+mail = Mail(app)
 app.url_map.strict_slashes = False
+
 
 CORS(app)
 
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT-KEY") #Método para traer variables.
 jwt = JWTManager(app)
 bcrypt = Bcrypt(app)
+frontend_url = "https://fuzzy-succotash-74vg5jqrqw5h6x7-3000.app.github.dev"
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
@@ -82,7 +98,6 @@ def serve_any_other_file(path):
     return response
 
 @app.route('/allforms', methods=['GET'])
-
 def get_forms():
     try:
         all_forms = Form.query.allgit()  # Obtiene todos los registros de la tabla Form
@@ -168,33 +183,120 @@ def login():
 
 @app.route('/forgot-password', methods=['POST'])
 def forgot_password():
-    body = request.get_json(silent=True)
-    email = body.get('email')
-    
-    if not email:
-        return jsonify({"msg": "Email is required"}), 400
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        print(os.getenv("MAIL_USERNAME"))
+        print(email)
+        
+        # Validar que el correo esté presente
+        if not email:
+            return jsonify({"msg": "Email is required"}), 400
 
-    user = User.query.filter_by(email=email).first()
-    
-    if not user:
-        return jsonify({"msg": "User with this email does not exist"}), 404
+        # Verificar si el correo está registrado en la base de datos
+        user = User.query.filter_by(email=email).first()
 
-    # Generar un UUID para el token de restablecimiento
-    reset_token = str(uuid.uuid4())
+        # Mensaje genérico, sin importar si el usuario fue encontrado o no
+        if not user:
+            return jsonify({"msg": "If the email is registered, a reset link has been sent."}), 200
 
-    # Crear una entrada en la tabla user_uuid
-    new_token = UserUUID(user_id=user.id, token=reset_token)
-    db.session.add(new_token)
-    db.session.commit()
+        # Generar un UUID
+        reset_uuid = str(uuid.uuid4())
 
-    # Aquí deberías enviar el correo electrónico con el token a través de un servicio de correo
-    # Pero, para propósitos de ejemplo, devolvemos el token en la respuesta
-    # En producción, deberías enviar el token por email y no devolverlo en la respuesta
-    return jsonify({"msg": "Reset link sent", "reset_token": reset_token}), 200
+        # Guardar el UUID en la base de datos
+        new_uuid_entry = UserUUID(userId=user.id, uuid=reset_uuid)
+        db.session.add(new_uuid_entry)
+        db.session.commit()
 
+        # Generar el enlace de restablecimiento de contraseña
+        reset_link = f"{frontend_url}/reset-password/{reset_uuid}"
+
+        # Enviar correo con el UUID
+        msg = Message(
+            subject="(No Reply), Mail para cambio contraseña",
+            sender=os.getenv("MAIL_USERNAME"),
+            recipients=[email]
+        )
+        # HTML content with a button
+        msg.html = f"""
+            <p>Click the button below to reset your password. The link will expire in 45 minutes.</p>
+            <a href="{reset_link}" style="
+                display: inline-block;
+                padding: 10px 20px;
+                font-size: 16px;
+                color: #fff;
+                background-color: #4F9CF9;
+                text-decoration: none;
+                border-radius: 5px;
+            ">Reset Password</a>
+            <p>If you didn't request a password reset, you can ignore this email.</p>
+        """
+        mail.send(msg)
+
+        # Mensaje genérico para evitar enumeración de correos
+        return jsonify({"msg": "If the email is registered, a reset link has been sent."}), 200
+
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "An error occurred. Please try again later."}), 500
+
+
+@app.route('/reset-password/<uuid>', methods=['PUT'])
+def reset_password(uuid):
+    try:
+        data = request.get_json()
+        new_password = data.get('newPassword')
+
+        # Verificar que se haya proporcionado la nueva contraseña
+        if not new_password:
+            return jsonify({"msg": "New password is required"}), 400
+
+        # Buscar el UUID en la tabla UserUUID
+        uuid_entry = UserUUID.query.filter_by(uuid=uuid).first()
+
+        # Verificar si el UUID existe y no ha expirado
+        if not uuid_entry or uuid_entry.is_expired():
+            return jsonify({"msg": "Invalid or expired reset link"}), 400
+
+        # Buscar al usuario asociado con este UUID
+        user = User.query.get(uuid_entry.userId)
+
+        if not user:
+            return jsonify({"msg": "User not found"}), 404
+
+        # Hashear la nueva contraseña con Flask-Bcrypt
+        hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+
+        # Almacenar la nueva contraseña hasheada en la base de datos
+        user.password = hashed_password
+        db.session.commit()
+
+        # Opcional: Borrar o invalidar el UUID tras el uso
+        db.session.delete(uuid_entry)
+        db.session.commit()
+
+        return jsonify({"msg": "Password updated"}), 200
+
+    except Exception as e:
+        # Mantén solo los mensajes de error para no mostrar información sensible
+        print(f"Error during password reset: {str(e)}")
+        return jsonify({"error": "An internal error occurred. Please try again later."}), 500
+
+
+def send_reset_email(email, reset_link):
+    try:
+        msg = Message(
+            subject="Password Reset Request",
+            sender=app.config.get("MAIL_USERNAME"),
+            recipients=[email]
+        )
+        msg.body = f"Click the link to reset your password: {reset_link}"
+        mail.send(msg)
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+        raise e  # Esto debería lanzar una excepción si hay un error al enviar el correo
 
 @app.route('/form', methods=['POST'])
-
 def create_form():
        
          # Extraer datos del cuerpo de la solicitud
@@ -232,7 +334,6 @@ def create_form():
 
 
 @app.route('/stock', methods=['GET'])
-
 def get_stock():
    
     try:
@@ -265,7 +366,6 @@ def get_stock():
         return jsonify({"error": str(e)}), 400
 
 @app.route('/stock', methods=['POST'])
-
 def create_stock():
    
     body = request.get_json(silent=True)
@@ -295,7 +395,6 @@ def create_stock():
 
 
 @app.route('/stock/<int:id>', methods=['PUT'])
-
 def update_stock(id):
     stock = Stock.query.get(id)
    
@@ -312,7 +411,6 @@ def update_stock(id):
     return jsonify(stock.serialize()), 200
 
 @app.route('/stock/available', methods=['GET'])
-
 def get_available_stock():
     try:
         # Filtrar los stocks que tengan quantity mayor a 0
@@ -327,62 +425,6 @@ def get_available_stock():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 400    
-    
-#Ruta GET para obtener todos o uno específico de UserUUID
-@app.route('/user_uuid', methods=['GET'])
-@app.route('/user_uuid/<int:id>', methods=['GET'])
-def get_user_uuid(id=None):
-     if id:
-         user_uuid = UserUUID.query.get(id)
-         if not user_uuid:
-             return jsonify({"message": "UUID not found"}), 404
-         return jsonify(user_uuid.serialize()), 200
-     else:
-         user_uuids = UserUUID.query.all()
-         return jsonify([uuid.serialize() for uuid in user_uuids]), 200
-
-# Ruta POST para crear un nuevo UserUUID
-@app.route('/user_uuid', methods=['POST'])
-def create_user_uuid():
-     body = request.get_json(silent=True)
-     user_id = body.get('userId')
-
-     user = User.query.get(user_id)
-     if not user:
-         return jsonify({"message": "User not found"}), 404
-
-     new_uuid = UserUUID(userId=user_id)
-     db.session.add(new_uuid)
-     db.session.commit()
-
-     return jsonify(new_uuid.serialize()), 201
-
-# Ruta POST para solicitar el restablecimiento de la contraseña
-@app.route('/password-reset-request', methods=['POST'])
-def request_password_reset():
-    body = request.get_json(silent=True)
-    email = body.get('email')  # Get the user's email from the request body
-
-    # Buscar el usuario por email
-    user = User.query.filter_by(email=email).first()
-    if not user:
-        return jsonify({"message": "User not found"}), 404
-
-    # Generar un nuevo UUID para el restablecimiento de la contraseña
-    reset_uuid = str(uuid.uuid4())  # Generate a unique UUID
-
-    # Crear una nueva entrada en la tabla UserUUID (o tabla de restablecimiento)
-    new_uuid_entry = UserUUID(userId=user.id, uuid=reset_uuid)
-    db.session.add(new_uuid_entry)
-    db.session.commit()
-
-    # Aquí enviarías un correo electrónico con el enlace de restablecimiento, que incluirá el UUID generado
-    reset_link = f"{request.host_url}reset-password/{reset_uuid}"
-    # send_reset_email(user.email, reset_link)  # Implementar función de envío de correo
-
-    return jsonify({"message": "Password reset link sent", "reset_link": reset_link}), 201
-
-
 
 
 # this only runs if `$ python src/main.py` is executed

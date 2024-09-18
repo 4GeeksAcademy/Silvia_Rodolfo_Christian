@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Enum
 from sqlalchemy.dialects.postgresql import UUID
+from datetime import datetime, timedelta
 import enum
 import uuid
 
@@ -58,7 +59,7 @@ class Stock(db.Model):
             "id": self.id,
             "description": self.description,
             "quantity": self.quantity,
-            "type": self.stockType.value,  # Convertir el Enum a su valor (cadena)
+            "type": self.stocktype.value,  # Convertir el Enum a su valor (cadena)
             "image": self.image
         }
     
@@ -107,22 +108,27 @@ class DetailForm(db.Model):
             "quantity": self.quantity,
             "initialDate": self.initialDate,
             "finalDate": self.finalDate,
-            "stocktype": self.stockType.value,  # Convertir el Enum a su valor (cadena)
+            "stocktype": self.stocktype.value,  # Convertir el Enum a su valor (cadena)
         }
 
 # Modelo UserUUID
 class UserUUID(db.Model):
-     __tablename__ = 'user_uuid'
-     id = db.Column(db.Integer, primary_key=True)
-     uuid = db.Column(UUID(as_uuid=True), default=uuid.uuid4, unique=True, nullable=False)
-     userId = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-     user_relationship = db.relationship('User', backref=db.backref('uuids', lazy=True))
-     def __repr__(self):
-         return f'<UserUUID {self.uuid}>'
+    __tablename__ = 'user_uuid'
 
-     def serialize(self):
-         return {
-             "id": self.id,
-             "uuid": str(self.uuid),  # Convertir UUID a cadena
-             "userId": self.userId
-         }
+    id = db.Column(db.Integer, primary_key=True)
+    userId = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    uuid = db.Column(db.String(36), unique=True, nullable=False)  # UUID generado
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)  # Fecha de creación
+
+    def is_expired(self):
+        # Expira en 45 minutos
+        expiration_time = self.created_at + timedelta(minutes=45)
+        return datetime.utcnow() > expiration_time
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "userId": self.userId,
+            "uuid": self.uuid,
+            "created_at": self.created_at
+        }

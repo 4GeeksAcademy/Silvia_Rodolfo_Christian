@@ -10,13 +10,11 @@ const ForgotPassword = () => {
 
     const handleForgotPassword = async (event) => {
         event.preventDefault(); // Prevenir comportamiento por defecto del formulario
-
         try {
             const response = await fetch(`${apiUrl}/forgot-password`, { // Ruta para restablecer contraseña
                 method: "POST",
-                mode: "no-cors",
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "application/json",  // Asegura que estás enviando JSON
                 },
                 body: JSON.stringify({
                     email,
@@ -29,14 +27,15 @@ const ForgotPassword = () => {
 
             const data = await response.json(); // Respuesta de la API
 
-            if (data.msg === "Reset link sent") {
+            if (data.msg === "If the email is registered, a reset link has been sent.") {
                 setMessage("A reset password link has been sent to your email.");
                 setTimeout(() => {
-                    navigate("/login"); // Redirigir a la página de inicio de sesión después de un tiempo
+                    navigate("/"); // Redirigir a la página de inicio de sesión después de un tiempo
                 }, 3000);
             } else {
                 setMessage("Error: Could not send reset link.");
             }
+            
         } catch (error) {
             console.error("Error in request:", error);
             setMessage("There was a problem sending the reset link. Please try again.");

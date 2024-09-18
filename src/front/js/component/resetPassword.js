@@ -34,7 +34,7 @@ const ResetPassword = () => {
             if (data.msg === "Password updated") {
                 setMessage("Password has been successfully updated!");
                 setTimeout(() => {
-                    navigate("/login"); // Redirect to login page after success
+                    navigate("/"); // Redirect to login page after success
                 }, 3000);
             } else {
                 setMessage("Error: Could not update the password.");

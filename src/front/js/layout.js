@@ -7,7 +7,6 @@ import { Home } from "./pages/home";
 import { Demo } from "./pages/demo";
 import { Single } from "./pages/single";
 import injectContext from "./store/appContext";
-
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
 import ForgotPassword from "./component/forgotPassword";
@@ -33,7 +32,7 @@ const Layout = () => {
                         <Route element={<Single />} path="/single/:theid" />
                         <Route element={<Register />} path="/register" />
                         {/* </Routes><Route element={<h1>Not found!</h1>} /> */}
-                        <Route element={<ForgotPassword />} path="/forgot-password" />
+                        <Route element={<ForgotPassword />} path="forgot-password" />
                         <Route element={<ResetPassword />} path="/reset-password/:uuid" /> {/* Reset Password using UUID */}
                     </Routes>
                     <Footer />
