@@ -1,7 +1,12 @@
+<<<<<<< HEAD
+from flask_sqlalchemy import SQLAlchemy;
+from sqlalchemy import Enum;
+=======
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Enum
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime, timedelta
+>>>>>>> ed29e0abddaa4d36c816da0b1a8a15d90960539c
 import enum
 import uuid
 
@@ -109,6 +114,8 @@ class DetailForm(db.Model):
             "initialDate": self.initialDate,
             "finalDate": self.finalDate,
             "stocktype": self.stocktype.value,  # Convertir el Enum a su valor (cadena)
+<<<<<<< HEAD
+=======
         }
 
 # Modelo UserUUID
@@ -131,4 +138,5 @@ class UserUUID(db.Model):
             "userId": self.userId,
             "uuid": self.uuid,
             "created_at": self.created_at
+>>>>>>> ed29e0abddaa4d36c816da0b1a8a15d90960539c
         }

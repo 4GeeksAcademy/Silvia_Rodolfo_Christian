@@ -416,6 +416,57 @@ def get_available_stock():
         return jsonify({"error": str(e)}), 400    
 
 
+@app.route('/form/<int:detail_id>', methods=['PUT'])
+@jwt_required()
+def update_form(detail_id): #detail_id es el identificador único del detalle de un producto específico en la tabla DetailForm.
+    current_user = get_jwt_identity()  #Obtenemos la identidad del usuario autenticado:
+    user = User.query.filter_by(email=current_user).first() #Mediante su email.
+    body = request.get_json(silent=True) #Obtenemos datos en formato JSON del body del fetch y devuelve un diccionario en Python.
+    if not user: #Validamos la existencia del usuario.
+        return jsonify ({'msg': 'User Not Found'}), 404
+    if not body: #verificamos si body es None o un diccionario vacío.
+        return jsonify({'msg': 'Fields cannot be left empty'}), 400
+    #formId enviado en la solicitud para saber qué formulario está asociado con el detalle del producto que estoy actualizando.
+    form_id = body.get('formId')
+    quantity_value = body.get('quantity')
+    initial_date = body.get('initialDate')
+    final_date = body.get('finalDate')
+ #Hacemos una consulta a DetailForm y buscamos un registro que coincida con detail_id (DetailForm.Id)
+    detail_form = DetailForm.query.get(detail_id)
+    if not detail_form : #Validamos la existencia del id del detalle del producto.
+        return jsonify ({'msg': 'DetailForm does not exist'}), 404
+    form = Form.query.get(form_id) #Verificamos que el form_Id (que se refiere a la columna id en Form) sea válido en la tabla Form:
+    if not form :
+        return jsonify ({'msg': 'Form does not exist'}), 404
+    if not quantity_value:
+        return jsonify ({'msg': 'You have to place an amount'}), 400
+    if not initial_date:
+        return jsonify ({'msg': 'You have to choose a initial date'}), 400
+    if not final_date:
+        return jsonify ({'msg': 'You have to choose a final date'}), 400
+#Después de obtener el form_id del body de la solicitud, asigno al registro detail_form, asociando así el detalle del producto con el formulario especificado.
+    detail_form.formId = form_id
+    detail_form.quantity = quantity_value
+    detail_form.initialDate = initial_date
+    detail_form.finalDate = final_date
+    db.session.commit()
+    return jsonify ({'msg': 'DetailForm updated successfully'}), 200
+
+    
+@app.route('/search', methods=['GET'])
+@jwt_required()
+def search():
+    current_user = get_jwt_identity()
+    types = request.args.get('type') #Obtenemos el valor del parámetro type de la consulta.
+    if types:
+        try:
+#Convierte la cadena types(lo que se envia en el front,ejem:"monitor") en el valor correspondiente de la tabla StockTypeEnum ("monitor")
+            type_enum = StockTypeEnum[types]
+        except KeyError: #Si el tipo no es válido devolvemos un mensaje:
+            return jsonify ({'msg': 'invalid type'}), 400
+#Buscamos todos los artículos en la tabla Stock que coinciden con el tipo especificado(ejem:"monitor").
+        results = Stock.query.filter_by(stockType=type_enum).all()
+
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
