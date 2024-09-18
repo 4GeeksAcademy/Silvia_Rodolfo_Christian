@@ -1,6 +1,14 @@
+<<<<<<< HEAD
 from flask_sqlalchemy import SQLAlchemy;
 from sqlalchemy import Enum;
+=======
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Enum
+from sqlalchemy.dialects.postgresql import UUID
+from datetime import datetime, timedelta
+>>>>>>> ed29e0abddaa4d36c816da0b1a8a15d90960539c
 import enum
+import uuid
 
 db = SQLAlchemy()
 # Definir el Enum en Python para UserType
@@ -106,4 +114,29 @@ class DetailForm(db.Model):
             "initialDate": self.initialDate,
             "finalDate": self.finalDate,
             "stocktype": self.stocktype.value,  # Convertir el Enum a su valor (cadena)
+<<<<<<< HEAD
+=======
+        }
+
+# Modelo UserUUID
+class UserUUID(db.Model):
+    __tablename__ = 'user_uuid'
+
+    id = db.Column(db.Integer, primary_key=True)
+    userId = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    uuid = db.Column(db.String(36), unique=True, nullable=False)  # UUID generado
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)  # Fecha de creación
+
+    def is_expired(self):
+        # Expira en 45 minutos
+        expiration_time = self.created_at + timedelta(minutes=45)
+        return datetime.utcnow() > expiration_time
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "userId": self.userId,
+            "uuid": self.uuid,
+            "created_at": self.created_at
+>>>>>>> ed29e0abddaa4d36c816da0b1a8a15d90960539c
         }
