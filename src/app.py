@@ -466,7 +466,14 @@ def search():
             return jsonify ({'msg': 'invalid type'}), 400
 #Buscamos todos los artículos en la tabla Stock que coinciden con el tipo especificado(ejem:"monitor").
         results = Stock.query.filter_by(stockType=type_enum).all()
-
+    else: #Si no se proporciona "type" buscamos todos los articulos.
+        results = Stock.query.all()
+#Serializamos cada articulo que coincide con el tipo enum (monitor, teclado, etc):
+        articles_serialize = [] #Almacenamos los articulos en un array vacío.
+#Iteramos sobre results ya que contiene las keywords con las que nos vamos a referir a los artículos.
+        for article in results:
+            articles_serialize.append(article.serialize()) #Serializamos cada artículo.
+    return jsonify ({'article': articles_serialize}), 200
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
