@@ -105,5 +105,5 @@ class DetailForm(db.Model):
             "quantity": self.quantity,
             "initialDate": self.initialDate,
             "finalDate": self.finalDate,
-            "stocktype": self.stockType.value,  # Convertir el Enum a su valor (cadena)
+            "stocktype": self.stocktype.value,  # Convertir el Enum a su valor (cadena)
         }

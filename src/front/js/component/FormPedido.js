@@ -47,7 +47,7 @@ export const FormPedido = () => {
 			<div className="d-flex justify-content-center align-items-center container row col-6" style={{ marginLeft: "100px" }}>
 				<div>
 					<h1 className="mb-n1 px-5" style={{ position: "relative", zIndex: 1, fontSize: "80px", fontWeight: "bold" }}>Order</h1>
-					<img src={línea} style={{ zIndex: 0 }} />
+					<img src={linea} style={{ zIndex: 0 }} />
 					<h3 className="px-5 fw-normal">Book your material</h3>
 					<p style={{color: "lightgray"}}>Recuerda que tienes un máximo de 5 productos</p>
 					
