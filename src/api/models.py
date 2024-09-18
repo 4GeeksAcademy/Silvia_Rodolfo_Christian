@@ -108,5 +108,27 @@ class DetailForm(db.Model):
             "quantity": self.quantity,
             "initialDate": self.initialDate,
             "finalDate": self.finalDate,
-            "stocktype": self.stockType.value,  # Convertir el Enum a su valor (cadena)
+            "stocktype": self.stocktype.value,  # Convertir el Enum a su valor (cadena)
+        }
+
+# Modelo UserUUID
+class UserUUID(db.Model):
+    __tablename__ = 'user_uuid'
+
+    id = db.Column(db.Integer, primary_key=True)
+    userId = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    uuid = db.Column(db.String(36), unique=True, nullable=False)  # UUID generado
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)  # Fecha de creación
+
+    def is_expired(self):
+        # Expira en 45 minutos
+        expiration_time = self.created_at + timedelta(minutes=45)
+        return datetime.utcnow() > expiration_time
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "userId": self.userId,
+            "uuid": self.uuid,
+            "created_at": self.created_at
         }
