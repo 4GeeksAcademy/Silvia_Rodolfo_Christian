@@ -98,21 +98,40 @@ def serve_any_other_file(path):
     return response
 
 @app.route('/allforms', methods=['GET'])
-#técnico puede ver todos los pedidos
+# técnico puede ver todos los pedidos
+@jwt_required()
 def get_forms():
     try:
-        all_forms = Form.query.allgit()  # Obtiene todos los registros de la tabla Form
-        # Aplica el método to_dict() a cada objeto Form en la lista
-        all_forms_serialize=[]
-        for form in all_forms:
-            all_forms_serialize.append(form.serialize())
+        current_user = get_jwt_identity() #Obtenemos la identidad del usuario(email).
+        user = User.query.filter_by(email=current_user).first() #Buscamos el usuario por su email.
+        if not user:
+            return jsonify({'msg': 'Usuario no registrado'}), 401
         
-        response_body = {
+        if user.user_type != UserTypeEnum.tecnico: #Verificamos el tipo de usuario.
+            return jsonify({'msg': 'No autorizado'}), 403
+#Busca el valor del parámetro email en la URL de la solicitud y lo guardamos en la variable email.
+        email = request.args.get('email')
+        if email: #Si se proporcionó un email:
+            user_to_search = User.query.filter_by(email=email).first() #Buscamos el usuario por su email.
+            if not user_to_search: #Si no se encontró un usuario con ese email:
+                return jsonify({'msg': 'Usuario no encontrado'}), 404
+#Buscamos los formularios que coincidan con el id del usuario y el email proporcionado(user_to_search):
+            all_forms = Form.query.filter_by(userId=user_to_search.id).all()
+        else:
+            all_forms = Form.query.all()#Si no se proporciona un email obtenemos todos los formularios. 
+        
+        # Aplica el método serialize() a cada objeto Form en la lista
+        all_forms_serialize = []
+        for form in all_forms:
+            all_forms_serialize.append(form.serialize()) #lo agregamos a all_forms_serialize.
+
+        response_body = { #Devolvemos los formularios serializados
             "data": all_forms_serialize
         }
         return jsonify(response_body), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 
 @app.route('/register', methods=['POST'])
