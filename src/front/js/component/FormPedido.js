@@ -2,19 +2,19 @@ import React, { Component, useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from 'react-router-dom'; //Permite crear enlaces de navegación entre páginas.
 import linea from "./../../img/linea.png";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckCircle, faTimesCircle, faCalendar, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { CardPedido } from "./CardPedido";
 
 
 
 
 export const FormPedido = () => {
-	const [search, setSearch] = useState(""); // Estado para el valor del buscador
 	const [pedidos, setPedidos] = useState([]); // Estado para guardar los pedidos (búsquedas)
 	const [showModal, setShowModal] = useState(false); // Estado para controlar la visibilidad del modal
 	const [pendingPedido, setPendingPedido] = useState(null); // Estado para el pedido pendiente
 	const [currentDate, setCurrentDate] = useState(""); // Estado para guardar la fecha actual
-	const [searchArticle, setSerachArticle] = useState("");
+	const [selectedType, setSelectedType] = useState(""); // Tipo de producto seleccionado
+	const [products, setProducts] = useState([]); // Estado para guardar los productos del tipo seleccionado
 	const [articles, setArticles] = useState([]); // Estado para guardar los artículos obtenidos
 	const navigate = useNavigate(); //Para redirigir a otras páginas
 	const apiUrl = process.env.BACKEND_URL; // URL base de la API desde las variables de entorno
@@ -24,136 +24,163 @@ export const FormPedido = () => {
 	const { detail_id } = useParams(); //Accedemos a los parámetros dinámicos de la URL como "detail_id".
 	const token = localStorage.getItem("jwt_token"); //Obtiene el token de autenticación almacenado.
 
-	const items = ["monitor", "teclado", "cable", "mouse", "camara"];
 
-	{/* Componente Search */}
+
+	// Función para obtener los tipos de productos (artículos)
 	const getArticlesByEnum = async () => {
-		const token = localStorage.getItem("jwt_token");
 		if (!token) {
-		  navigate("/login");
-		  return;
+			navigate("/login");
+			return;
 		}
 		try {
-		  const response = await fetch(`${apiUrl}search`, {
-			headers: {
-			  "Content-Type": "application/json",
-			  "Authorization": `Bearer ${token}`
+			const response = await fetch(`${apiUrl}search`, {
+				headers: {
+					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`
+				}
+			});
+			if (!response.ok) {
+				throw new Error(`HTTP error! Status: ${response.status}`);
 			}
-		  });
-		  if (!response.ok) {
-			throw new Error(`HTTP error! Status: ${response.status}`);
-		  }
-		  const data = await response.json();
-		  setArticles(data.articles || []); // Guardamos los artículos obtenidos
+			const data = await response.json();
+			setArticles(data.articles || []); // Guardamos los tipos de productos obtenidos
+		} catch (error) {
+			console.log("Error en la solicitud", error);
+			alert("Error al obtener los tipos de productos");
 		}
-		catch (error) {
-		  console.log("Error en la solicitud", error);
-		  alert("Error al obtener los artículos");
+	};
+
+	// Función para obtener los productos de un tipo seleccionado
+	const getProductsByType = async (type) => {
+		if (!token) {
+			navigate("/login");
+			return;
 		}
-	  };
-	  const handlekeyDown = (event) => {
-		if (event.key === "Enter") {
-		  getArticlesByEnum();
+		try {
+			const response = await fetch(`${apiUrl}/products?type=${type}`, {
+				headers: {
+					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`
+				}
+			});
+			if (!response.ok) {
+				throw new Error(`HTTP error! Status: ${response.status}`);
+			}
+			const data = await response.json();
+			setProducts(data.products || []); // Guardamos los productos obtenidos para el tipo seleccionado
+		} catch (error) {
+			console.log("Error en la solicitud", error);
+			alert("Error al obtener los productos del tipo seleccionado");
 		}
-	  };
-
-	  useEffect(() => {
-        if (search.trim() !== "") {
-            getArticlesByEnum(); // Llamamos a la función cuando hay texto en el buscador
-        }
-    }, [search]);
+	};
 
 
+	// Función para manejar la selección de un tipo de producto
+	const handleSelectType = (event) => {
+		const selectedValue = event.target.value;
+		setSelectedType(selectedValue);
+		if (selectedValue) {
+			setShowModal(true); // Mostrar modal
+			getArticlesByEnum(selectedValue); // Obtener productos del tipo seleccionado
+		}
+	};
 
-	{/* FrontPedido */}
+
+
+	// Llamar a la función para obtener los tipos de productos cuando el componente se monte
+	useEffect(() => {
+		getArticlesByEnum();
+	}, []);
+
+
+	{/* FrontPedido */ }
 	const addForm = async (event) => {
 		event.preventDefault();
 		console.log("Token:", token);
 		if (!token) { //Si no hay token:
-		  navigate('/login'); //Redirige al usuario a la página de inicio de sesión.
-		  return; //Termina la ejecución de la función fetchData si no hay un token.
+			navigate('/login'); //Redirige al usuario a la página de inicio de sesión.
+			return; //Termina la ejecución de la función fetchData si no hay un token.
 		}
 		if (!initialDate || !finalDate) { //Validar ambas fechas.
-		  alert('Por favor selecciona ambas fechas.');
-		  return;
+			alert('Por favor selecciona ambas fechas.');
+			return;
 		}
 		try {
-		  const response = await fetch(`${apiUrl}form`, {
-			method: "POST",
-			headers: {
-			  "Content-Type": "application/json",
-			  "Authorization": `Bearer ${token}` //Autorizamos al usuario a hacer la solicitud
-			},
-			body: JSON.stringify({
-			  initialDate,
-			  finalDate,
-			  quantity
-			})
-		  });
-		  if (!response.ok) {
-			throw new Error(`HTTP error! Status: ${response.status}`);
-		  }
-		  const data = await response.json();
-		  if (data.msg === "Form and details created successfully") {
-			navigate('/stock'); //PREGUNTAR Y MODIFICAR(PÁGINA PRINCIPAL?)
-		  } else {
-			alert("Error al crear formulario")
-		  }
+			const response = await fetch(`${apiUrl}form`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}` //Autorizamos al usuario a hacer la solicitud
+				},
+				body: JSON.stringify({
+					initialDate,
+					finalDate,
+					quantity
+				})
+			});
+			if (!response.ok) {
+				throw new Error(`HTTP error! Status: ${response.status}`);
+			}
+			const data = await response.json();
+			if (data.msg === "Form and details created successfully") {
+				navigate('/stock'); //PREGUNTAR Y MODIFICAR(PÁGINA PRINCIPAL?)
+			} else {
+				alert("Error al crear formulario")
+			}
 		} catch (error) {
-		  console.error("Error en la solicitud", error);
-		  alert("Error al crear formulario. Inténtalo de nuevo");
+			console.error("Error en la solicitud", error);
+			alert("Error al crear formulario. Inténtalo de nuevo");
 		}
-	  };
-	  const updateForm = async () => {
+	};
+	const updateForm = async () => {
 		if (!token) {
-		  navigate('/login');
-		  return;
+			navigate('/login');
+			return;
 		}
 		if (!initialDate || !finalDate) { //Validar ambas fechas.
-		  alert('Por favor selecciona ambas fechas.');
-		  return;
+			alert('Por favor selecciona ambas fechas.');
+			return;
 		}
 		try {
-		  const response = await fetch(`${apiUrl}form/${detail_id}`, {
-			method: "PUT",
-			headers: {
-			  "Content-Type": "application/json",
-			  "Authorization": `Bearer ${token}` //Autorizamos al usuario a hacer la solicitud
-			},
-			body: JSON.stringify({
-			  initialDate,
-			  finalDate,
-			  quantity
-			})
-		  });
-		  if (!response.ok) {
-			throw new Error(`HTTP error! Status: ${response.status}`);
-		  }
-		  const data = await response.json();
-		  if (data.msg === "DetailForm updated successfully") {
-			navigate('/stock'); //PREGUNTAR Y MODIFICAR(PÁGINA PRINCIPAL?)
-		  } else {
-			alert("Error al actualizar formulario")
-		  }
+			const response = await fetch(`${apiUrl}form/${detail_id}`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}` //Autorizamos al usuario a hacer la solicitud
+				},
+				body: JSON.stringify({
+					initialDate,
+					finalDate,
+					quantity
+				})
+			});
+			if (!response.ok) {
+				throw new Error(`HTTP error! Status: ${response.status}`);
+			}
+			const data = await response.json();
+			if (data.msg === "DetailForm updated successfully") {
+				navigate('/stock'); //PREGUNTAR Y MODIFICAR(PÁGINA PRINCIPAL?)
+			} else {
+				alert("Error al actualizar formulario")
+			}
 		} catch (error) {
-		  console.error("Error en la solicitud", error);
-		  alert("Error al actualizar el formulario. Inténtalo de nuevo");
+			console.error("Error en la solicitud", error);
+			alert("Error al actualizar el formulario. Inténtalo de nuevo");
 		}
-	  }
+	}
 
-	// Función para obtener la fecha actual y formatearla a dd.mm.yyyy
-	useEffect(() => {
-		const today = new Date();
-		const day = String(today.getDate()).padStart(2, '0');
-		const month = String(today.getMonth() + 1).padStart(2, '0'); // Los meses en JavaScript van de 0 a 11
-		const year = today.getFullYear();
-		const formattedDate = `${day}/${month}/${year}`;
-		setCurrentDate(formattedDate); // Guardamos la fecha formateada en el estado
-	}, []);
 
-	// Función que abre el modal
-	const openModal = () => {
-		setShowModal(true); // Mostrar modal
+
+	// Función para manejar el clic en el ícono de búsqueda y abrir el modal
+	const handleSearchClick = () => {
+		if (!selectedType) {
+			alert('Por favor, selecciona un tipo de producto antes de buscar.');
+			return;
+		}
+		// Cargar productos del tipo seleccionado
+		getProductsByType(selectedType);
+		// Mostrar el modal
+		setShowModal(true);
 	};
 
 	// Función que cierra el modal y añade el pedido si el usuario confirma
@@ -165,15 +192,6 @@ export const FormPedido = () => {
 		setPendingPedido(null); // Limpiar el pedido pendiente
 	};
 
-	// Función que maneja la búsqueda y muestra el modal
-	const handleSearch = (event) => {
-		event.preventDefault(); // Evita el comportamiento por defecto del submit
-
-		if (search.trim() !== "") { // Solo si hay texto en el campo de búsqueda
-			setPendingPedido(search); // Guardar el pedido pendiente
-			openModal(); // Mostrar modal
-		}
-	};
 
 	// Función para eliminar un pedido de la lista
 	const eliminarPedido = (index) => {
@@ -205,7 +223,17 @@ export const FormPedido = () => {
 		if (quedanTantosPedidos > 1) {
 			return <span>Quedan {quedanTantosPedidos} productos.</span>;
 		}
-	}
+	};
+
+	// Función para obtener la fecha actual y formatearla a dd.mm.yyyy
+	useEffect(() => {
+		const today = new Date();
+		const day = String(today.getDate()).padStart(2, '0');
+		const month = String(today.getMonth() + 1).padStart(2, '0'); // Los meses en JavaScript van de 0 a 11
+		const year = today.getFullYear();
+		const formattedDate = `${day}/${month}/${year}`;
+		setCurrentDate(formattedDate); // Guardamos la fecha formateada en el estado
+	}, []);
 
 	return (
 		<div>
@@ -234,50 +262,54 @@ export const FormPedido = () => {
 				<p style={{ color: "lightgray" }}>Recuerda que tienes un máximo de 5 productos. {countPedidos()}</p>
 
 				{/* Barra de búsqueda */}
-				<div className="row mb-4">
-					{/* Input de búsqueda */}
+                <div className="row mb-4">
+                    <div className="col-12 col-md-9">
+                        <div className="input-group">
+                            <select
+                                className="form-select fw-light fs-6"
+                                style={{ backgroundColor: "#D3E7FF", color: "#4F9CF9" }}
+                                value={selectedType}
+                                onChange={handleSelectType}
+                                required
+                            >
+                                <option value="">Selecciona un tipo de producto</option> {/* Opción por defecto */}
+                                <option value="monitor">Monitor</option>
+                                <option value="teclado">Teclado</option>
+                                <option value="cable">Cable</option>
+                                <option value="mouse">Mouse</option>
+                                <option value="camara">Cámara</option>
+                            </select>
 
-					<div className="col-12 col-md-9">
-						<form onSubmit={handleSearch}>
-							<div className="input-group">
-								<input
-									list="item-options"
-									value={search}
-									onChange={(e) => setSearch(e.target.value)}
-									type="search"
-									className="form-control form-control-lg fw-light fs-6 input"
-									style={{ backgroundColor: "#D3E7FF" }}
-									id="search"
-									placeholder="Search here" />
+							{/* Icono de búsqueda */}
+							<button
+								className="input-group-text"
+								style={{ backgroundColor: "#4F9CF9", cursor: "pointer" }}
+								onClick={handleSearchClick} // Manejar clic en el ícono de búsqueda
+							>
+								<FontAwesomeIcon icon={faMagnifyingGlass} style={{ color: "#043873" }} />
+							</button>
+						</div>
 
-								{/* Lista de opciones */}
-								<datalist id="item-options">
-                                    {articles.map((article, index) => (
-                                        <option key={index} value={article.name}>{article.name}</option>
-                                    ))}
-                                </datalist>
-								{/* Icono de búsqueda con evento onClick */}
-								<button className="input-group-text" style={{ backgroundColor: "#4F9CF9", cursor: "pointer" }} onClick={handleSearch} >
-									<FontAwesomeIcon icon={faMagnifyingGlass} style={{ color: "#043873" }} />
-								</button>
-							</div>
-						</form>
-						{/* Modal */}
+						{/* Modal para seleccionar productos */}
 						{showModal && (
 							<div className="modal fade show" style={{ display: "block" }}>
 								<div className="modal-dialog">
 									<div className="modal-content">
 										<div className="modal-header">
-											<h1 className="modal-title fs-5" id="staticBackdropLabel">Resultado de la búsqueda</h1>
-											<button type="button" className="btn-close" onClick={() => closeModal(false)}></button>
+											<h5 className="modal-title">Productos del tipo {selectedType}</h5>
+											<button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
 										</div>
 										<div className="modal-body">
-											Has buscado: <strong>{pendingPedido}</strong>
-											<p>¿Deseas añadir este producto a tu pedido?</p>
+											<ul>
+												{products.map((product, index) => (
+													<li key={index}>
+														<button onClick={() => addProductToOrder(product)}>{product.name}</button>
+													</li>
+												))}
+											</ul>
 										</div>
 										<div className="modal-footer">
-											<button type="button" className="btn btn-secondary" onClick={() => closeModal(false)}>Cerrar</button>
-											<button type="button" className="btn btn-primary" onClick={() => closeModal(true)}>Añadir a pedido</button>
+											<button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cerrar</button>
 										</div>
 									</div>
 								</div>
