@@ -7,10 +7,12 @@ import { Home } from "./pages/home";
 import { Demo } from "./pages/demo";
 import { Single } from "./pages/single";
 import injectContext from "./store/appContext";
-
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
+
 import { FormPedido } from "./component/FormPedido";
+import ForgotPassword from "./component/forgotPassword";
+import ResetPassword from "./component/resetPassword"; // New component
 
 import Register from "./component/Register";
 import Stock from "./pages/Stock";
@@ -36,10 +38,14 @@ const Layout = () => {
                         <Route element={<FormPedido />} path="/formPedido" />
                         <Route element={<Single />} path="/single/:theid" />
                         <Route element={<Register />} path="/register" />
+
                         <Route element={<Stock />} path="/stock" />
                         <Route element={<NewArticle />} path="/new-article" />
                         <Route element={<EditArticle />} path="/edit-article/:id" />
+                        <Route element={<ForgotPassword />} path="forgot-password" />
+                        <Route element={<ResetPassword />} path="/reset-password/:uuid" /> {/* Reset Password using UUID */}
                         <Route element={<h1>Not found!</h1>} />
+
                     </Routes>
                     <Footer />
                 </ScrollToTop>
