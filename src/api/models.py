@@ -1,6 +1,9 @@
-from flask_sqlalchemy import SQLAlchemy;
-from sqlalchemy import Enum;
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Enum
+from sqlalchemy.dialects.postgresql import UUID
+from datetime import datetime, timedelta
 import enum
+import uuid
 
 db = SQLAlchemy()
 # Definir el Enum en Python para UserType
@@ -105,5 +108,5 @@ class DetailForm(db.Model):
             "quantity": self.quantity,
             "initialDate": self.initialDate,
             "finalDate": self.finalDate,
-            "stocktype": self.stocktype.value,  # Convertir el Enum a su valor (cadena)
+            "stocktype": self.stockType.value,  # Convertir el Enum a su valor (cadena)
         }

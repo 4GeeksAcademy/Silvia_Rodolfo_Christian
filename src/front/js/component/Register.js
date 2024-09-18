@@ -53,7 +53,7 @@ const Register = () => {
     };
 
     return (
-        <div className="d-flex">
+        <div className="container-fluid d-flex flex-column flex-md-row align-items-center vh-100 p-3">
             <div className="d-flex vh-100 justify-content-center align-items-center container row col-6" style={{ marginLeft: "100px" }}>
                 <div>
                     <h1 className="mb-n1 px-5" style={{ position: "relative", zIndex: 1, fontSize: "80px", fontWeight: "bold" }}>Sign up</h1>

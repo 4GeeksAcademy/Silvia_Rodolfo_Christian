@@ -1,3 +1,4 @@
+
 import linea from "../../img/linea.png"
 import yeti from "../../img/yeti.png"
 import { Link, useNavigate } from "react-router-dom";
@@ -75,11 +76,11 @@ export const Home = () => {
 					</div>
 					<div className="mb-3">
 						<input value={password} onChange={(e) => setPassword(e.target.value)} type="password" className="form-control form-control-lg fw-light fs-6 input" style={{ backgroundColor: "#D3E7FF" }} id="password" placeholder="Enter password" />
-						<div id="forgotPassword" className="form-text text-end">Forgot your password?</div>
+						<div id="forgotPassword" className="form-text text-end"><Link to="/forgot-password">Forgot your password?</Link></div>
 					</div>
 					<button type="submit" className="btn btn-primary btn-lg fw-light mt-3 btn-login" style={{ backgroundColor: "#4F9CF9", border: "none", width: "100%" }}>Login</button>
 				</form>
-			</div>
+			</div>	
 		</div>
 	);
 };
