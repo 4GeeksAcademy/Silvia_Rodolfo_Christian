@@ -6,8 +6,9 @@ const Article = ({ description, quantity, stocktype, image, id }) => {
   const { store, actions } = useContext(Context);
   const navigate = useNavigate();
   const [isSelected, setIsSelected] = useState(false);
-  const [hidden, setHidden] = useState(true);
+  //const [hidden, setHidden] = useState();
   const usertype = store.usertype;
+  let hidden;
 
   useEffect(() => {
     setIsSelected(store.selected.some((element) => element.description === description));
@@ -16,19 +17,10 @@ const Article = ({ description, quantity, stocktype, image, id }) => {
       const token = localStorage.getItem("jwt_token");
       if (!token) {
         navigate("/");
-      } else {
-        await actions.getUserType(); //obtiene usertype
-        const usertype = store.usertype;
-        setHidden(usertype === "usuario");
-        /*if (usertype === "usuario") {
-          setHidden(true);
-        } else {
-          setHidden(false);
-        }*/
-      }
+      } 
     };
     fetchUserType();
-  }, [store.selected, description]);
+  }, []);
 
   const handleSelectedClick = () => {
     if (isSelected) {
@@ -51,7 +43,7 @@ const Article = ({ description, quantity, stocktype, image, id }) => {
         <p>{stocktype}</p>
         <p>Quantity:{quantity}</p>
 
-        {!hidden && (
+        {usertype === "usuario" && (
           <div className={`btn btn-outline-secondary ${isSelected ? 'active' : ''}`} onClick={handleSelectedClick}>
             {isSelected ? (
               <i className="fa-solid fa-cart-shopping" />
@@ -61,7 +53,7 @@ const Article = ({ description, quantity, stocktype, image, id }) => {
           </div>
         )}
 
-        {hidden && ( //si hidden es falso, muestra el botón
+        {usertype === "tecnico" && ( 
           <div className="text-center mb-2">
             <button type="button" className="btn btn-secondary m-2" style={{ backgroundColor: "#043873" }} onClick={() => navigate(`/edit-article/${id}`)}>
               <i className="fa-solid fa-pen-to-square" />
