@@ -76,25 +76,29 @@ const getState = ({ getStore, getActions, setStore }) => {
 					})
 					.catch(() => { });
 			},
-			getUser: (usertype) => {
+			getUser: async () => {
+				//obtiene datos de usuario por id
 				const store = getStore();
-				fetch(`${store.apiUrl}/user/${usertype}`)
-					.then(response => response.json())
-					.then((data) => {
-						setStore({ user: data.results })
-					})
-					.catch(() => { });
-			},
-			getUserType: async () => {
-				const store = getStore();
-				const response = await fetch(`${store.apiUrl}/stock`, {
-					method: 'GET',
-					headers: {
-						"Content-Type": "application/json"
-					}
-				});
-				const data = await response.json();
-				setStore({ usertype: data.usertype });
+				const token = localStorage.getItem("jwt_token")
+				try {
+					// Petición para obtener toda la información del usuario
+					const response = await fetch(`${store.apiUrl}/user`, {
+						method: 'GET',
+						headers: {
+							"Content-Type": "application/json",
+							'Authorization': 'Bearer ' + token 
+						}
+					});
+
+					const data = await response.json();
+					
+					setStore({
+						usertype: data.data.userType
+					});
+					
+				} catch (error) {
+					console.error('Error al obtener el usuario:', error);
+				}
 			},
 			deleteArticle: (id) => {
 				console.log("Intentando eliminar artículo con ID:", id);

@@ -132,11 +132,21 @@ def register():
         email=email,
         password=pw_hash,
         isActive=True,
-        userType=UserTypeEnum.usuario
+        usertype=UserTypeEnum.usuario
     )
     db.session.add(new_user)
     db.session.commit()
     return jsonify({'msg': 'New User Created'}), 201
+
+@app.route('/user', methods=['GET'])
+@jwt_required()
+def get_single_user():
+    current_user = get_jwt_identity()
+    single_user = User.query.filter_by(email=current_user).first()
+    if not single_user:
+        return jsonify({'msg': 'El usuario no existe'}), 400
+    return jsonify({'msg': 'Este es el usuario que buscas', 
+                    'data': single_user.serialize()}), 200
 
 
 @app.route('/form', methods=['POST'])
