@@ -15,7 +15,7 @@ export const Navbar = () => {
 	//comprueba si hay token
 	useEffect(() => {
 		setIsLogged(!!token);
-	}, []);
+	}, [token]);
 
 	//si está logueado cambia el estado y elimina el token, si no lo está envía a inicio para que lo haga
 	const handleLogin = () => {
@@ -28,15 +28,15 @@ export const Navbar = () => {
 		}
 	};
 
-	const noCart = (description) => {
-		actions.deleteSelected(description);
+	const noCart = (id) => {
+		actions.deleteSelected(id);
 	};
 
 	return (
 		<nav className="navbar" style={{ backgroundColor: "#043873" }}>
 			<div className="container d-flex">
 				<Link to="/">
-					<img src={logoNavbar} style={{width: "200px"}} />
+					<img src={logoNavbar} style={{ width: "200px" }} />
 				</Link>
 				<div className="d-flex align-items-center ms-auto gap-2">
 					<button onClick={handleLogin} type="button" className="btn ms-auto" style={{ backgroundColor: "#FFE492" }}>
@@ -62,11 +62,12 @@ export const Navbar = () => {
 												<div className="p-2" onClick={() => noCart(selected[0])}>
 													<i className="fa-solid fa-trash" />
 												</div>
-												<button type="button" style={{ backgroundColor: "#4F9CF9" }}>
-													Order
-												</button>
+												<div>
+													<button type="button" className="btn btn-secondary m-2" style={{ backgroundColor: "#4F9CF9" }} onClick={() => navigate("/formPedido")}>
+														Order
+													</button>
+												</div>
 											</li>
-
 										))
 									) : (
 										<li className="dropdown-item">No items</li>

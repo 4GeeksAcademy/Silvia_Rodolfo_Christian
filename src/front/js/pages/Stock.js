@@ -1,30 +1,36 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Context } from "../store/appContext";
 import linea from "../../img/linea.png"
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Article from "../component/Article";
 
 const Stock = () => {
     const { store, actions } = useContext(Context);
     const navigate = useNavigate();
-    const [hidden, setHidden] = useState(true);
+    const usertype = store.usertype;
 
-    //comprueba si hay token y el usertype
+    //comprueba si hay token y el usertype para ocultar botones
     useEffect(() => {
-        const token = localStorage.getItem("jwt_token")
-        if (!token) {
-            console.log("No hay token")
-            navigate("/")
-        } else {
-            const usertype = store.usertype;
-            if (usertype === "usuario") {
-                setHidden(true);
+        const fetchUserType = async () => {
+            const token = localStorage.getItem("jwt_token");
+            if (!token) {
+                navigate("/");
             } else {
-                setHidden(false);
+                await actions.getUser();
             }
-        }
-        actions.getStock();
+        };
+        fetchUserType();
+        console.log(usertype);
     }, []);
+
+    //dependiendo del usertype el botón va a una página o a otra
+    const goTo = () => {
+        if (usertype === "usuario") {
+            navigate("/formPedido");
+        } else {
+            navigate("/new-article");
+        }
+    };
 
     return (
         <div className="container">
@@ -34,11 +40,9 @@ const Stock = () => {
                     <img src={linea} style={{ zIndex: 0 }} alt="Linea decorativa" />
                 </div>
                 <div className="mt-5">
-                    <Link to="/new-article">
-                        <button type="button" className="btn btn-primary fw-light" style={{ backgroundColor: "#4F9CF9", border: "none" }}>
-                            New article
-                        </button>
-                    </Link>
+                    <button onClick={goTo} type="button" className="btn btn-primary fw-light" style={{ backgroundColor: "#4F9CF9", border: "none" }}>
+                    {usertype === "usuario" ? "Order" : "New article"}
+                    </button>
                 </div>
                 <div className="container mt-3">
                     <div className="row">
@@ -51,7 +55,7 @@ const Stock = () => {
                                             stocktype={article.stocktype}
                                             quantity={article.quantity}
                                             image={article.image}
-                                            usertype={hidden}
+                                            usertype={usertype}
                                             id={article.id}
                                         />
                                     </div>
