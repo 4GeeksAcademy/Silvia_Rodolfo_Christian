@@ -97,6 +97,7 @@ def serve_any_other_file(path):
     return response
 
 @app.route('/allforms', methods=['GET'])
+#técnico puede ver todos los pedidos
 def get_forms():
     try:
         all_forms = Form.query.allgit()  # Obtiene todos los registros de la tabla Form
@@ -333,6 +334,7 @@ def create_form():
 
 
 @app.route('/stock', methods=['GET'])
+@jwt_required()
 def get_stock():
    
     try:
@@ -358,6 +360,8 @@ def get_stock():
         if not stock_items:
             return jsonify({"message": "No items found"}), 404
 
+        current_user = get_jwt_identity()
+        print(current_user)
         # Devolver los resultados en formato JSON
         return jsonify([stock.serialize() for stock in stock_items]), 200
 
@@ -374,40 +378,6 @@ def create_stock():
     stock_type = body.get('type')
     image = body.get('image')
     
-    if not description or not quantity or not stock_type or not image:
-        return jsonify({"message": "Missing required fields"}), 400
-
-    try:
-        new_stock = Stock(
-            description=description,
-            quantity=quantity,
-            type=StockTypeEnum(stock_type),
-            image=image
-        )
-        db.session.add(new_stock)
-        db.session.commit()
-
-        return jsonify(new_stock.serialize()), 201
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"message": f"Error creating stock: {str(e)}"}), 500
-
-
-@app.route('/stock/<int:id>', methods=['PUT'])
-def update_stock(id):
-    stock = Stock.query.get(id)
-   
-    if not stock:
-        return jsonify({"message": "Stock not found"}), 404
-    
-    body = request.get_json(silent=True)
-    stock.description = body.get('description', stock.description)
-    stock.quantity = body.get('quantity', stock.quantity)
-    stock.type = StockTypeEnum(body['type']) if 'type' in body else stock.type
-    stock.image = body.get('image', stock.image)
-
-    db.session.commit()
-    return jsonify(stock.serialize()), 200
 
 @app.route('/stock/available', methods=['GET'])
 def get_available_stock():
@@ -426,23 +396,9 @@ def get_available_stock():
         return jsonify({"error": str(e)}), 400    
 
 
+
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))
     app.run(host='0.0.0.0', port=PORT, debug=True)
-    '''@app.route('/promote_to_admin', methods=['POST'])
-def promote_to_admin():
-    if current_user.user_type != "admin":  # Solo un admin puede promover
-        return jsonify({"msg": "Access denied"}), 403
 
-    body = request.get_json(silent=True)
-    user_id = body.get('user_id')
-
-    user = User.query.get(user_id)
-    if not user:
-        return jsonify({"msg": "User not found"}), 404
-
-    user.user_type = "admin"
-    db.session.commit()
-
-    return jsonify({"msg": f"User {user.email} promoted to admin"}), 200'''

@@ -17,7 +17,7 @@ class StockTypeEnum(enum.Enum):
     cable = "cable"
     mouse = "mouse"
     camara= "camara"
-
+    
 class User(db.Model):
     __tablename__='user'
     id = db.Column(db.Integer, primary_key=True)
