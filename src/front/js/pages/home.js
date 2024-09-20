@@ -55,22 +55,29 @@ export const Home = () => {
 		 <div className="d-flex flex-column flex-md-row vh-100 align-items-center justify-content-center">
 		 {/* Sección izquierda */}
 		 <div className="text-center text-md-start col-12 col-md-6 d-flex flex-column justify-content-center align-items-md-start position-relative">
-                <h1 className="mb-1 px-md-5 display-4 font-weight-bold" style={{fontSize: "80px", fontWeight: "bold"}}>Sign in</h1>
-                <img src={linea} className="mx-md-5 my-2" alt="Linea decorativa" />
-                <h3 className="px-md-5">Book your material</h3>
-                <h6 className="px-md-5 mt-5">If you do not yet have an account</h6>
-                <div className="px-md-5 mt-3">
+			<div className="d-flex justify-content-start align-items-center container row col-9">
+                <div className="col-12">
+                    <h1 className="mb-n1 px-5" style={{ position: "relative", zIndex: 1, fontSize: "clamp(60px, 10vw, 80px)", fontWeight: "bold" }}>Sign up</h1>
+                    <img className="mt-2" src={linea} style={{ maxWidth: "100%", minWidth: "300px" }} />
+                    <h3 className="px-5 fw-normal">Book your material</h3>
+					<h6 className="px-md-5 mt-5">If you do not yet have an account</h6>
+                </div>
+				<div className="px-md-5 mt-3">
                     <Link to="/register">
                         <button type="button" className="btn btn-primary fw-light" style={{ backgroundColor: "#4F9CF9", border: "none" }}>
                             Sign up <i className="fa-solid fa-arrow-right fa-sm" />
                         </button>
                     </Link>
                 </div>
-
-                {/* Imagen del yeti alineada a la derecha y más cerca */}
-                <div className="position-absolute yeti-img-container">
+                 {/* Imagen del yeti alineada a la derecha y más cerca */}
+				 <div className="position-absolute yeti-img-container">
                     <img src={yeti} className="img-fluid yeti-img" alt="Yeti" />
                 </div>
+            </div>
+                                
+                
+
+               
             </div>
 
 		 {/* Sección derecha - Formulario */}
