@@ -214,7 +214,7 @@ export const FormPedido = () => {
 				<div className="row justify-content-start text-start mb-4 col-6">
 					<div className="col-12">
 						<h1 className="mb-n1 px-5" style={{ position: "relative", zIndex: 1, fontSize: "clamp(60px, 10vw, 80px)", fontWeight: "bold" }}>Order</h1>
-						<img className="mt-2" src={linea} style={{ maxWidth: "100%", minWidth: "300px"}} />
+						<img className="mt-2" src={linea} style={{ maxWidth: "100%", minWidth: "300px" }} />
 					</div>
 				</div>
 
