@@ -236,7 +236,7 @@ export const FormPedido = () => {
 	}, []);
 
 	return (
-		<div>
+		
 			<div className="container mt-auto p-3 d-flex flex-column min-vh-100">
 
 				<div className="row justify-content-start text-start mb-4 col-6">
@@ -331,7 +331,7 @@ export const FormPedido = () => {
 					))}
 				</div>
 			</div >
-		</div>
+		
 
 	);
 };
