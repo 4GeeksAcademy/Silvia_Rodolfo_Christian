@@ -19,7 +19,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_jwt_extended import JWTManager
 from datetime import timedelta #Importamos "timedelta" de datetime para modificar el tiempo de expiración de nuestro token.
 from flask_bcrypt import Bcrypt
-from datetime import datetime
+
 # from models import Person
 
 
@@ -47,7 +47,7 @@ CORS(app)
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT-KEY") #Método para traer variables.
 jwt = JWTManager(app)
 bcrypt = Bcrypt(app)
-frontend_url = "https://fuzzy-succotash-74vg5jqrqw5h6x7-3000.app.github.dev"
+frontend_url = os.getenv("FRONTEND_URL")
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
@@ -87,7 +87,6 @@ def sitemap():
      return send_from_directory(static_file_dir, 'index.html')
 
 # any other endpoint will try to serve it like a static file
-
 
 @app.route('/<path:path>', methods=['GET'])
 def serve_any_other_file(path):
