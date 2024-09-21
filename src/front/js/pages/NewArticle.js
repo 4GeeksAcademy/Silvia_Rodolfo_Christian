@@ -29,10 +29,6 @@ const NewArticle = () => {
       });
 
       const file = await response.json();
-      //solicitud POST en la que enviamos la info a la ruta
-      //const response = await axios.post("https://api.cloudinary.com/v1_1/dohlrocq4/image/upload", formData);
-      //console.log("Imagen subida", response.data);
-
 
       //devuelve la URL segura de la imagen subida
       console.log(file);
@@ -43,7 +39,6 @@ const NewArticle = () => {
       throw error;
     }
   };
-
 
   const saveArticle = async () => {
     try {
