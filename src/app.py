@@ -362,11 +362,41 @@ def get_stock():
 def create_stock():
    
     body = request.get_json(silent=True)
+
+    #accede a los datos del formulario
+    description=body['description']
+    stocktype=body['stocktype']
+    quantity=body['quantity']
+    image=body['image']
+
+     #valida campos requeridos
+    if 'description' not in body:
+        return jsonify({'msg': 'El campo description es requerido'}), 400
+    if 'stocktype' not in body:
+        return jsonify({'msg': 'El campo stocktype es requerido'}), 400
+    if 'quantity' not in body:
+        return jsonify({'msg': 'El campo quantity es requerido'}), 400
+    if 'image' not in body:
+        return jsonify({'msg': 'El campo imagen es requerido'}), 400
     
-    description = body.get('description')
-    quantity = body.get('quantity')
-    stock_type = body.get('type')
-    image = body.get('image')
+        #verifica si el artículo ya existe
+
+    if Stock.query.filter_by(description=description).first() is not None:
+        return jsonify({'msg': 'El artículo ya está en stock'}), 400
+
+    #crea el nuevo artículo
+    new_article = Stock(
+        description=description,
+        stocktype=stocktype,
+        quantity=quantity,
+        image=image  #guarda la ruta de la imagen en la BD
+    )
+
+    #guarda en la BD
+    db.session.add(new_article)
+    db.session.commit()
+    #return jsonify(new_article.serialize()), 201
+    return jsonify({'msg': 'Artículo creado con éxito'}), 200
     
 
 @app.route('/stock/available', methods=['GET'])
