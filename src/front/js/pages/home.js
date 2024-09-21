@@ -49,9 +49,7 @@ export const Home = () => {
 		}
 	};
 
-	return (
-
-		
+	return (		
 		 <div className="d-flex flex-column flex-md-row vh-100 align-items-center justify-content-center">
 		 {/* Sección izquierda */}
 		 <div className="text-center text-md-start col-12 col-md-6 d-flex flex-column justify-content-center align-items-md-start position-relative">
@@ -110,7 +108,5 @@ export const Home = () => {
 			 </form>
 		 </div>
 	 </div>
-	
 	);
 };
-

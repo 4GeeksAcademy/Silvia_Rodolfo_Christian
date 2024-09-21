@@ -260,6 +260,7 @@ def forgot_password():
     except Exception as e:
         print(e)
         return jsonify({"error": "An error occurred. Please try again later."}), 500
+
 @app.route('/reset-password/<uuid>', methods=['PUT'])
 def reset_password(uuid):
     try:
@@ -290,7 +291,6 @@ def reset_password(uuid):
         # Mantén solo los mensajes de error para no mostrar información sensible
         print(f"Error during password reset: {str(e)}")
         return jsonify({"error": "An internal error occurred. Please try again later."}), 500
-
 
 def send_reset_email(email, reset_link):
     try:
@@ -341,7 +341,6 @@ def create_form():
              "details": [detail.serialize() for detail in new_form.form_relationship]  # Devolver los detalles del form
          }), 201
 
-
 @app.route('/stock', methods=['GET'])
 @jwt_required()
 def get_stock():
@@ -361,6 +360,9 @@ def get_stock():
             query = query.filter(Stock.description.like(f'%{description}%'))  # Filtrado por descripción parcial
         if stock_type:
             query = query.filter_by(type=StockTypeEnum(stock_type))
+
+        #para que al modificar siga ordenando por id y no se ponga al final
+        query = query.order_by(Stock.id)
 
         # Ejecutar la consulta
         stock_items = query.all()
@@ -417,6 +419,41 @@ def create_stock():
     #return jsonify(new_article.serialize()), 201
     return jsonify({'msg': 'Artículo creado con éxito'}), 200
     
+@app.route('/stock/<int:id>', methods=['GET'])
+def get_single_article(id):
+    single_article = Stock.query.get(id) 
+    if not single_article:
+        return jsonify({'msg': f'El articulo con id {id} no existe'}), 400
+    return jsonify({'msg': 'Este es el artículo que buscas', 
+                    'data': single_article.serialize()}), 200
+
+@app.route('/stock/<int:id>', methods=['PUT'])
+def edit_article(id):
+    body = request.get_json(silent=True)
+    if body is None:
+        return jsonify({'msg': 'El cuerpo de la solicitud debe ser un JSON válido'}), 400
+    article = Stock.query.get(id)
+    if not article:
+        return jsonify({'msg': f'El artículo con id {id} no ha sido encontrado'}), 404
+    if 'description' in body:
+        article.description = body['description']
+    if 'stocktype' in body:
+        article.stocktype = body['stocktype']
+    if 'quantity' in body:
+        article.quantity = body['quantity']
+    if 'image' in body:
+        article.image = body['image']
+    db.session.commit()
+    return jsonify({'msg': f'El artículo con id {id} ha sido modificado'}), 200
+
+@app.route('/stock/<int:id>', methods=['DELETE'])
+def delete_article(id):
+    article = Stock.query.get(id)
+    if not article:
+        return jsonify({'msg': f'El artículo con id {id} no ha sido encontrado'}),404
+    db.session.delete(article)
+    db.session.commit()
+    return jsonify({'msg': f'El artículo con id {id} ha sido eliminado'}), 200
 
 @app.route('/stock/available', methods=['GET'])
 def get_available_stock():
@@ -433,7 +470,6 @@ def get_available_stock():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 400    
-
 
 @app.route('/form/<int:detail_id>', methods=['PUT'])
 @jwt_required()
@@ -470,8 +506,7 @@ def update_form(detail_id): #detail_id es el identificador único del detalle de
     detail_form.finalDate = final_date
     db.session.commit()
     return jsonify ({'msg': 'DetailForm updated successfully'}), 200
-
-    
+   
 @app.route('/search', methods=['GET'])
 @jwt_required()
 def search():

@@ -71,14 +71,13 @@ class Form(db.Model):
     user_relationship =db.relationship("User")
     
     def __repr__(self):
-        return f'<form:{self.id},Initial Date:{self.initialDate},Final Date:{self.finalDate},User:{self.userId}>'
+        return f'<form:{self.id},Date:{self.date},User:{self.userId}>'
 
     def serialize(self):
         return {
             "id": self.id,
             "date":self.date,
             "userId": self.userId
-            
         }
     
 class DetailForm(db.Model):
