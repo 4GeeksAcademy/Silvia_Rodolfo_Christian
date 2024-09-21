@@ -74,7 +74,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 						console.log(data);
 						setStore({ article: data })
 					})
-					.catch(() => { });
+					.catch((err) => { err })
 			},
 			getUser: async () => {
 				//obtiene datos de usuario por id
@@ -93,7 +93,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const data = await response.json();
 					
 					setStore({
-						usertype: data.data.userType
+						usertype: data.data.usertype
 					});
 					
 				} catch (error) {
@@ -122,24 +122,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					})
 					.catch((err) => { err })
 
-			},
-			/*getArticle: (id) => {
-				const store = getStore();
-				fetch(store.apiUrl + "/stock/" + id)
-					.then(response => response.json())
-					.then(data => {
-						console.log(data);
-						data.stock.forEach((objeto) => {
-							if (objeto.id == idContact) {
-								document.getElementById("name").value = objeto.name;
-								document.getElementById("phone").value = objeto.phone;
-								document.getElementById("email").value = objeto.email;
-								document.getElementById("address").value = objeto.address;
-							}
-						});
-					})
-					.catch((err) => { err })
-			},*/
+			}
 		}
 	};
 };
