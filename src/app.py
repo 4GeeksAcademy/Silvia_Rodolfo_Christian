@@ -13,7 +13,6 @@ from api.commands import setup_commands
 from flask_mail import Mail, Message
 import uuid
 from flask_cors import CORS
-from flask_login import login_required, current_user
 from flask_jwt_extended import create_access_token #Importamos las librerias necesarias.
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -273,7 +272,7 @@ def reset_password(uuid):
         return jsonify({"error": "An internal error occurred. Please try again later."}), 500
 
 @app.route('/change-password', methods=['POST'])
-@login_required
+@jwt_required()  # Verifica que el usuario está autenticado con JWT
 def change_password():
     try:
         data = request.get_json()
@@ -285,6 +284,14 @@ def change_password():
         if not current_password or not new_password or not confirm_password:
             return jsonify({"msg": "All fields are required"}), 400
 
+        # Obtener la identidad del usuario actual desde el token JWT
+        current_user_email = get_jwt_identity()
+
+        # Buscar al usuario en la base de datos
+        current_user = User.query.filter_by(email=current_user_email).first()
+        if not current_user:
+            return jsonify({"msg": "User not found"}), 404
+
         # Verificar si la contraseña actual es correcta
         if not bcrypt.check_password_hash(current_user.password, current_password):
             return jsonify({"msg": "Incorrect current password"}), 400
@@ -295,6 +302,8 @@ def change_password():
 
         # Hashear la nueva contraseña usando Flask-Bcrypt
         hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+
+        # Actualizar la contraseña en la base de datos
         current_user.password = hashed_password
         db.session.commit()
 
