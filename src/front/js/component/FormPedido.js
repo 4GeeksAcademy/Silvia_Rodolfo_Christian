@@ -9,12 +9,14 @@ import { CardPedido } from "./CardPedido";
 
 
 export const FormPedido = () => {
+	const [search, setSearch] = useState(""); // Estado para el valor del buscador
 	const [pedidos, setPedidos] = useState([]); // Estado para guardar los pedidos (búsquedas)
 	const [showModal, setShowModal] = useState(false); // Estado para controlar la visibilidad del modal
 	const [pendingPedido, setPendingPedido] = useState(null); // Estado para el pedido pendiente
 	const [currentDate, setCurrentDate] = useState(""); // Estado para guardar la fecha actual
+	const [stocktype, setStocktype] = useState("");
 	const [selectedType, setSelectedType] = useState(""); // Tipo de producto seleccionado
-	const [products, setProducts] = useState([]); // Estado para guardar los productos del tipo seleccionado
+	const [searchArticle, setSerachArticle] = useState("");
 	const [articles, setArticles] = useState([]); // Estado para guardar los artículos obtenidos
 	const navigate = useNavigate(); //Para redirigir a otras páginas
 	const apiUrl = process.env.BACKEND_URL; // URL base de la API desde las variables de entorno
@@ -25,39 +27,15 @@ export const FormPedido = () => {
 	const token = localStorage.getItem("jwt_token"); //Obtiene el token de autenticación almacenado.
 
 
-
-	// Función para obtener los tipos de productos (artículos)
+	{/* Componente Search */ }
 	const getArticlesByEnum = async () => {
-		if (!token) {
-			navigate("/login");
-			return;
-		}
-		try {
-			const response = await fetch(`${apiUrl}search`, {
-				headers: {
-					"Content-Type": "application/json",
-					"Authorization": `Bearer ${token}`
-				}
-			});
-			if (!response.ok) {
-				throw new Error(`HTTP error! Status: ${response.status}`);
-			}
-			const data = await response.json();
-			setArticles(data.articles || []); // Guardamos los tipos de productos obtenidos
-		} catch (error) {
-			console.log("Error en la solicitud", error);
-			alert("Error al obtener los tipos de productos");
-		}
-	};
 
-	// Función para obtener los productos de un tipo seleccionado
-	const getProductsByType = async (type) => {
 		if (!token) {
 			navigate("/login");
 			return;
 		}
 		try {
-			const response = await fetch(`${apiUrl}/products?type=${type}`, {
+			const response = await fetch(`${apiUrl}/search`, {
 				headers: {
 					"Content-Type": "application/json",
 					"Authorization": `Bearer ${token}`
@@ -67,10 +45,11 @@ export const FormPedido = () => {
 				throw new Error(`HTTP error! Status: ${response.status}`);
 			}
 			const data = await response.json();
-			setProducts(data.products || []); // Guardamos los productos obtenidos para el tipo seleccionado
-		} catch (error) {
+			setArticles(data.articles || []); // Guardamos los artículos obtenidos
+		}
+		catch (error) {
 			console.log("Error en la solicitud", error);
-			alert("Error al obtener los productos del tipo seleccionado");
+			alert("Error al obtener los artículos");
 		}
 	};
 
@@ -84,13 +63,6 @@ export const FormPedido = () => {
 			getArticlesByEnum(selectedValue); // Obtener productos del tipo seleccionado
 		}
 	};
-
-
-
-	// Llamar a la función para obtener los tipos de productos cuando el componente se monte
-	useEffect(() => {
-		getArticlesByEnum();
-	}, []);
 
 
 	{/* FrontPedido */ }
@@ -236,10 +208,10 @@ export const FormPedido = () => {
 	}, []);
 
 	return (
-		<div className="flex-grow-1 py-4">
-			<div className="d-flex flex-column min-vh-100">
-				<div className="d-flex justify-content-center align-items-center container row col-6" style={{ marginLeft: "100px" }}>
-					<div>
+		<div>
+			<div className="container mt-auto p-3 d-flex flex-column min-vh-100">
+				<div className="row justify-content-start text-start mb-4 col-6">
+					<div className="col-12">
 						<h1 className="mb-n1 px-5" style={{ position: "relative", zIndex: 1, fontSize: "80px", fontWeight: "bold" }}>Order</h1>
 						<img src={linea} style={{ zIndex: 0 }} />
 						<h3 className="px-5 fw-normal">Book your material</h3>
