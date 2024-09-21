@@ -81,7 +81,7 @@ const NewArticle = () => {
 
   return (
     <div className="container">
-      <div className="d-flex vh-100 mt-5 row">
+      <div className="d-flex flex-column align-items-start mt-5 row" style={{minHeight: "200px"}}>
         <div>
           <h1 className="mb-n1 px-5" style={{ position: "relative", zIndex: 1, fontWeight: "bold" }}>Stock</h1>
           <img src={linea} style={{ zIndex: 0 }} alt="Linea decorativa" />
@@ -94,7 +94,7 @@ const NewArticle = () => {
           </Link>
         </div>
 
-        <div className="card mb-5" style={{ width: "18rem", backgroundColor: "#FFE492" }}>
+        <div className="card mb-5 mt-5" style={{ width: "18rem", backgroundColor: "#FFE492" }}>
 
           <Image
             //'cloudName' es el nombre de la cuenta de cloudinary
