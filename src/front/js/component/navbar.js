@@ -15,20 +15,6 @@ export const Navbar = () => {
 		setIsLogged(!!token);
 	}, [token]);
 
-	// Obtener las iniciales del usuario
-	const getUserInitials = () => {
-		if (store.user && store.user.firstName && store.user.lastName) {
-			const firstNameInitial = store.user.firstName.charAt(0).toUpperCase();
-			const lastNameInitial = store.user.lastName.charAt(0).toUpperCase();
-			const initials = `${firstNameInitial}${lastNameInitial}`;
-
-			console.log("Initials of the user:", initials); // Imprimir las iniciales en la consola
-			return initials;
-		}
-		console.log("User data is missing or incomplete."); // Si no hay datos del usuario
-		return '';
-	};
-
 	// Manejar Login/Logout
 	const handleLogin = () => {
 		if (isLogged) {
@@ -52,27 +38,9 @@ export const Navbar = () => {
 					<img src={logoNavbar} style={{ width: "200px" }} alt="Logo" />
 				</Link>
 				<div className="d-flex align-items-center ms-auto gap-2">
-					{/* Mostrar las iniciales del usuario en un círculo si está logueado */}
-					{token && store.user && store.user.firstName && store.user.lastName ? (
+					{/* Mostrar el dropdown de perfil con el nombre si está logueado */}
+					{token ? (
 						<div className="d-flex align-items-center">
-							<div
-								style={{
-									backgroundColor: "#4F9CF9",
-									color: "#fff",
-									borderRadius: "50%",
-									width: "40px",
-									height: "40px",
-									display: "flex",
-									justifyContent: "center",
-									alignItems: "center",
-									fontSize: "16px",
-									fontWeight: "bold",
-									marginRight: "10px"
-								}}
-							>
-								{getUserInitials()}
-							</div>
-
 							<div className="btn-group">
 								<button
 									type="button"
@@ -81,7 +49,10 @@ export const Navbar = () => {
 									aria-expanded="false"
 									style={{ backgroundColor: "#4F9CF9", color: "#fff" }}
 								>
-									Perfil
+									{/* Mostrar el nombre completo del usuario si está disponible */}
+									{store.user && store.user.firstName && store.user.lastName
+										? `${store.user.firstName} ${store.user.lastName}`
+										: "Perfil"}
 								</button>
 								<ul className="dropdown-menu dropdown-menu-end">
 									<li>
@@ -97,9 +68,7 @@ export const Navbar = () => {
 								</ul>
 							</div>
 						</div>
-					) : (
-						<span>User data is missing or incomplete</span>
-					)}
+					) : null}
 
 					{/* Botón de Login/Logout */}
 					{!token && (
