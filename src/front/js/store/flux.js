@@ -48,10 +48,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 				});
 				setStore({ demo: demo });
 			},
-
-			deleteSelected: (id) => {
+			deleteSelected: (description) => {
 				const store = getStore();
-				setStore({ selected: store.selected.filter(selected => selected[0] !== id) });
+				setStore({ selected: store.selected.filter(selected => selected[0] !== description) });
 			},
 
 			addSelected: (elemento) => {

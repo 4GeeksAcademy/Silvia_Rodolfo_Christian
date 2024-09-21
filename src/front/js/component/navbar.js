@@ -123,30 +123,27 @@ export const Navbar = () => {
 							</button>
 
 							<ul className="dropdown-menu dropdown-menu-end">
-								{store.selected.length > 0 ? (
-									store.selected.map((selected, index) => (
-										<li className="dropdown-item d-flex" key={index}>
-											<div className="me-auto p-2">
-												{selected[0]}
-											</div>
-											<div className="p-2" onClick={() => noCart(selected[0])}>
-												<i className="fa-solid fa-trash" />
-											</div>
-											<div>
-												<button
-													type="button"
-													className="btn btn-secondary m-2"
-													style={{ backgroundColor: "#4F9CF9" }}
-													onClick={() => navigate("/formPedido")}
-												>
-													Order
-												</button>
-											</div>
-										</li>
-									))
-								) : (
-									<li className="dropdown-item">No items</li>
-								)}
+								{
+									store.selected.length > 0 ? (
+										store.selected.map((selected, index) => (
+											<li className="dropdown-item d-flex" key={index}>
+												<div className="me-auto p-2">
+													{selected[0]}
+												</div>
+												<div className="p-2" onClick={() => noCart(selected[0])}>
+													<i className="fa-solid fa-trash" />
+												</div>
+												<div>
+													<button type="button" className="btn btn-secondary m-2" style={{ backgroundColor: "#4F9CF9" }} onClick={() => navigate("/formPedido")}>
+														Order
+													</button>
+												</div>
+											</li>
+										))
+									) : (
+										<li className="dropdown-item">No items</li>
+									)
+								}
 							</ul>
 						</div>
 					)}
