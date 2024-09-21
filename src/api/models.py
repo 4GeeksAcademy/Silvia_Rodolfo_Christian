@@ -76,10 +76,8 @@ class Form(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "initialDate": self.initialDate,
-            "finalDate": self.finalDate,
-            "userId": self.id,
-            "date":self.date
+            "date":self.date,
+            "userId": self.id          
         }
     
 class DetailForm(db.Model):

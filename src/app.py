@@ -13,6 +13,7 @@ from api.commands import setup_commands
 from flask_mail import Mail, Message
 import uuid
 from flask_cors import CORS
+from flask_login import login_required, current_user
 from flask_jwt_extended import create_access_token #Importamos las librerias necesarias.
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -282,6 +283,37 @@ def reset_password(uuid):
         print(f"Error during password reset: {str(e)}")
         return jsonify({"error": "An internal error occurred. Please try again later."}), 500
 
+@app.route('/change-password', methods=['POST'])
+@login_required
+def change_password():
+    try:
+        data = request.get_json()
+        current_password = data.get('currentPassword')
+        new_password = data.get('newPassword')
+        confirm_password = data.get('confirmPassword')
+
+        # Validar que todos los campos están presentes
+        if not current_password or not new_password or not confirm_password:
+            return jsonify({"msg": "All fields are required"}), 400
+
+        # Verificar si la contraseña actual es correcta
+        if not bcrypt.check_password_hash(current_user.password, current_password):
+            return jsonify({"msg": "Incorrect current password"}), 400
+
+        # Verificar que la nueva contraseña coincida con la confirmación
+        if new_password != confirm_password:
+            return jsonify({"msg": "New passwords do not match"}), 400
+
+        # Hashear la nueva contraseña usando Flask-Bcrypt
+        hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+        current_user.password = hashed_password
+        db.session.commit()
+
+        return jsonify({"msg": "Password changed successfully!"}), 200
+
+    except Exception as e:
+        print(f"Error during password change: {str(e)}")
+        return jsonify({"error": "An internal error occurred. Please try again later."}), 500
 
 def send_reset_email(email, reset_link):
     try:
