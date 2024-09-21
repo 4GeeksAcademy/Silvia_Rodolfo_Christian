@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { Context } from "../store/appContext";
 import linea from "../../img/linea.png"
 import { useNavigate } from "react-router-dom";
