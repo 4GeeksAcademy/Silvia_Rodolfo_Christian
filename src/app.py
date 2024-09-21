@@ -198,29 +198,22 @@ def forgot_password():
         email = data.get('email')
         print(os.getenv("MAIL_USERNAME"))
         print(email)
-        
         # Validar que el correo esté presente
         if not email:
             return jsonify({"msg": "Email is required"}), 400
-
         # Verificar si el correo está registrado en la base de datos
         user = User.query.filter_by(email=email).first()
-
         # Mensaje genérico, sin importar si el usuario fue encontrado o no
         if not user:
             return jsonify({"msg": "If the email is registered, a reset link has been sent."}), 200
-
         # Generar un UUID
         reset_uuid = str(uuid.uuid4())
-
         # Guardar el UUID en la base de datos
         new_uuid_entry = UserUUID(userId=user.id, uuid=reset_uuid)
         db.session.add(new_uuid_entry)
         db.session.commit()
-
         # Generar el enlace de restablecimiento de contraseña
         reset_link = f"{frontend_url}/reset-password/{reset_uuid}"
-
         # Enviar correo con el UUID
         msg = Message(
             subject="(No Reply), Mail para cambio contraseña",
@@ -242,10 +235,8 @@ def forgot_password():
             <p>If you didn't request a password reset, you can ignore this email.</p>
         """
         mail.send(msg)
-
         # Mensaje genérico para evitar enumeración de correos
         return jsonify({"msg": "If the email is registered, a reset link has been sent."}), 200
-
     except Exception as e:
         print(e)
         return jsonify({"error": "An error occurred. Please try again later."}), 500
@@ -255,37 +246,27 @@ def reset_password(uuid):
     try:
         data = request.get_json()
         new_password = data.get('newPassword')
-
         # Verificar que se haya proporcionado la nueva contraseña
         if not new_password:
             return jsonify({"msg": "New password is required"}), 400
-
         # Buscar el UUID en la tabla UserUUID
         uuid_entry = UserUUID.query.filter_by(uuid=uuid).first()
-
         # Verificar si el UUID existe y no ha expirado
         if not uuid_entry or uuid_entry.is_expired():
             return jsonify({"msg": "Invalid or expired reset link"}), 400
-
         # Buscar al usuario asociado con este UUID
         user = User.query.get(uuid_entry.userId)
-
         if not user:
             return jsonify({"msg": "User not found"}), 404
-
         # Hashear la nueva contraseña con Flask-Bcrypt
         hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
-
         # Almacenar la nueva contraseña hasheada en la base de datos
         user.password = hashed_password
         db.session.commit()
-
         # Opcional: Borrar o invalidar el UUID tras el uso
         db.session.delete(uuid_entry)
         db.session.commit()
-
         return jsonify({"msg": "Password updated"}), 200
-
     except Exception as e:
         # Mantén solo los mensajes de error para no mostrar información sensible
         print(f"Error during password reset: {str(e)}")

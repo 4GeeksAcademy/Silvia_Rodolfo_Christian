@@ -40,7 +40,6 @@ const NewArticle = () => {
     }
   };
 
-
   const saveArticle = async () => {
     try {
       //sube la imagen y obtiene la URL

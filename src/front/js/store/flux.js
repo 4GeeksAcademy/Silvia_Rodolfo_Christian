@@ -74,7 +74,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 						console.log(data);
 						setStore({ article: data })
 					})
-					.catch(() => { });
+					.catch((err) => { err })
 			},
 			getUser: async () => {
 				//obtiene datos de usuario por id
