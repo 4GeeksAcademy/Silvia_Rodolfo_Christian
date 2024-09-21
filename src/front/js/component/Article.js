@@ -6,9 +6,7 @@ const Article = ({ description, quantity, stocktype, image, id }) => {
   const { store, actions } = useContext(Context);
   const navigate = useNavigate();
   const [isSelected, setIsSelected] = useState(false);
-  //const [hidden, setHidden] = useState();
   const usertype = store.usertype;
-  let hidden;
 
   useEffect(() => {
     setIsSelected(store.selected.some((element) => element.description === description));

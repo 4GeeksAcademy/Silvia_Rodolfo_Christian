@@ -43,22 +43,6 @@ const EditArticle = () => {
         }
     };
     
-    //const [articleToEdit, setArticleToEdit] = useState({})
-    useEffect(() => {
-        if (id) {
-            loadArticle();
-            /*const findArticle = store.article.filter((article) => {
-                return article.id == id
-            })
-            
-            setArticleToEdit(findArticle[0])
-            setDescription(findArticle[0].description);
-            setStocktype(findArticle[0].type);
-            setQuantity(findArticle[0].quantity);        
-            setImageUrl(findArticle[0].image);*/
-        }
-    }, [id]);
-    
     const uploadImage = async () => {
         //añade la imagen seleccionada por el usuario (una nueva)
         const formData = new FormData();

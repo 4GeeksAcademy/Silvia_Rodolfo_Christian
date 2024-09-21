@@ -122,24 +122,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					})
 					.catch((err) => { err })
 
-			},
-			/*getArticle: (id) => {
-				const store = getStore();
-				fetch(store.apiUrl + "/stock/" + id)
-					.then(response => response.json())
-					.then(data => {
-						console.log(data);
-						data.stock.forEach((objeto) => {
-							if (objeto.id == idContact) {
-								document.getElementById("name").value = objeto.name;
-								document.getElementById("phone").value = objeto.phone;
-								document.getElementById("email").value = objeto.email;
-								document.getElementById("address").value = objeto.address;
-							}
-						});
-					})
-					.catch((err) => { err })
-			},*/
+			}
 		}
 	};
 };

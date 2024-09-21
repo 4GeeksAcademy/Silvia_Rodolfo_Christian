@@ -236,118 +236,122 @@ export const FormPedido = () => {
 	}, []);
 
 	return (
-	<div className="flex-grow-1 py-4">
-		<div className="d-flex flex-column min-vh-100">
-			<div className="d-flex justify-content-center align-items-center container row col-6" style={{ marginLeft: "100px" }}>
-				<div>
-					<h1 className="mb-n1 px-5" style={{ position: "relative", zIndex: 1, fontSize: "80px", fontWeight: "bold" }}>Order</h1>
-					<img src={linea} style={{ zIndex: 0 }} />
-					<h3 className="px-5 fw-normal">Book your material</h3>
-					<p style={{color: "lightgray"}}>Recuerda que tienes un máximo de 5 productos</p>
-					
-					<form onSubmit={handleSubmit}>
-						<input value={search} onChange={(e) => setSearch(e.target.value)} type="search" className="form-control form-control-lg fw-light fs-6 input" style={{ backgroundColor: "#D3E7FF" }} id="search" placeholder="Search here" />
-					</form>
-					<div className="px-5">
-						<button type="button" className="btn btn-primary fw-light" style={{ backgroundColor: "#4F9CF9", border: "none" }}>
-							Order
-
-		<div>
-			<div className="container mt-auto p-3 d-flex flex-column min-vh-100">
-
-				<div className="row justify-content-start text-start mb-4 col-6">
-					<div className="col-12">
+		<div className="flex-grow-1 py-4">
+			<div className="d-flex flex-column min-vh-100">
+				<div className="d-flex justify-content-center align-items-center container row col-6" style={{ marginLeft: "100px" }}>
+					<div>
 						<h1 className="mb-n1 px-5" style={{ position: "relative", zIndex: 1, fontSize: "80px", fontWeight: "bold" }}>Order</h1>
-						<img className="mt-2" src={linea} />
-					</div>
-				</div>
+						<img src={linea} style={{ zIndex: 0 }} />
+						<h3 className="px-5 fw-normal">Book your material</h3>
+						<p style={{ color: "lightgray" }}>Recuerda que tienes un máximo de 5 productos</p>
 
-				{/* Información de la orden */}
-				<div className="row justify-content-center mb-4">
-					<div className="col-md-3 text-center">
-						<h6 style={{ color: "#043873" }}><strong>Order #XXXXXX</strong></h6> {/* -------------------- Conectar el número de Order con la BBDD*/}
-
-					</div>
-					<div className="col-md-3 text-center">
-						<h6 style={{ color: "#043873" }}><strong>{currentDate}</strong></h6>
-					</div>
-					<div className="col-md-3 text-center">
-						<h6 style={{ color: "#043873" }}><strong>NAME LASTNAME</strong></h6>
-					</div>
-				</div>
-				<p style={{ color: "lightgray" }}>Recuerda que tienes un máximo de 5 productos. {countPedidos()}</p>
-
-				{/* Barra de búsqueda */}
-                <div className="row mb-4">
-                    <div className="col-12 col-md-9">
-                        <div className="input-group">
-                            <select
-                                className="form-select fw-light fs-6"
-                                style={{ backgroundColor: "#D3E7FF", color: "#4F9CF9" }}
-                                value={selectedType}
-                                onChange={handleSelectType}
-                                required
-                            >
-                                <option value="">Selecciona un tipo de producto</option> {/* Opción por defecto */}
-                                <option value="monitor">Monitor</option>
-                                <option value="teclado">Teclado</option>
-                                <option value="cable">Cable</option>
-                                <option value="mouse">Mouse</option>
-                                <option value="camara">Cámara</option>
-                            </select>
-
-							{/* Icono de búsqueda */}
-							<button
-								className="input-group-text"
-								style={{ backgroundColor: "#4F9CF9", cursor: "pointer" }}
-								onClick={handleSearchClick} // Manejar clic en el ícono de búsqueda
-							>
-								<FontAwesomeIcon icon={faMagnifyingGlass} style={{ color: "#043873" }} />
-							</button>
+						<form onSubmit={handleSubmit}>
+							<input value={search} onChange={(e) => setSearch(e.target.value)} type="search" className="form-control form-control-lg fw-light fs-6 input" style={{ backgroundColor: "#D3E7FF" }} id="search" placeholder="Search here" />
+						</form>
+						<div className="px-5">
+							<button type="button" className="btn btn-primary fw-light" style={{ backgroundColor: "#4F9CF9", border: "none" }} />
+							Order
 						</div>
+					</div>
+				</div>
+			</div>
 
-						{/* Modal para seleccionar productos */}
-						{showModal && (
-							<div className="modal fade show" style={{ display: "block" }}>
-								<div className="modal-dialog">
-									<div className="modal-content">
-										<div className="modal-header">
-											<h5 className="modal-title">Productos del tipo {selectedType}</h5>
-											<button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
-										</div>
-										<div className="modal-body">
-											<ul>
-												{products.map((product, index) => (
-													<li key={index}>
-														<button onClick={() => addProductToOrder(product)}>{product.name}</button>
-													</li>
-												))}
-											</ul>
-										</div>
-										<div className="modal-footer">
-											<button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cerrar</button>
+			<div>
+				<div className="container mt-auto p-3 d-flex flex-column min-vh-100">
+
+					<div className="row justify-content-start text-start mb-4 col-6">
+						<div className="col-12">
+							<h1 className="mb-n1 px-5" style={{ position: "relative", zIndex: 1, fontSize: "80px", fontWeight: "bold" }}>Order</h1>
+							<img className="mt-2" src={linea} />
+						</div>
+					</div>
+
+					{/* Información de la orden */}
+					<div className="row justify-content-center mb-4">
+						<div className="col-md-3 text-center">
+							<h6 style={{ color: "#043873" }}><strong>Order #XXXXXX</strong></h6> {/* -------------------- Conectar el número de Order con la BBDD*/}
+
+						</div>
+						<div className="col-md-3 text-center">
+							<h6 style={{ color: "#043873" }}><strong>{currentDate}</strong></h6>
+						</div>
+						<div className="col-md-3 text-center">
+							<h6 style={{ color: "#043873" }}><strong>NAME LASTNAME</strong></h6>
+						</div>
+					</div>
+					<p style={{ color: "lightgray" }}>Recuerda que tienes un máximo de 5 productos. {countPedidos()}</p>
+
+					{/* Barra de búsqueda */}
+					<div className="row mb-4">
+						<div className="col-12 col-md-9">
+							<div className="input-group">
+								<select
+									className="form-select fw-light fs-6"
+									style={{ backgroundColor: "#D3E7FF", color: "#4F9CF9" }}
+									value={selectedType}
+									onChange={handleSelectType}
+									required
+								>
+									<option value="">Selecciona un tipo de producto</option> {/* Opción por defecto */}
+									<option value="monitor">Monitor</option>
+									<option value="teclado">Teclado</option>
+									<option value="cable">Cable</option>
+									<option value="mouse">Mouse</option>
+									<option value="camara">Cámara</option>
+								</select>
+
+								{/* Icono de búsqueda */}
+								<button
+									className="input-group-text"
+									style={{ backgroundColor: "#4F9CF9", cursor: "pointer" }}
+									onClick={handleSearchClick} // Manejar clic en el ícono de búsqueda
+								>
+									<FontAwesomeIcon icon={faMagnifyingGlass} style={{ color: "#043873" }} />
+								</button>
+							</div>
+
+							{/* Modal para seleccionar productos */}
+							{showModal && (
+								<div className="modal fade show" style={{ display: "block" }}>
+									<div className="modal-dialog">
+										<div className="modal-content">
+											<div className="modal-header">
+												<h5 className="modal-title">Productos del tipo {selectedType}</h5>
+												<button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
+											</div>
+											<div className="modal-body">
+												<ul>
+													{products.map((product, index) => (
+														<li key={index}>
+															<button onClick={() => addProductToOrder(product)}>{product.name}</button>
+														</li>
+													))}
+												</ul>
+											</div>
+											<div className="modal-footer">
+												<button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cerrar</button>
+											</div>
 										</div>
 									</div>
 								</div>
-							</div>
-						)}
-					</div>
+							)}
+						</div>
 
-					<div className="col-12 col-md-3 text-md-end text-center mt-3 mt-md-0">
-						<button type="submit" className="btn btn-primary fw-light align-text-center" style={{ backgroundColor: "#4F9CF9", border: "none", width: "150px" }} >
-							<strong>Order</strong>
-						</button>
+						<div className="col-12 col-md-3 text-md-end text-center mt-3 mt-md-0">
+							<button type="submit" className="btn btn-primary fw-light align-text-center" style={{ backgroundColor: "#4F9CF9", border: "none", width: "150px" }} >
+								<strong>Order</strong>
+							</button>
+						</div>
 					</div>
-				</div>
-				{/* Lista de Artículos generados a partir de las búsquedas */}
-				<div className="col-12 mb-3" >
-					{pedidos.map((pedido, index) => (
-						<CardPedido key={index} descripcion={pedido.descripcion} cantidad={pedido.cantidad} onDelete={() => eliminarPedido(index)}
-							onCantidadChange={(nuevaCantidad) => actualizarCantidad(index, nuevaCantidad)} />
-					))}
-				</div>
-			</div >
+					{/* Lista de Artículos generados a partir de las búsquedas */}
+					<div className="col-12 mb-3" >
+						{pedidos.map((pedido, index) => (
+							<CardPedido key={index} descripcion={pedido.descripcion} cantidad={pedido.cantidad} onDelete={() => eliminarPedido(index)}
+								onCantidadChange={(nuevaCantidad) => actualizarCantidad(index, nuevaCantidad)} />
+						))}
+					</div>
+				</div >
+			</div>
 		</div>
-
 	);
 };

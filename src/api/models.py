@@ -1,6 +1,4 @@
 
-from flask_sqlalchemy import SQLAlchemy;
-from sqlalchemy import Enum;
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Enum
 from sqlalchemy.dialects.postgresql import UUID
@@ -30,7 +28,7 @@ class User(db.Model):
     password = db.Column(db.String(80), unique=False, nullable=False)
     isActive = db.Column(db.Boolean(), unique=False, nullable=False)
     # Definir userType como Enum con opciones "tecnico" y "usuario"
-    userType = db.Column(Enum(UserTypeEnum), nullable=False)
+    usertype = db.Column(Enum(UserTypeEnum), nullable=False)
 
     def __repr__(self):
         return f'<User {self.email}>'
@@ -43,7 +41,7 @@ class User(db.Model):
             "lastName": self.lastName,
             "password":self.password,
             "isActive":self.isActive,
-            "userType": self.userType.value  # Convertir el Enum a su valor (cadena)
+            "usertype": self.usertype.value  # Convertir el Enum a su valor (cadena)
             # do not serialize the password, its a security breach
         }
     
@@ -74,15 +72,13 @@ class Form(db.Model):
     user_relationship =db.relationship("User")
     
     def __repr__(self):
-        return f'<form:{self.id},Initial Date:{self.initialDate},Final Date:{self.finalDate},User:{self.userId}>'
+        return f'<form:{self.id},Date:{self.date},User:{self.userId}>'
 
     def serialize(self):
         return {
             "id": self.id,
-            "initialDate": self.initialDate,
-            "finalDate": self.finalDate,
-            "userId": self.id,
-            "date":self.date
+            "date":self.date,
+            "userId": self.userId
         }
     
 class DetailForm(db.Model):
