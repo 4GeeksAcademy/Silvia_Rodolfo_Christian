@@ -97,7 +97,7 @@ def serve_any_other_file(path):
     response.cache_control.max_age = 0  # avoid cache memory
     return response
 
-@app.route('/allforms', methods=['GET'])
+@app.route('/all_forms', methods=['GET'])
 # técnico puede ver todos los pedidos
 @jwt_required()
 def get_forms():
