@@ -51,9 +51,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 				//reset the global store
 				setStore({ demo: demo });
 			},
-			deleteSelected: (description) => {
+			deleteSelected: (id) => {
 				const store = getStore();
-				setStore({ selected: store.selected.filter(selected => selected[0] !== description) });
+				setStore({ selected: store.selected.filter(selected => selected[0] !== id) });
 			},
 			addSelected: (elemento) => {
 				const store = getStore();
@@ -62,29 +62,43 @@ const getState = ({ getStore, getActions, setStore }) => {
 			getStock: () => {
 				const store = getStore();
 				const token = localStorage.getItem("jwt_token")
-				fetch(store.apiUrl + "/stock", {
+				fetch(`${store.apiUrl}/stock`, {
 					method: 'GET',
 					headers: {
 						"Content-Type": "application/json",
-						'Authorization': 'Bearer ' + token // ⬅⬅⬅ authorization token
+						'Authorization': 'Bearer ' + token //authorization token
 					}
 				})
-
 					.then(response => response.json())
 					.then((data) => {
 						console.log(data);
 						setStore({ article: data })
 					})
-					.catch(() => { });
+					.catch((err) => { err })
 			},
-			getUser: (usertype) => {
+			getUser: async () => {
+				//obtiene datos de usuario por id
 				const store = getStore();
-				fetch(`${store.apiUrl}/user/${usertype}`)
-					.then(response => response.json())
-					.then((data) => {
-						setStore({ user: data.results })
-					})
-					.catch(() => { });
+				const token = localStorage.getItem("jwt_token")
+				try {
+					// Petición para obtener toda la información del usuario
+					const response = await fetch(`${store.apiUrl}/user`, {
+						method: 'GET',
+						headers: {
+							"Content-Type": "application/json",
+							'Authorization': 'Bearer ' + token 
+						}
+					});
+
+					const data = await response.json();
+					
+					setStore({
+						usertype: data.data.usertype
+					});
+					
+				} catch (error) {
+					console.error('Error al obtener el usuario:', error);
+				}
 			},
 			deleteArticle: (id) => {
 				console.log("Intentando eliminar artículo con ID:", id);
@@ -108,24 +122,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					})
 					.catch((err) => { err })
 
-			},
-			/*getArticle: (id) => {
-				const store = getStore();
-				fetch(store.apiUrl + "/stock/" + id)
-					.then(response => response.json())
-					.then(data => {
-						console.log(data);
-						data.stock.forEach((objeto) => {
-							if (objeto.id == idContact) {
-								document.getElementById("name").value = objeto.name;
-								document.getElementById("phone").value = objeto.phone;
-								document.getElementById("email").value = objeto.email;
-								document.getElementById("address").value = objeto.address;
-							}
-						});
-					})
-					.catch((err) => { err })
-			},*/
+			}
 		}
 	};
 };

@@ -2,14 +2,25 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 
-const Article = ({ description, quantity, stocktype, image, usertype, id }) => {
+const Article = ({ description, quantity, stocktype, image, id }) => {
   const { store, actions } = useContext(Context);
   const navigate = useNavigate();
   const [isSelected, setIsSelected] = useState(false);
+  //const [hidden, setHidden] = useState();
+  const usertype = store.usertype;
+  let hidden;
 
   useEffect(() => {
     setIsSelected(store.selected.some((element) => element.description === description));
-  }, [store.selected, description]);
+    //obtiene usertype y hace que se oculten los botones elegidos
+    const fetchUserType = async () => {
+      const token = localStorage.getItem("jwt_token");
+      if (!token) {
+        navigate("/");
+      } 
+    };
+    fetchUserType();
+  }, []);
 
   const handleSelectedClick = () => {
     if (isSelected) {
@@ -21,9 +32,8 @@ const Article = ({ description, quantity, stocktype, image, usertype, id }) => {
   };
 
   const deleteArticleClic = (id) => {
-    console.log(id);
     actions.deleteArticle(id);
-};
+  };
 
   return (
     <div className="card mb-5 p-2" style={{ width: "18rem", backgroundColor: "#FFE492" }}>
@@ -33,22 +43,27 @@ const Article = ({ description, quantity, stocktype, image, usertype, id }) => {
         <p>{stocktype}</p>
         <p>Quantity:{quantity}</p>
 
+        {usertype === "usuario" && (
+          <div className={`btn btn-outline-secondary ${isSelected ? 'active' : ''}`} onClick={handleSelectedClick}>
+            {isSelected ? (
+              <i className="fa-solid fa-cart-shopping" />
+            ) : (
+              <i className="fa-solid fa-cart-arrow-down" />
+            )}
+          </div>
+        )}
 
-        <div className={`btn btn-outline-secondary ${isSelected ? 'active' : ''}`} onClick={handleSelectedClick} hidden={usertype != "usuario"}>
-          {isSelected ? (
-            <i className="fa-solid fa-cart-shopping" />
-          ) : (
-            <i className="fa-solid fa-cart-arrow-down" />
-          )}
-        </div>
-        <div className="text-center mb-2" hidden={usertype === "usuario"}>
-          <button type="button" className="btn btn-secondary m-2" style={{ backgroundColor: "#043873" }} onClick={() => navigate(`/edit-article/${id}`)}>
-            <i className="fa-solid fa-pen-to-square" />
-          </button>
-          <button type="button" className="btn btn-secondary m-2" style={{ backgroundColor: "#043873" }} onClick={() => {deleteArticleClic(id)}}>
-            <i className="fa-solid fa-trash" />
-          </button>
-        </div>
+        {usertype === "tecnico" && ( 
+          <div className="text-center mb-2">
+            <button type="button" className="btn btn-secondary m-2" style={{ backgroundColor: "#043873" }} onClick={() => navigate(`/edit-article/${id}`)}>
+              <i className="fa-solid fa-pen-to-square" />
+            </button>
+            <button type="button" className="btn btn-secondary m-2" style={{ backgroundColor: "#043873" }} onClick={() => { deleteArticleClic(id) }}>
+              <i className="fa-solid fa-trash" />
+            </button>
+          </div>
+        )}
+
       </div>
     </div>
   )
