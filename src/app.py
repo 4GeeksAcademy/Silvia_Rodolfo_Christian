@@ -19,7 +19,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_jwt_extended import JWTManager
 from datetime import timedelta #Importamos "timedelta" de datetime para modificar el tiempo de expiración de nuestro token.
 from flask_bcrypt import Bcrypt
-from datetime import datetime
+
 # from models import Person
 
 
@@ -47,7 +47,7 @@ CORS(app)
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT-KEY") #Método para traer variables.
 jwt = JWTManager(app)
 bcrypt = Bcrypt(app)
-frontend_url = "https://fuzzy-succotash-74vg5jqrqw5h6x7-3000.app.github.dev"
+frontend_url = os.getenv("FRONTEND_URL")
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
@@ -87,7 +87,6 @@ def sitemap():
      return send_from_directory(static_file_dir, 'index.html')
 
 # any other endpoint will try to serve it like a static file
-
 
 @app.route('/<path:path>', methods=['GET'])
 def serve_any_other_file(path):
@@ -291,6 +290,48 @@ def reset_password(uuid):
     except Exception as e:
         # Mantén solo los mensajes de error para no mostrar información sensible
         print(f"Error during password reset: {str(e)}")
+        return jsonify({"error": "An internal error occurred. Please try again later."}), 500
+
+@app.route('/change-password', methods=['POST'])
+@jwt_required()  # Verifica que el usuario está autenticado con JWT
+def change_password():
+    try:
+        data = request.get_json()
+        current_password = data.get('currentPassword')
+        new_password = data.get('newPassword')
+        confirm_password = data.get('confirmPassword')
+
+        # Validar que todos los campos están presentes
+        if not current_password or not new_password or not confirm_password:
+            return jsonify({"msg": "All fields are required"}), 400
+
+        # Obtener la identidad del usuario actual desde el token JWT
+        current_user_email = get_jwt_identity()
+
+        # Buscar al usuario en la base de datos
+        current_user = User.query.filter_by(email=current_user_email).first()
+        if not current_user:
+            return jsonify({"msg": "User not found"}), 404
+
+        # Verificar si la contraseña actual es correcta
+        if not bcrypt.check_password_hash(current_user.password, current_password):
+            return jsonify({"msg": "Incorrect current password"}), 400
+
+        # Verificar que la nueva contraseña coincida con la confirmación
+        if new_password != confirm_password:
+            return jsonify({"msg": "New passwords do not match"}), 400
+
+        # Hashear la nueva contraseña usando Flask-Bcrypt
+        hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+
+        # Actualizar la contraseña en la base de datos
+        current_user.password = hashed_password
+        db.session.commit()
+
+        return jsonify({"msg": "Password changed successfully!"}), 200
+
+    except Exception as e:
+        print(f"Error during password change: {str(e)}")
         return jsonify({"error": "An internal error occurred. Please try again later."}), 500
 
 def send_reset_email(email, reset_link):

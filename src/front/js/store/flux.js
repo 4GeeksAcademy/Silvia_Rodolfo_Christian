@@ -17,7 +17,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 			apiUrl: process.env.BACKEND_URL,
 			article: [],
 			usertype: [],
-			selected: []
+			selected: [],
+			user: "", // Añadimos un campo user para almacenar los datos del usuario
+			userInitials: '' // Campo para almacenar las iniciales del usuario
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -28,27 +30,22 @@ const getState = ({ getStore, getActions, setStore }) => {
 			getMessage: async () => {
 				try {
 					// fetching data from the backend
-					const resp = await fetch(process.env.BACKEND_URL + "/api/hello")
-					const data = await resp.json()
-					setStore({ message: data.message })
+					const resp = await fetch(process.env.BACKEND_URL + "/api/hello");
+					const data = await resp.json();
+					setStore({ message: data.message });
 					// don't forget to return something, that is how the async resolves
 					return data;
 				} catch (error) {
-					console.log("Error loading message from backend", error)
+					console.log("Error loading message from backend", error);
 				}
 			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
 
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
+			changeColor: (index, color) => {
+				const store = getStore();
 				const demo = store.demo.map((elm, i) => {
 					if (i === index) elm.background = color;
 					return elm;
 				});
-
-				//reset the global store
 				setStore({ demo: demo });
 			},
 			deleteSelected: (description) => {
@@ -59,9 +56,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const store = getStore();
 				setStore({ selected: [...store.selected, elemento] });
 			},
+
 			getStock: () => {
 				const store = getStore();
-				const token = localStorage.getItem("jwt_token")
+				const token = localStorage.getItem("jwt_token");
 				fetch(`${store.apiUrl}/stock`, {
 					method: 'GET',
 					headers: {
@@ -71,10 +69,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 				})
 					.then(response => response.json())
 					.then((data) => {
-						console.log(data);
-						setStore({ article: data })
+						setStore({ article: data });
 					})
-					.catch((err) => { err })
+					.catch((err) => { console.error(err) });
 			},
 			getUser: async () => {
 				//obtiene datos de usuario por id
@@ -86,23 +83,33 @@ const getState = ({ getStore, getActions, setStore }) => {
 						method: 'GET',
 						headers: {
 							"Content-Type": "application/json",
-							'Authorization': 'Bearer ' + token 
+							'Authorization': 'Bearer ' + token
 						}
 					});
 
 					const data = await response.json();
-					
-					setStore({
-						usertype: data.data.usertype
-					});
-					
+
+					if (data && data.data) {
+						const user = data.data;
+
+						const firstNameInitial = user.firstName ? user.firstName.charAt(0).toUpperCase() : '';
+						const lastNameInitial = user.lastName ? user.lastName.charAt(0).toUpperCase() : '';
+						const initials = `${firstNameInitial}${lastNameInitial}`;
+
+						setStore({
+							user: user,
+							userInitials: initials,
+							usertype: user.usertype
+						});
+					} else {
+						console.error('No se encontraron datos de usuario');
+					}
+
 				} catch (error) {
 					console.error('Error al obtener el usuario:', error);
 				}
 			},
 			deleteArticle: (id) => {
-				console.log("Intentando eliminar artículo con ID:", id);
-
 				const store = getStore();
 				const actions = getActions();
 				fetch(`${store.apiUrl}/stock/${id}`, {
@@ -114,17 +121,16 @@ const getState = ({ getStore, getActions, setStore }) => {
 				})
 					.then(response => {
 						if (response.ok) {
-							console.log("Artículo eliminado exitosamente.");
 							actions.getStock(); // Actualiza la lista de artículos
 						} else {
 							console.error("Error al eliminar el artículo.");
 						}
 					})
-					.catch((err) => { err })
-
+					.catch((err) => { console.error(err); });
 			}
 		}
 	};
 };
 
 export default getState;
+
