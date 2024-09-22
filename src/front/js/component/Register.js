@@ -30,8 +30,7 @@ const Register = () => {
                     firstName,
                     lastName,
                     email,
-                    password,
-                    usertype
+                    password
                 })
             });
             if (!response.ok) { //Si la respuesta de la API no es exitosa (código de estado no es 200), lanza un error.
