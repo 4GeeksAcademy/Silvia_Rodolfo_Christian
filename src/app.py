@@ -119,7 +119,8 @@ def get_forms():
             all_forms = Form.query.filter_by(userId=user_to_search.id).all()
         else:
             all_forms = Form.query.all()#Si no se proporciona un email obtenemos todos los formularios. 
-        
+        if not all_forms:  # Si no se encuentran formularios:
+            return jsonify({'msg': 'No se encontraron formularios'}), 404
         # Aplica el método serialize() a cada objeto Form en la lista
         all_forms_serialize = []
         for form in all_forms:

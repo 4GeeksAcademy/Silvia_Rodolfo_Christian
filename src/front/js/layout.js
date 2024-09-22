@@ -9,7 +9,7 @@ import { Single } from "./pages/single";
 import injectContext from "./store/appContext";
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
-
+import AllForms from "./component/AllForms";
 import { FormPedido } from "./component/FormPedido";
 import ForgotPassword from "./component/forgotPassword";
 import ResetPassword from "./component/resetPassword"; // New component
@@ -38,6 +38,7 @@ const Layout = () => {
                         <Route element={<FormPedido />} path="/formPedido" />
                         <Route element={<Single />} path="/single/:theid" />
                         <Route element={<Register />} path="/register" />
+                        <Route element={<AllForms />} path="/all_Forms" />
 
                         <Route element={<Stock />} path="/stock" />
                         <Route element={<NewArticle />} path="/new-article" />
