@@ -50,6 +50,7 @@ export const Navbar = () => {
 									style={{ backgroundColor: "#4F9CF9", color: "#fff" }}
 								>
 									{/* Mostrar el nombre completo del usuario si está disponible */}
+									{console.log(store.user)}
 									{store.user && store.user.firstName && store.user.lastName
 										? `${store.user.firstName} ${store.user.lastName}`
 										: "Perfil"}
