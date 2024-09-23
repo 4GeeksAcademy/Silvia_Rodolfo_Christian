@@ -14,9 +14,8 @@ export const FormPedido = () => {
 	const [showModal, setShowModal] = useState(false); // Estado para controlar la visibilidad del modal
 	const [pendingPedido, setPendingPedido] = useState(null); // Estado para el pedido pendiente
 	const [currentDate, setCurrentDate] = useState(""); // Estado para guardar la fecha actual
-	const [stocktype, setStocktype] = useState("");
 	const [selectedType, setSelectedType] = useState(""); // Tipo de producto seleccionado
-	const [searchArticle, setSerachArticle] = useState("");
+	const [products, setProducts] = useState([]); // Estado para los productos
 	const [articles, setArticles] = useState([]); // Estado para guardar los artículos obtenidos
 	const navigate = useNavigate(); //Para redirigir a otras páginas
 	const apiUrl = process.env.BACKEND_URL; // URL base de la API desde las variables de entorno
@@ -53,6 +52,29 @@ export const FormPedido = () => {
 		}
 	};
 
+	// Función para obtener los productos de un tipo seleccionado
+	const getProductsByType = async (type) => {
+		if (!token) {
+			navigate("/login");
+			return;
+		}
+		try {
+			const response = await fetch(`${apiUrl}/products?type=${type}`, {
+				headers: {
+					"Content-Type": "application/json",
+					"Authorization": `Bearer ${token}`
+				}
+			});
+			if (!response.ok) {
+				throw new Error(`HTTP error! Status: ${response.status}`);
+			}
+			const data = await response.json();
+			setProducts(data.products || []); // Guardamos los productos obtenidos para el tipo seleccionado
+		} catch (error) {
+			console.log("Error en la solicitud", error);
+			alert("Error al obtener los productos del tipo seleccionado");
+		}
+	};
 
 	// Función para manejar la selección de un tipo de producto
 	const handleSelectType = (event) => {
@@ -209,44 +231,9 @@ export const FormPedido = () => {
 
 	return (
 		<div>
-			<div className="container mt-auto p-3 d-flex flex-column min-vh-100">
-				<div className="row justify-content-start text-start mb-4 col-6">
-					<div className="col-12">
-<<<<<<< HEAD
-						<h1 className="mb-n1 px-5" style={{ position: "relative", zIndex: 1, fontSize: "80px", fontWeight: "bold" }}>Order</h1>
-						<img src={linea} style={{ zIndex: 0 }} />
-						<h3 className="px-5 fw-normal">Book your material</h3>
-						<p style={{ color: "lightgray" }}>Recuerda que tienes un máximo de 5 productos</p>
+				
+					
 
-=======
-
-						<h1 className="mb-n1 px-5" style={{ position: "relative", zIndex: 1, fontSize: "80px", fontWeight: "bold" }}>Order</h1>
-						<img src={linea} style={{ zIndex: 0 }} />
-						<h3 className="px-5 fw-normal">Book your material</h3>
-						<p style={{ color: "lightgray" }}>Recuerda que tienes un máximo de 5 productos</p>
-
->>>>>>> 3c04691a8d6733ef7000669afae8e72849f42a1e
-						<form onSubmit={handleSubmit}>
-							<input value={search} onChange={(e) => setSearch(e.target.value)} type="search" className="form-control form-control-lg fw-light fs-6 input" style={{ backgroundColor: "#D3E7FF" }} id="search" placeholder="Search here" />
-						</form>
-						<div className="px-5">
-							<button type="button" className="btn btn-primary fw-light" style={{ backgroundColor: "#4F9CF9", border: "none" }} />
-							Order
-						</div>
-					</div>
-				</div>
-			</div>
-
-<<<<<<< HEAD
-=======
-						<h1 className="mb-n1 px-5" style={{ position: "relative", zIndex: 1, fontSize: "clamp(60px, 10vw, 80px)", fontWeight: "bold" }}>Order</h1>
-						<img className="mt-2" src={linea} style={{ maxWidth: "100%", minWidth: "300px" }} />
-
-					</div>
-				</div>
-			</div>
-
->>>>>>> 3c04691a8d6733ef7000669afae8e72849f42a1e
 			<div>
 				<div className="container mt-auto p-3 d-flex flex-column min-vh-100">
 
@@ -328,7 +315,7 @@ export const FormPedido = () => {
 							)}
 						</div>
 
-						<div className="col-12 col-md-3 text-md-end text-center mt-3 mt-md-0">
+						<div className="col-12 col-md-3 text-md-end text-center">
 							<button type="submit" className="btn btn-primary fw-light align-text-center" style={{ backgroundColor: "#4F9CF9", border: "none", width: "150px" }} >
 								<strong>Order</strong>
 							</button>
