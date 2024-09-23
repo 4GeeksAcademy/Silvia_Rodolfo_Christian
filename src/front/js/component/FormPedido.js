@@ -53,6 +53,7 @@ export const FormPedido = () => {
 	};
 
 	// Función para obtener los productos de un tipo seleccionado
+	
 	const getProductsByType = async (type) => {
 		if (!token) {
 			navigate("/login");
@@ -76,14 +77,16 @@ export const FormPedido = () => {
 		}
 	};
 
+
 	// Función para manejar la selección de un tipo de producto
 	const handleSelectType = (event) => {
 		const selectedValue = event.target.value;
 		setSelectedType(selectedValue);
 		if (selectedValue) {
 			setShowModal(true); // Mostrar modal
-			getArticlesByEnum(selectedValue); // Obtener productos del tipo seleccionado
+			getProductsByType(selectedValue); // Obtener productos del tipo seleccionado
 		}
+
 	};
 
 
@@ -168,14 +171,12 @@ export const FormPedido = () => {
 	// Función para manejar el clic en el ícono de búsqueda y abrir el modal
 	const handleSearchClick = () => {
 		if (!selectedType) {
-			alert('Por favor, selecciona un tipo de producto antes de buscar.');
-			return;
+		  alert('Por favor, selecciona un tipo de producto antes de buscar.');
+		  return;
 		}
 		// Cargar productos del tipo seleccionado
 		getProductsByType(selectedType);
-		// Mostrar el modal
-		setShowModal(true);
-	};
+	  };
 
 	// Función que cierra el modal y añade el pedido si el usuario confirma
 	const closeModal = (addPedido) => {
