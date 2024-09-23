@@ -60,9 +60,7 @@ const Register = () => {
                     <img src={linea} style={{ zIndex: 0 }} />
                     <h3 className="px-5 fw-normal">Book your material</h3>
                 </div>
-                <div className="position-relative">
-                    <img src={yeti} style={{ zIndex: 0, width: "300px", bottom: "200px", left: "550px" }} className="position-absolute" />
-                </div>
+                
             </div>
 
             <div className="container col-3 row d-flex justify-content-center align-items-center" style={{ marginLeft: "80px" }}>
