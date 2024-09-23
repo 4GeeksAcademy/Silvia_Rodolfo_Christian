@@ -67,15 +67,10 @@ export const Home = () => {
                         </button>
                     </Link>
                 </div>
-                 {/* Imagen del yeti alineada a la derecha y más cerca */}
-				 <div className="position-absolute yeti-img-container">
-                    <img src={yeti} className="img-fluid yeti-img" alt="Yeti" />
-                </div>
+                
             </div>
                                 
-                
-
-               
+            
             </div>
 
 		 {/* Sección derecha - Formulario */}
