@@ -104,27 +104,31 @@ def get_forms():
         current_user = get_jwt_identity() #Obtenemos la identidad del usuario(email).
         user = User.query.filter_by(email=current_user).first() #Buscamos el usuario por su email.
         if not user:
-            return jsonify({'msg': 'Usuario no registrado'}), 401
+            return jsonify({'msg': 'The user does not exist'}), 401
         
-        if user.user_type != UserTypeEnum.tecnico: #Verificamos el tipo de usuario.
-            return jsonify({'msg': 'No autorizado'}), 403
+        if user.usertype != UserTypeEnum.tecnico: #Verificamos el tipo de usuario.
+            return jsonify({'msg': 'Unauthorized'}), 403
 #Busca el valor del parámetro email en la URL de la solicitud y lo guardamos en la variable email.
         email = request.args.get('email')
         if email: #Si se proporcionó un email:
             user_to_search = User.query.filter_by(email=email).first() #Buscamos el usuario por su email.
             if not user_to_search: #Si no se encontró un usuario con ese email:
-                return jsonify({'msg': 'Usuario no encontrado'}), 404
+                return jsonify({'msg': 'User Not Found'}), 404
 #Buscamos los formularios que coincidan con el id del usuario y el email proporcionado(user_to_search):
             all_forms = Form.query.filter_by(userId=user_to_search.id).all()
         else:
             all_forms = Form.query.all()#Si no se proporciona un email obtenemos todos los formularios. 
         if not all_forms:  # Si no se encuentran formularios:
-            return jsonify({'msg': 'No se encontraron formularios'}), 404
+            return jsonify({'msg': 'No forms found'}), 404
         # Aplica el método serialize() a cada objeto Form en la lista
-        all_forms_serialize = []
-        for form in all_forms:
-            all_forms_serialize.append(form.serialize()) #lo agregamos a all_forms_serialize.
-
+        all_forms_serialize = [] #Aquí guardaremos los formularios(data).
+        for form in all_forms: #Iteramos sobre cada formulario en la tabla "Form".
+            form_data = form.serialize() #Serializamos cada formulario.
+#Añadimos el nombre y apellido del usuario relacionado al formulario a la llave "user_name" y "user_last_name":
+            form_data['user_name'] = form.user_relationship.firstName 
+            form_data['user_last_name'] = form.user_relationship.lastName
+            all_forms_serialize.append(form_data) #añadimos el formulario serializado a la lista.
+    
         response_body = { #Devolvemos los formularios serializados
             "data": all_forms_serialize
         }
