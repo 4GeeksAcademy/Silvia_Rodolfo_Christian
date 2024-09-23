@@ -27,7 +27,7 @@ class User(db.Model):
     password = db.Column(db.String(80), unique=False, nullable=False)
     isActive = db.Column(db.Boolean(), unique=False, nullable=False)
     # Definir userType como Enum con opciones "tecnico" y "usuario"
-    userType = db.Column(Enum(UserTypeEnum), nullable=False)
+    usertype = db.Column(Enum(UserTypeEnum), nullable=False)
 
     def __repr__(self):
         return f'<User {self.email}>'
