@@ -212,6 +212,7 @@ export const FormPedido = () => {
 			<div className="container mt-auto p-3 d-flex flex-column min-vh-100">
 				<div className="row justify-content-start text-start mb-4 col-6">
 					<div className="col-12">
+
 						<h1 className="mb-n1 px-5" style={{ position: "relative", zIndex: 1, fontSize: "80px", fontWeight: "bold" }}>Order</h1>
 						<img src={linea} style={{ zIndex: 0 }} />
 						<h3 className="px-5 fw-normal">Book your material</h3>
@@ -224,6 +225,10 @@ export const FormPedido = () => {
 							<button type="button" className="btn btn-primary fw-light" style={{ backgroundColor: "#4F9CF9", border: "none" }} />
 							Order
 						</div>
+
+						<h1 className="mb-n1 px-5" style={{ position: "relative", zIndex: 1, fontSize: "clamp(60px, 10vw, 80px)", fontWeight: "bold" }}>Order</h1>
+						<img className="mt-2" src={linea} style={{ maxWidth: "100%", minWidth: "300px" }} />
+
 					</div>
 				</div>
 			</div>
