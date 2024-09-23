@@ -63,7 +63,7 @@ const ChangePasswordLogged = () => {
                     <h3 className="px-5 fw-normal">Secure your account</h3>
                     <h6 className="px-5 fw-light" style={{ marginTop: "80px" }}>Ensure your account is safe with a new password</h6>
                 </div>
-                <img src={yeti} style={{ zIndex: 0, width: "300px", bottom: "200px", left: "550px" }} className="position-absolute" alt="Yeti decorativo" />
+                
             </div>
 
             <div className="container col-3 row d-flex justify-content-center align-items-center container" style={{ marginLeft: "80px" }}>
