@@ -21,12 +21,7 @@ const Article = ({ description, quantity, stocktype, image, id }) => {
   }, []);
 
   const handleSelectedClick = () => {
-    if (isSelected) {
-      actions.deleteSelected(description);
-    } else {
-      actions.addSelected([description]);
-    }
-    setIsSelected(!isSelected);
+   actions.handleSelected(description);
   };
 
   const deleteArticleClic = (id) => {
@@ -47,8 +42,8 @@ const Article = ({ description, quantity, stocktype, image, id }) => {
         {usertype === "usuario" && (
           <div className="d-flex align-items-center">
             <p className="mb-0">Añadir al pedido </p>
-            <div className={`btn ${isSelected ? 'active' : ''}`} onClick={handleSelectedClick}>
-              {isSelected ? (
+            <div className={`btn ${store.selected.includes(description) ? 'active' : ''}`} onClick={handleSelectedClick}>
+              {store.selected.includes(description) ? (
                 <i className="fa-solid fa-square-check fa-2xl" style={{ color: "#042649" }} />
               ) : (
                 <i className="fa-regular fa-square-check fa-2xl" style={{ color: "#042649" }} />

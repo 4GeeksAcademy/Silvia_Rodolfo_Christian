@@ -48,13 +48,16 @@ const getState = ({ getStore, getActions, setStore }) => {
 				});
 				setStore({ demo: demo });
 			},
-			deleteSelected: (description) => {
+			handleSelected: (description) => {
 				const store = getStore();
-				setStore({ selected: store.selected.filter(selected => selected[0] !== description) });
-			},
-			addSelected: (elemento) => {
-				const store = getStore();
-				setStore({ selected: [...store.selected, elemento] });
+				if(store.selected.includes(description)) {
+					const newArray = store.selected.filter((item)=>{
+						return item != description;
+					})
+					setStore({selected: newArray})
+				} else {
+					setStore({ selected: [...store.selected, description] });
+				}
 			},
 
 			getStock: () => {

@@ -542,6 +542,7 @@ def search():
 #Buscamos todos los artículos en la tabla Stock que coinciden con el tipo especificado(ejem:"monitor").
         results = Stock.query.filter_by(stockType=type_enum).all()
 
+
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))
