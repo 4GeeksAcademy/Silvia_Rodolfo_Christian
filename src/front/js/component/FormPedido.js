@@ -55,22 +55,30 @@ export const FormPedido = () => {
 	// Función para obtener los productos de un tipo seleccionado
 	
 	const getProductsByType = async (type) => {
+		console.log('hola');
+		
 		if (!token) {
 			navigate("/login");
 			return;
 		}
 		try {
-			const response = await fetch(`${apiUrl}/products?type=${type}`, {
+			const response = await fetch(`${apiUrl}/search`, {
 				headers: {
 					"Content-Type": "application/json",
 					"Authorization": `Bearer ${token}`
-				}
+					
+				},
+				body: JSON.stringify({type:type}),
+				method: 'POST'
 			});
 			if (!response.ok) {
 				throw new Error(`HTTP error! Status: ${response.status}`);
 			}
+			console.log(response);
+			
 			const data = await response.json();
-			setProducts(data.products || []); // Guardamos los productos obtenidos para el tipo seleccionado
+			console.log(data);
+			setProducts(data.article || []); // Guardamos los productos obtenidos para el tipo seleccionado
 		} catch (error) {
 			console.log("Error en la solicitud", error);
 			alert("Error al obtener los productos del tipo seleccionado");
@@ -302,7 +310,7 @@ export const FormPedido = () => {
 												<ul>
 													{products.map((product, index) => (
 														<li key={index}>
-															<button onClick={() => addProductToOrder(product)}>{product.name}</button>
+															<button onClick={() => addProductToOrder(product)}>{product.description}</button>
 														</li>
 													))}
 												</ul>
