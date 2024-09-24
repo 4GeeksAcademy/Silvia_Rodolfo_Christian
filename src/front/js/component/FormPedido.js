@@ -1,14 +1,10 @@
-import React, { useContext, useState, useEffect } from "react";
-import { useNavigate, useParams } from 'react-router-dom'; //Permite crear enlaces de navegación entre páginas.
+import React, { Component, useState, useEffect } from "react";
+import { Link, useNavigate, useParams } from 'react-router-dom'; //Permite crear enlaces de navegación entre páginas.
 import linea from "./../../img/linea.png";
-import { Context } from "../store/appContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { CardPedido } from "./CardPedido";
-
-
 export const FormPedido = () => {
-	const { store, actions } = useContext(Context);
 	const [search, setSearch] = useState(""); // Estado para el valor del buscador
 	const [pedidos, setPedidos] = useState([]); // Estado para guardar los pedidos (búsquedas)
 	const [showModal, setShowModal] = useState(false); // Estado para controlar la visibilidad del modal
@@ -24,34 +20,9 @@ export const FormPedido = () => {
 	const [quantity, setQuantity] = useState(0);
 	const { detail_id } = useParams(); //Accedemos a los parámetros dinámicos de la URL como "detail_id".
 	const token = localStorage.getItem("jwt_token"); //Obtiene el token de autenticación almacenado.
-	const selected = store.selected;
+	
 
 	// Función para obtener los productos de un tipo seleccionado
-	{/*const getProductsByType = async (type) => {
-		if (!token) {
-			navigate("/login");
-			return;
-		}
-		try {
-			const response = await fetch(`${apiUrl}/search`, {
-				headers: {
-					"Content-Type": "application/json",
-					"Authorization": `Bearer ${token}`
-				},
-				body: JSON.stringify({ type: type }),
-				method: 'POST'
-			});
-			if (!response.ok) {
-				throw new Error(`HTTP error! Status: ${response.status}`);
-			}
-			const data = await response.json();
-			console.log(data);
-			setProducts(data.article || []); // Guardamos los productos obtenidos para el tipo seleccionado	
-		} catch (error) {
-			console.log("Error en la solicitud", error);
-			alert("Error al obtener los productos del tipo seleccionado");
-		}
-	};*/}
     
 const getProductsByType = async (type) => {
     console.log('Fetching products of type:', type); // Agregar log para verificar qué tipo se está enviando
@@ -60,11 +31,11 @@ const getProductsByType = async (type) => {
         return;
     }
     try {
-        const response = await fetch(`${apiUrl}/search?type=${type}`, { // Pasamos el "type" como parámetro de la URL
+        const response = await fetch(${apiUrl}/search?type=${type}, { // Pasamos el "type" como parámetro de la URL
             method: 'POST', // Método POST según la API definida en el backend
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}` // Autenticación mediante el token
+                "Authorization": `Bearer: ${token}` // Autenticación mediante el token
             }
         });
         if (!response.ok) {
@@ -78,6 +49,12 @@ const getProductsByType = async (type) => {
         alert("Error al obtener los productos del tipo seleccionado.");
     }
 };
+
+
+
+
+
+
 
     // Función que añade el producto seleccionado al pedido
     const addProductToOrder = (product) => {
