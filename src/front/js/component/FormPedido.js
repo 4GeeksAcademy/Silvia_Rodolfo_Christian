@@ -21,67 +21,58 @@ export const FormPedido = () => {
     const { detail_id } = useParams(); //Accedemos a los parámetros dinámicos de la URL como "detail_id".
     const token = localStorage.getItem("jwt_token"); //Obtiene el token de autenticación almacenado.
 	
-    {/* Componente Search */ }
-    const getArticlesByEnum = async () => {
-        if (!token) {
-            navigate("/login");
-            return;
-        }
-        try {
-            const response = await fetch(`${apiUrl}/search`, {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                }
-            });
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            const data = await response.json();
-            setArticles(data.articles || []); // Guardamos los artículos obtenidos
-        }
-        catch (error) {
-            console.log("Error en la solicitud", error);
-            alert("Error al obtener los artículos");
-        }
-    };
+
     // Función para obtener los productos de un tipo seleccionado
-    const getProductsByType = async (type) => {
-        console.log('hola');
-        if (!token) {
-            navigate("/login");
-            return;
-        }
-        try {
-            const response = await fetch(`${apiUrl}/search`, {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({type:type}),
-                method: 'POST'
-            });
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+    
+const getProductsByType = async (type) => {
+    console.log('Fetching products of type:', type); // Agregar log para verificar qué tipo se está enviando
+    if (!token) {
+        navigate("/login");
+        return;
+    }
+    try {
+        const response = await fetch(`${apiUrl}/search?type=${type}`, { // Pasamos el "type" como parámetro de la URL
+            method: 'POST', // Método POST según la API definida en el backend
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}` // Autenticación mediante el token
             }
-            console.log(response);
-            const data = await response.json();
-            console.log(data);
-            setProducts(data.article || []); // Guardamos los productos obtenidos para el tipo seleccionado
-        } catch (error) {
-            console.log("Error en la solicitud", error);
-            alert("Error al obtener los productos del tipo seleccionado");
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
+        const data = await response.json(); // Parseamos la respuesta
+        console.log("Productos recibidos:", data); // Log de productos recibidos
+        setProducts(data.article || []); // Guardamos los productos obtenidos para el tipo seleccionado
+    } catch (error) {
+        console.log("Error en la solicitud:", error);
+        alert("Error al obtener los productos del tipo seleccionado.");
+    }
+};
+
+
+
+
+
+
+
+    // Función que añade el producto seleccionado al pedido
+    const addProductToOrder = (product) => {
+        setPedidos([...pedidos, { descripcion: product.description, cantidad: 1 }]); // Añadimos el producto a pedidos
+        setShowModal(false); // Cerramos el modal
     };
+
     // Función para manejar la selección de un tipo de producto
+
     const handleSelectType = (event) => {
-        const selectedValue = event.target.value;
-        setSelectedType(selectedValue);
+        const selectedValue = event.target.value;  // Obtener el valor seleccionado en el dropdown
+        setSelectedType(selectedValue);  // Guardar el valor seleccionado en el estado
         if (selectedValue) {
-            setShowModal(true); // Mostrar modal
-            getProductsByType(selectedValue); // Obtener productos del tipo seleccionado
+            getProductsByType(selectedValue);  // Llamar a la función para obtener los productos del tipo seleccionado
+            setShowModal(true);  // Mostrar el modal con los productos
         }
     };
+
     {/* FrontPedido */ }
     const addForm = async (event) => {
         event.preventDefault();
@@ -157,6 +148,8 @@ export const FormPedido = () => {
             alert("Error al actualizar el formulario. Inténtalo de nuevo");
         }
     }
+
+
     // Función para manejar el clic en el ícono de búsqueda y abrir el modal
     const handleSearchClick = () => {
         if (!selectedType) {
@@ -166,26 +159,21 @@ export const FormPedido = () => {
         // Cargar productos del tipo seleccionado
         getProductsByType(selectedType);
       };
-    // Función que cierra el modal y añade el pedido si el usuario confirma
-    const closeModal = (addPedido) => {
-        setShowModal(false); // Cerrar modal
-        if (addPedido && pendingPedido) {  // Añadir el pedido pendiente solo si el usuario lo confirma
-            setPedidos([...pedidos, { descripcion: pendingPedido, cantidad: 1 }]); // Agregar pedido
-        }
-        setPendingPedido(null); // Limpiar el pedido pendiente
-    };
+    
     // Función para eliminar un pedido de la lista
     const eliminarPedido = (index) => {
         // Filtrar los pedidos eliminando el que tiene el id que recibimos
         const nuevosPedidos = pedidos.filter((_, i) => i !== index);
         setPedidos(nuevosPedidos); // Actualizar el estado con la nueva lista
     };
+
     // Función para actualizar la cantidad de un pedido
     const actualizarCantidad = (index, nuevaCantidad) => {
         const nuevosPedidos = [...pedidos];
         nuevosPedidos[index].cantidad = nuevaCantidad; // Actualizamos la cantidad directamente
         setPedidos(nuevosPedidos); // Actualizar el estado con la nueva cantidad
     };
+
     // Función para el conteo de productos pedidos
     function countPedidos() {
         const totalPedidos = pedidos.reduce((total, pedido) => total + pedido.cantidad, 0);
@@ -201,6 +189,7 @@ export const FormPedido = () => {
             return <span>Quedan {quedanTantosPedidos} productos.</span>;
         }
     };
+
     // Función para obtener la fecha actual y formatearla a dd.mm.yyyy
     useEffect(() => {
         const today = new Date();
@@ -288,7 +277,7 @@ export const FormPedido = () => {
                             )}
                         </div>
                         <div className="col-12 col-md-3 text-md-end text-center">
-                            <button type="submit" className="btn btn-primary fw-light align-text-center" style={{ backgroundColor: "#4F9CF9", border: "none", width: "150px" }} >
+                            <button onClick={addForm()} type="submit" className="btn btn-primary fw-light align-text-center" style={{ backgroundColor: "#4F9CF9", border: "none", width: "150px" }} >
                                 <strong>Order</strong>
                             </button>
                         </div>
