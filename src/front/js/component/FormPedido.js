@@ -1,13 +1,11 @@
-import React, { useContext, useState, useEffect } from "react";
-import { useNavigate, useParams } from 'react-router-dom'; //Permite crear enlaces de navegación entre páginas.
+import React, { useState, useEffect } from "react";
+import {useNavigate, useParams } from 'react-router-dom'; //Permite crear enlaces de navegación entre páginas.
 import linea from "./../../img/linea.png";
-import { Context } from "../store/appContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { CardPedido } from "./CardPedido";
-
-
 export const FormPedido = () => {
+
 
     const [search, setSearch] = useState(""); // Estado para el valor del buscador
     const [pedidos, setPedidos] = useState([]); // Estado para guardar los pedidos (búsquedas)
@@ -31,6 +29,7 @@ export const FormPedido = () => {
 	const selected = store.selected;
 
 
+
     
 const getProductsByType = async (type) => {
     console.log('Fetching products of type:', type); // Agregar log para verificar qué tipo se está enviando
@@ -39,11 +38,11 @@ const getProductsByType = async (type) => {
         return;
     }
     try {
-        const response = await fetch(`${apiUrl}/search?type=${type}`, { // Pasamos el "type" como parámetro de la URL
+        const response = await fetch(${apiUrl}/search?type=${type}, { // Pasamos el "type" como parámetro de la URL
             method: 'POST', // Método POST según la API definida en el backend
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}` // Autenticación mediante el token
+                "Authorization": `Bearer: ${token}` // Autenticación mediante el token
             }
         });
         if (!response.ok) {
@@ -57,6 +56,12 @@ const getProductsByType = async (type) => {
         alert("Error al obtener los productos del tipo seleccionado.");
     }
 };
+
+
+
+
+
+
 
     // Función que añade el producto seleccionado al pedido
     const addProductToOrder = (product) => {
