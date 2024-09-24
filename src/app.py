@@ -527,8 +527,8 @@ def update_form(detail_id): #detail_id es el identificador único del detalle de
     detail_form.finalDate = final_date
     db.session.commit()
     return jsonify ({'msg': 'DetailForm updated successfully'}), 200
-   
-@app.route('/search', methods=['GET'])
+
+@app.route('/search', methods=['POST'])
 @jwt_required()
 def search():
     current_user = get_jwt_identity()
@@ -541,6 +541,11 @@ def search():
             return jsonify ({'msg': 'invalid type'}), 400
 #Buscamos todos los artículos en la tabla Stock que coinciden con el tipo especificado(ejem:"monitor").
         results = Stock.query.filter_by(stockType=type_enum).all()
+    else: #Si no se proporciona "type" buscamos todos los articulos.
+        results = Stock.query.all()
+#Serializamos cada articulo que coincide con el tipo enum (monitor, teclado, etc):
+    articles_serialize = [article.serialize() for article in results]
+    return jsonify ({'article': articles_serialize}), 200
 
 
 # this only runs if `$ python src/main.py` is executed
