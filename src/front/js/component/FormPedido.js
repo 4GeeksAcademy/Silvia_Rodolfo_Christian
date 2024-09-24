@@ -15,8 +15,8 @@ export const FormPedido = () => {
     const [articles, setArticles] = useState([]); // Estado para guardar los artículos obtenidos
     const navigate = useNavigate(); //Para redirigir a otras páginas
     const apiUrl = process.env.BACKEND_URL; // URL base de la API desde las variables de entorno
-    const [initialDate, setInitialDate] = useState("");
-    const [finalDate, setFinalDate] = useState("");
+    const [initialDate, setInitialDate] = useState(null);
+    const [finalDate, setFinalDate] = useState(null);
     const [quantity, setQuantity] = useState(0);
     const { detail_id } = useParams(); //Accedemos a los parámetros dinámicos de la URL como "detail_id".
     const token = localStorage.getItem("jwt_token"); //Obtiene el token de autenticación almacenado.
@@ -73,6 +73,12 @@ const getProductsByType = async (type) => {
         }
     };
 
+    // Función para manejar el cambio de fechas
+    const handleDatesChange = (start, end) => {
+        setInitialDate(start);
+        setFinalDate(end);
+    };
+
     {/* FrontPedido */ }
     const addForm = async (event) => {
         event.preventDefault();
@@ -95,8 +101,8 @@ const getProductsByType = async (type) => {
                 body: JSON.stringify({
                     initialDate,
                     finalDate,
-                    quantity
-                })
+                    quantity,
+                }),
             });
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -277,7 +283,7 @@ const getProductsByType = async (type) => {
                             )}
                         </div>
                         <div className="col-12 col-md-3 text-md-end text-center">
-                            <button onClick={addForm()} type="submit" className="btn btn-primary fw-light align-text-center" style={{ backgroundColor: "#4F9CF9", border: "none", width: "150px" }} >
+                            <button onClick={addForm} type="submit" className="btn btn-primary fw-light align-text-center" style={{ backgroundColor: "#4F9CF9", border: "none", width: "150px" }} >
                                 <strong>Order</strong>
                             </button>
                         </div>
@@ -286,7 +292,7 @@ const getProductsByType = async (type) => {
                     <div className="col-12 mb-3" >
                         {pedidos.map((pedido, index) => (
                             <CardPedido key={index} descripcion={pedido.descripcion} cantidad={pedido.cantidad} onDelete={() => eliminarPedido(index)}
-                                onCantidadChange={(nuevaCantidad) => actualizarCantidad(index, nuevaCantidad)} />
+                                onCantidadChange={(nuevaCantidad) => actualizarCantidad(index, nuevaCantidad)} onDatesChange={handleDatesChange} />
                         ))}
                     </div>
                 </div >
