@@ -48,16 +48,20 @@ const getState = ({ getStore, getActions, setStore }) => {
 				});
 				setStore({ demo: demo });
 			},
-			handleSelected: (description) => {
+			handleSelected: (article) => {
 				const store = getStore();
-				if(store.selected.includes(description)) {
-					const newArray = store.selected.filter((item)=>{
-						return item != description;
-					})
-					setStore({selected: newArray})
+				if(store.selected.length == 5) {
+					alert("Recuerda que tienes un máximo de 5 productos");
 				} else {
-					setStore({ selected: [...store.selected, description] });
-				}
+					if(store.selected.includes(article)) {
+						const newArray = store.selected.filter((item)=>{
+							return item.description != article.description;
+						})
+						setStore({selected: newArray})
+					} else {
+						setStore({ selected: [...store.selected, article] });
+					}
+				}	
 			},
 			getStock: () => {
 				const store = getStore();
