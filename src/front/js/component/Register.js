@@ -53,50 +53,51 @@ const Register = () => {
     };
 
     return (
-        <div className="container-fluid d-flex flex-column flex-md-row align-items-center vh-100 p-3">
-            <div className="d-flex vh-100 justify-content-center align-items-center container row col-6" style={{ marginLeft: "100px" }}>
-                <div>
-                    <h1 className="mb-n1 px-5" style={{ position: "relative", zIndex: 1, fontSize: "80px", fontWeight: "bold" }}>Sign up</h1>
-                    <img src={linea} style={{ zIndex: 0 }} />
-                    <h3 className="px-5 fw-normal">Book your material</h3>
-                </div>
-                <div className="position-relative">
-                    <img src={yeti} style={{ zIndex: 0, width: "300px", bottom: "200px", left: "550px" }} className="position-absolute" />
+        <div className="d-flex flex-column flex-md-row vh-100 align-items-center justify-content-center">
+            <div className="text-center text-md-start col-12 col-md-6 d-flex flex-column justify-content-center align-items-md-start position-relative">
+                <h1 className="mb-n1 px-md-5 display-4 font-weight-bold" style={{ fontSize: "80px", fontWeight: "bold" }}>Sign up</h1>
+                <img src={linea} className="mt-2mx-md-5 my-2 img-fluid" style={{ zIndex: 0, maxWidth: "100%", height: "auto" }} alt="Linea decorativa" />
+                <h3 className="px-md-5 fw-normal">Book your material</h3>
+
+                {/* Imagen del yeti alineada a la derecha y más cerca */}
+                <div className="yeti-img-container ">
+                    <img src={yeti} style={{ zIndex: 0 }} className=" img-fluid yeti-img" alt="Yeti" />
                 </div>
             </div>
 
-            <div className="container col-3 row d-flex justify-content-center align-items-center" style={{ marginLeft: "80px" }}>
-                <form onSubmit={signUp}>
-                    <h2 className="fw-light mb-3">Sign up</h2>
-                    <div className="mb-3">
+
+            <div className="col-12 col-md-4 d-flex justify-content-center align-items-center">
+                <form onSubmit={signUp}  className="w-100 p-4 p-md-5">
+                    <h2 className="fw-light mb-4">Sign up</h2>
+                    <div className="form-group mb-4">
                         <input type="text" className="form-control form-control-lg fw-light fs-6 input" style={{ backgroundColor: "#D3E7FF" }} id="firstName" placeholder="Your first name" value={firstName}
                             onChange={(e) => setFirstName(e.target.value)}
                             required />
                     </div>
-                    <div className="mb-3">
+                    <div className="form-group mb-4">
                         <input type="text" className="form-control form-control-lg fw-light fs-6 input" style={{ backgroundColor: "#D3E7FF" }} id="lastName" placeholder="Your lastname" value={lastName}
                             onChange={(e) => setLastName(e.target.value)}
                             required />
                     </div>
-                    <div className="mb-3">
+                    <div className="form-group mb-4">
                         <input type="email" className="form-control form-control-lg fw-light fs-6 input" style={{ backgroundColor: "#D3E7FF" }} id="email" placeholder="Your email" value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required />
                     </div>
-                    <div className="mb-3">
+                    <div className="mform-group mb-4">
                         <input type="password" className="form-control form-control-lg fw-light fs-6 input" style={{ backgroundColor: "#D3E7FF" }} id="password" placeholder="Your password" value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required />
                     </div>
-                    <div className="mb-3">
+                    <div className="form-group mb-4">
                         <input type="password" className="form-control form-control-lg fw-light fs-6 input" style={{ backgroundColor: "#D3E7FF" }} id="confirmPassword" placeholder="Confirm password" value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             required />
                     </div>
-                    <button type="submit" className="btn btn-primary btn-lg fw-light mt-3 btn-login" style={{ backgroundColor: "#4F9CF9", border: "none", width: "100%" }}>Save</button>
+                    <button type="submit" className="btn btn-login btn-primary btn-lg w-100 fw-light" style={{ backgroundColor: "#4F9CF9", border: "none" }}>Save</button>
                 </form>
             </div>
-        </div>
+        </div >
     );
 };
 

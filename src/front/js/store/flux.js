@@ -59,7 +59,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 					setStore({ selected: [...store.selected, description] });
 				}
 			},
-
 			getStock: () => {
 				const store = getStore();
 				const token = localStorage.getItem("jwt_token");

@@ -6,35 +6,34 @@
     on that page only (the ones not reused in other pages).
 */
 
+.mb-n1 {
+    margin-bottom: -25px !important;
+}
+
+.input::placeholder {
+    color: #4F9CF9
+}
+
+.btn-login {
+    box-shadow: 0 0 20px rgba(0, 123, 255, 0.5);
+}
+
 .yeti-img-container {
-    top: 150px;
-    right: 20px;
-    transform: translateY(-50px);
+    position: absolute;
+    right: 0px;
+    bottom: 0;
+    z-index: -1;
 }
 
 .yeti-img {
-    width: 300px;
+    max-width: 100%;
+    height: auto;
+    position: relative
 }
 
-/* Ajuste para pantallas más pequeñas */
-@media (max-width: 768px) {
-    .yeti-img {
-        width: 200px; /* Ajusta el tamaño para pantallas pequeñas */
-    }
-
+/*oculta yeti en móviles*/
+@media (max-width: 767px) {
     .yeti-img-container {
-        top: 120px;
-        right: 10px;
-    }
-}
-
-@media (max-width: 576px) {
-    .yeti-img {
-        width: 150px; /* Ajusta el tamaño para pantallas muy pequeñas */
-    }
-
-    .yeti-img-container {
-        top: 100px;
-        right: 5px;
+        display: none;
     }
 }

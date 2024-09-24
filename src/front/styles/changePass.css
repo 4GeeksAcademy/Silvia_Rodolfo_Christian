@@ -2,7 +2,13 @@
     color: #4F9CF9
 }
 
+.responsive-title {
+    font-size: 80px; /* Tamaño por defecto */
+}
 
+.mb-n1 {
+    margin-bottom: -25px !important;
+}
 
 .btn-login {
     box-shadow: 0 0 20px rgba(0, 123, 255, 0.5);
@@ -13,7 +19,6 @@
     right: 0px;
     bottom: 0;
     z-index: -1;
-    
 }
 
 .yeti-img {

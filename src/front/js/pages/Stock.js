@@ -85,18 +85,22 @@ const Stock = () => {
                     <div className="container mt-4">
                         <h3>Productos relacionados: {selectedType}</h3>
                         <div className="row g-3">
-                            {articles.map((article, index) => (
-                                <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3">
-                                    <Article
-                                        description={article.description}
-                                        stocktype={article.stocktype}
-                                        quantity={article.quantity}
-                                        image={article.image}
-                                        usertype={usertype}
-                                        id={article.id}
-                                    />
-                                </div>
-                            ))}
+                            {articles.length > 0 ? (
+                                articles.map((article, index) => (
+                                    <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3">
+                                        <Article
+                                            description={article.description}
+                                            stocktype={article.stocktype}
+                                            quantity={article.quantity}
+                                            image={article.image}
+                                            usertype={usertype}
+                                            id={article.id}
+                                        />
+                                    </div>
+                                ))
+                            ) : (
+                                <p>No hay artículos disponibles.</p> // Mensaje si no hay artículos
+                            )}
                         </div>
                     </div>
                 )}
