@@ -52,35 +52,43 @@ export const FormPedido = () => {
 			alert("Error al obtener los productos del tipo seleccionado");
 		}
 	};*/}
+    
+const getProductsByType = async (type) => {
+    console.log('Fetching products of type:', type); // Agregar log para verificar qué tipo se está enviando
+    if (!token) {
+        navigate("/login");
+        return;
+    }
+    try {
+        const response = await fetch(`${apiUrl}/search?type=${type}`, { // Pasamos el "type" como parámetro de la URL
+            method: 'POST', // Método POST según la API definida en el backend
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}` // Autenticación mediante el token
+            }
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json(); // Parseamos la respuesta
+        console.log("Productos recibidos:", data); // Log de productos recibidos
+        setProducts(data.article || []); // Guardamos los productos obtenidos para el tipo seleccionado
+    } catch (error) {
+        console.log("Error en la solicitud:", error);
+        alert("Error al obtener los productos del tipo seleccionado.");
+    }
+};
 
-	const getProductsByType = async (type) => {
-		console.log('Fetching products of type:', type); // Agregar log para verificar qué tipo se está enviando
-		if (!token) {
-			navigate("/login");
-			return;
-		}
-		try {
-			const response = await fetch(`${apiUrl}/search?type=${type}`, { // Pasamos el "type" como parámetro de la URL
-				method: 'POST', // Método POST según la API definida en el backend
-				headers: {
-					"Content-Type": "application/json",
-					"Authorization": `Bearer ${token}` // Autenticación mediante el token
-				}
-			});
-			if (!response.ok) {
-				throw new Error(`HTTP error! Status: ${response.status}`);
-			}
-			const data = await response.json(); // Parseamos la respuesta
-			console.log("Productos recibidos:", data); // Log de productos recibidos
-			setProducts(data.article || []); // Guardamos los productos obtenidos para el tipo seleccionado
-		} catch (error) {
-			console.log("Error en la solicitud:", error);
-			alert("Error al obtener los productos del tipo seleccionado.");
-		}
-	};
+    // Función que añade el producto seleccionado al pedido
+    const addProductToOrder = (product) => {
+        setPedidos([...pedidos, { descripcion: product.description, cantidad: 1 }]); // Añadimos el producto a pedidos
+        setShowModal(false); // Cerramos el modal
+    };
 
-	// Función para manejar la selección de un tipo de producto
-	const handleSelectType = (event) => {
+    // Función para manejar la selección de un tipo de producto
+
+    const handleSelectType = (event) => {
+
         const selectedValue = event.target.value;  // Obtener el valor seleccionado en el dropdown
         setSelectedType(selectedValue);  // Guardar el valor seleccionado en el estado
         if (selectedValue) {
@@ -88,13 +96,9 @@ export const FormPedido = () => {
             setShowModal(true);  // Mostrar el modal con los productos
         }
     };
-	// Función que añade el producto seleccionado al pedido
-    const addProductToOrder = (product) => {
-        setPedidos([...pedidos, { descripcion: product.description, cantidad: 1 }]); // Añadimos el producto a pedidos
-        setShowModal(false); // Cerramos el modal
-    };
-	{/* FrontPedido */ }
-	const addForm = async (event) => {
+
+    {/* FrontPedido */ }
+    const addForm = async (event) => {
         event.preventDefault();
         console.log("Token:", token);
         if (!token) { //Si no hay token:
@@ -301,6 +305,174 @@ export const FormPedido = () => {
 						</div>
 						<div className="col-12 col-md-3 text-md-end text-center">
                             <button onClick={addForm} type="submit" className="btn btn-primary fw-light align-text-center" style={{ backgroundColor: "#4F9CF9", border: "none", width: "150px" }} >
+=======
+    const updateForm = async () => {
+        if (!token) {
+            navigate('/login');
+            return;
+        }
+        if (!initialDate || !finalDate) { //Validar ambas fechas.
+            alert('Por favor selecciona ambas fechas.');
+            return;
+        }
+        try {
+            const response = await fetch(`${apiUrl}form/${detail_id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}` //Autorizamos al usuario a hacer la solicitud
+                },
+                body: JSON.stringify({
+                    initialDate,
+                    finalDate,
+                    quantity
+                })
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = await response.json();
+            if (data.msg === "DetailForm updated successfully") {
+                navigate('/stock'); //PREGUNTAR Y MODIFICAR(PÁGINA PRINCIPAL?)
+            } else {
+                alert("Error al actualizar formulario")
+            }
+        } catch (error) {
+            console.error("Error en la solicitud", error);
+            alert("Error al actualizar el formulario. Inténtalo de nuevo");
+        }
+    }
+
+
+    // Función para manejar el clic en el ícono de búsqueda y abrir el modal
+    const handleSearchClick = () => {
+        if (!selectedType) {
+          alert('Por favor, selecciona un tipo de producto antes de buscar.');
+          return;
+        }
+        // Cargar productos del tipo seleccionado
+        getProductsByType(selectedType);
+      };
+    
+    // Función para eliminar un pedido de la lista
+    const eliminarPedido = (index) => {
+        // Filtrar los pedidos eliminando el que tiene el id que recibimos
+        const nuevosPedidos = pedidos.filter((_, i) => i !== index);
+        setPedidos(nuevosPedidos); // Actualizar el estado con la nueva lista
+    };
+
+    // Función para actualizar la cantidad de un pedido
+    const actualizarCantidad = (index, nuevaCantidad) => {
+        const nuevosPedidos = [...pedidos];
+        nuevosPedidos[index].cantidad = nuevaCantidad; // Actualizamos la cantidad directamente
+        setPedidos(nuevosPedidos); // Actualizar el estado con la nueva cantidad
+    };
+
+    // Función para el conteo de productos pedidos
+    function countPedidos() {
+        const totalPedidos = pedidos.reduce((total, pedido) => total + pedido.cantidad, 0);
+        let maxPedidos = 5;
+        let quedanTantosPedidos = maxPedidos - totalPedidos;
+        if (quedanTantosPedidos === 0) {
+            return <span style={{ color: "red" }}>Has alcanzado el máximo de productos por pedir.</span>;
+        }
+        if (quedanTantosPedidos === 1) {
+            return <span style={{ color: "orange" }}>Queda 1 producto.</span>;
+        }
+        if (quedanTantosPedidos > 1) {
+            return <span>Quedan {quedanTantosPedidos} productos.</span>;
+        }
+    };
+
+    // Función para obtener la fecha actual y formatearla a dd.mm.yyyy
+    useEffect(() => {
+        const today = new Date();
+        const day = String(today.getDate()).padStart(2, '0');
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // Los meses en JavaScript van de 0 a 11
+        const year = today.getFullYear();
+        const formattedDate = `${day}/${month}/${year}`;
+        setCurrentDate(formattedDate); // Guardamos la fecha formateada en el estado
+    }, []);
+
+	return (
+        <div>
+            <div>
+                <div className="container mt-auto p-3 d-flex flex-column min-vh-100">
+                    <div className="row justify-content-start text-start mb-4 col-6">
+                        <div className="col-12">
+                            <h1 className="mb-n1 px-5" style={{ position: "relative", zIndex: 1, fontSize: "80px", fontWeight: "bold" }}>Order</h1>
+                            <img className="mt-2" src={linea} />
+                        </div>
+                    </div>
+                    {/* Información de la orden */}
+                    <div className="row justify-content-center mb-4">
+                        <div className="col-md-3 text-center">
+                            <h6 style={{ color: "#043873" }}><strong>Order #XXXXXX</strong></h6> {/* -------------------- Conectar el número de Order con la BBDD*/}
+                        </div>
+                        <div className="col-md-3 text-center">
+                            <h6 style={{ color: "#043873" }}><strong>{currentDate}</strong></h6>
+                        </div>
+                        <div className="col-md-3 text-center">
+                            <h6 style={{ color: "#043873" }}><strong>NAME LASTNAME</strong></h6>
+                        </div>
+                    </div>
+                    <p style={{ color: "lightgray" }}>Recuerda que tienes un máximo de 5 productos. {countPedidos()}</p>
+                    {/* Barra de búsqueda */}
+                    <div className="row mb-4">
+                        <div className="col-12 col-md-9">
+                            <div className="input-group">
+                                <select
+                                    className="form-select fw-light fs-6"
+                                    style={{ backgroundColor: "#D3E7FF", color: "#4F9CF9" }}
+                                    value={selectedType}
+                                    onChange={handleSelectType}
+                                    required
+                                >
+                                    <option value="">Selecciona un tipo de producto</option> {/* Opción por defecto */}
+                                    <option value="monitor">Monitor</option>
+                                    <option value="teclado">Teclado</option>
+                                    <option value="cable">Cable</option>
+                                    <option value="mouse">Mouse</option>
+                                    <option value="camara">Cámara</option>
+                                </select>
+                                {/* Icono de búsqueda */}
+                                <button
+                                    className="input-group-text"
+                                    style={{ backgroundColor: "#4F9CF9", cursor: "pointer" }}
+                                    onClick={handleSearchClick} // Manejar clic en el ícono de búsqueda
+                                >
+                                    <FontAwesomeIcon icon={faMagnifyingGlass} style={{ color: "#043873" }} />
+                                </button>
+                            </div>
+                            {/* Modal para seleccionar productos */}
+                            {showModal && (
+                                <div className="modal fade show" style={{ display: "block" }}>
+                                    <div className="modal-dialog">
+                                        <div className="modal-content">
+                                            <div className="modal-header">
+                                                <h5 className="modal-title">Productos del tipo {selectedType}</h5>
+                                                <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
+                                            </div>
+                                            <div className="modal-body">
+                                                <ul>
+                                                    {products.map((product, index) => (
+                                                        <li key={index}>
+                                                            <button onClick={() => addProductToOrder(product)}>{product.description}</button>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                            <div className="modal-footer">
+                                                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cerrar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        <div className="col-12 col-md-3 text-md-end text-center">
+                            <button onClick={addForm()} type="submit" className="btn btn-primary fw-light align-text-center" style={{ backgroundColor: "#4F9CF9", border: "none", width: "150px" }} >
+
                                 <strong>Order</strong>
                             </button>
                         </div>
