@@ -26,11 +26,6 @@ export const Navbar = () => {
 		}
 	};
 
-	// Eliminar elemento del carrito
-	const noCart = (description) => {
-		actions.deleteSelected(description);
-	};
-
 	return (
 		<nav className="navbar" style={{ backgroundColor: "#043873" }}>
 			<div className="container d-flex">
@@ -96,7 +91,7 @@ export const Navbar = () => {
 									store.selected.map((selected, index) => (
 										<li className="dropdown-item d-flex" key={index}>
 											<div className="me-auto p-2">
-												{selected}
+												{selected.description}
 											</div>
 											<div className="p-2" onClick={() => actions.handleSelected(selected)}>
 												<i className="fa-solid fa-xmark" />

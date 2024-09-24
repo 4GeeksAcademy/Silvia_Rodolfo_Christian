@@ -527,7 +527,7 @@ def update_form(detail_id): #detail_id es el identificador único del detalle de
     detail_form.finalDate = final_date
     db.session.commit()
     return jsonify ({'msg': 'DetailForm updated successfully'}), 200
-   
+  
 @app.route('/search', methods=['POST'])  # Método POST para recibir la solicitud
 @jwt_required()
 def search():
@@ -549,7 +549,6 @@ def search():
     articles_serialize = [article.serialize() for article in results]
     # Devolver la respuesta en formato JSON
     return jsonify({'article': articles_serialize}), 200
-
 
 
 # this only runs if `$ python src/main.py` is executed
