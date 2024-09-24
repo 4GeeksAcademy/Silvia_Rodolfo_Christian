@@ -552,28 +552,31 @@ def update_form(detail_id): #detail_id es el identificador único del detalle de
     detail_form.finalDate = final_date
     db.session.commit()
     return jsonify ({'msg': 'DetailForm updated successfully'}), 200
-   
-@app.route('/search', methods=['GET'])
+  
+@app.route('/search', methods=['POST'])  # Método POST para recibir la solicitud
 @jwt_required()
 def search():
-    current_user = get_jwt_identity()
-    types = request.args.get('type') #Obtenemos el valor del parámetro type de la consulta.
+    current_user = get_jwt_identity()  # Obtener la identidad del usuario autenticado
+    types = request.args.get('type')  # Obtenemos el valor del parámetro type de la URL (ej: /search?type=monitor)
     if types:
         try:
-#Convierte la cadena types(lo que se envia en el front,ejem:"monitor") en el valor correspondiente de la tabla StockTypeEnum ("monitor")
+            # Convierte la cadena enviada en 'types' a un valor del enum StockTypeEnum (ej: 'monitor' -> StockTypeEnum.monitor)
             type_enum = StockTypeEnum[types]
-        except KeyError: #Si el tipo no es válido devolvemos un mensaje:
-            return jsonify ({'msg': 'invalid type'}), 400
-#Buscamos todos los artículos en la tabla Stock que coinciden con el tipo especificado(ejem:"monitor").
-        results = Stock.query.filter_by(stockType=type_enum).all()
-    else: #Si no se proporciona "type" buscamos todos los articulos.
+            
+        except KeyError:
+            # Si no se reconoce el tipo, devolvemos un error
+            return jsonify({'msg': 'invalid type'}), 400
+        # Filtrar los productos en la base de datos por el tipo
+        results = Stock.query.filter_by(stocktype=type_enum).all()
+    else:
+        # Si no se especifica el tipo, se devuelven todos los productos
         results = Stock.query.all()
-#Serializamos cada articulo que coincide con el tipo enum (monitor, teclado, etc):
-        articles_serialize = [] #Almacenamos los articulos en un array vacío.
-#Iteramos sobre results ya que contiene las keywords con las que nos vamos a referir a los artículos.
-        for article in results:
-            articles_serialize.append(article.serialize()) #Serializamos cada artículo.
-    return jsonify ({'article': articles_serialize}), 200
+    # Serializar los productos obtenidos
+    articles_serialize = [article.serialize() for article in results]
+    # Devolver la respuesta en formato JSON
+    return jsonify({'article': articles_serialize}), 200
+
+
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':

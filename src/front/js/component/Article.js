@@ -7,6 +7,13 @@ const Article = ({ description, quantity, stocktype, image, id }) => {
   const navigate = useNavigate();
   const [isSelected, setIsSelected] = useState(false);
   const usertype = store.usertype;
+  const articulo = {
+    description: description,
+    quantity: quantity,
+    stocktype: stocktype,
+    image: image,
+    id: id
+  };
 
   useEffect(() => {
     setIsSelected(store.selected.some((element) => element.description === description));
@@ -21,12 +28,7 @@ const Article = ({ description, quantity, stocktype, image, id }) => {
   }, []);
 
   const handleSelectedClick = () => {
-    if (isSelected) {
-      actions.deleteSelected(description);
-    } else {
-      actions.addSelected([description]);
-    }
-    setIsSelected(!isSelected);
+    actions.handleSelected(articulo);
   };
 
   const deleteArticleClic = (id) => {
@@ -47,8 +49,8 @@ const Article = ({ description, quantity, stocktype, image, id }) => {
         {usertype === "usuario" && (
           <div className="d-flex align-items-center">
             <p className="mb-0">Añadir al pedido </p>
-            <div className={`btn ${isSelected ? 'active' : ''}`} onClick={handleSelectedClick}>
-              {isSelected ? (
+            <div className={`btn ${store.selected.includes(articulo) ? 'active' : ''}`} onClick={handleSelectedClick}>
+              {store.selected.includes(articulo) ? (
                 <i className="fa-solid fa-square-check fa-2xl" style={{ color: "#042649" }} />
               ) : (
                 <i className="fa-regular fa-square-check fa-2xl" style={{ color: "#042649" }} />

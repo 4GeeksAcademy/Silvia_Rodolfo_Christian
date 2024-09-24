@@ -26,11 +26,6 @@ export const Navbar = () => {
 		}
 	};
 
-	// Eliminar elemento del carrito
-	const noCart = (description) => {
-		actions.deleteSelected(description);
-	};
-
 	return (
 		<nav className="navbar" style={{ backgroundColor: "#043873" }}>
 			<div className="container d-flex">
@@ -50,7 +45,6 @@ export const Navbar = () => {
 									style={{ backgroundColor: "#4F9CF9", color: "#fff" }}
 								>
 									{/* Mostrar el nombre completo del usuario si está disponible */}
-									{console.log(store.user)}
 									{store.user && store.user.firstName && store.user.lastName
 										? `${store.user.firstName} ${store.user.lastName}`
 										: "Perfil"}
@@ -97,9 +91,9 @@ export const Navbar = () => {
 									store.selected.map((selected, index) => (
 										<li className="dropdown-item d-flex" key={index}>
 											<div className="me-auto p-2">
-												{selected[0]}
+												{selected.description}
 											</div>
-											<div className="p-2" onClick={() => noCart(selected[0])}>
+											<div className="p-2" onClick={() => actions.handleSelected(selected)}>
 												<i className="fa-solid fa-xmark" />
 											</div>
 										</li>

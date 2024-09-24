@@ -49,64 +49,65 @@ export const Home = () => {
 		}
 	};
 
-	return (		
-		 <div className="d-flex flex-column flex-md-row vh-100 align-items-center justify-content-center">
-		 {/* Sección izquierda */}
-		 <div className="text-center text-md-start col-12 col-md-6 d-flex flex-column justify-content-center align-items-md-start position-relative">
-                <h1 className="mb-1 px-md-5 display-4 font-weight-bold" style={{fontSize: "80px", fontWeight: "bold"}}>Sign in</h1>
-                <img src={linea} className="mx-md-5 my-2" alt="Linea decorativa" />
-                <h3 className="px-md-5">Book your material</h3>
-                <h6 className="px-md-5 mt-5">If you do not yet have an account</h6>
-                <div className="px-md-5 mt-3">
-                    <Link to="/register">
-                        <button type="button" className="btn btn-primary fw-light" style={{ backgroundColor: "#4F9CF9", border: "none" }}>
-                            Sign up <i className="fa-solid fa-arrow-right fa-sm" />
-                        </button>
-                    </Link>
-                </div>
+	return (
+		<div className="d-flex flex-column flex-md-row vh-100 align-items-center justify-content-center">
+			{/* Sección izquierda */}
+			<div className="text-center text-md-start col-12 col-md-6 d-flex flex-column justify-content-center align-items-md-start position-relative">
+				<h1 className="mb-n1 px-md-5 display-4 font-weight-bold" style={{ fontSize: "80px", fontWeight: "bold" }}>Sign in</h1>
+				<img src={linea} className="mt-2mx-md-5 my-2 img-fluid" style={{ zIndex: 0, maxWidth: "100%", height: "auto" }} alt="Linea decorativa" />
+				<h3 className="px-md-5 fw-normal">Book your material</h3>
+				<h6 className="px-md-5 mt-5">If you do not yet have an account</h6>
+				<div className="px-md-5 mt-3">
+					<Link to="/register">
+						<button type="button" className="btn btn-primary fw-light" style={{ backgroundColor: "#4F9CF9", border: "none" }}>
+							Sign up <i className="fa-solid fa-arrow-right fa-sm" />
+						</button>
+					</Link>
+				</div>
 
-                {/* Imagen del yeti alineada a la derecha y más cerca */}
-                <div className="position-absolute yeti-img-container">
-                    <img src={yeti} className="img-fluid yeti-img" alt="Yeti" />
-                </div>
-            </div>
+				{/* Imagen del yeti alineada a la derecha y más cerca */}
+				<div className="yeti-img-container">
+					<img src={yeti} style={{ zIndex: 0 }} className=" img-fluid yeti-img" alt="Yeti" />
+				</div>
+			</div>
 
-		 {/* Sección derecha - Formulario */}
-		 <div className="col-12 col-md-4 d-flex justify-content-center align-items-center">
-			 <form onSubmit={handleSubmit} className="w-100 p-4 p-md-5">
-				 <h2 className="fw-light mb-4">Sign in</h2>
-				 <div className="form-group mb-4">
-					 <input
-						 value={email}
-						 onChange={(e) => setEmail(e.target.value)}
-						 type="email"
-						 className="form-control form-control-lg fw-light fs-6 input"
-						 id="email"
-						 placeholder="Enter email"
-						 required
-						 style={{ backgroundColor: "#D3E7FF" }}
-					 />
-				 </div>
-				 <div className="form-group mb-4">
-					 <input
-						 value={password}
-						 onChange={(e) => setPassword(e.target.value)}
-						 type="password"
-						 className="form-control form-control-lg fw-light fs-6 input"
-						 id="password"
-						 placeholder="Enter password"
-						 required
-						 style={{ backgroundColor: "#D3E7FF" }}
-					 />
-					 <div id="forgotPassword" className="form-text text-end">
-						 <Link to="/forgot-password">Forgot your password?</Link>
-					 </div>
-				 </div>
-				 <button type="submit" className="btn btn-primary btn-lg w-100 fw-light" style={{ backgroundColor: "#4F9CF9", border: "none" }}>
-					 Login
-				 </button>
-			 </form>
-		 </div>
-	 </div>
+
+			{/* Sección derecha - Formulario */}
+			<div className="col-12 col-md-4 d-flex justify-content-center align-items-center">
+				<form onSubmit={handleSubmit} className="w-100 p-4 p-md-5">
+					<h2 className="fw-light mb-4">Sign in</h2>
+					<div className="form-group mb-4">
+						<input
+							value={email}
+							onChange={(e) => setEmail(e.target.value)}
+							type="email"
+							className="form-control form-control-lg fw-light fs-6 input"
+							id="email"
+							placeholder="Enter email"
+							required
+							style={{ backgroundColor: "#D3E7FF" }}
+						/>
+					</div>
+					<div className="form-group mb-4">
+						<input
+							value={password}
+							onChange={(e) => setPassword(e.target.value)}
+							type="password"
+							className="form-control form-control-lg fw-light fs-6 input"
+							id="password"
+							placeholder="Enter password"
+							required
+							style={{ backgroundColor: "#D3E7FF" }}
+						/>
+						<div id="forgotPassword" className="form-text text-end">
+							<Link to="/forgot-password">Forgot your password?</Link>
+						</div>
+					</div>
+					<button type="submit" className="btn btn-login btn-primary btn-lg w-100 fw-light" style={{ backgroundColor: "#4F9CF9", border: "none" }}>
+						Login
+					</button>
+				</form>
+			</div>
+		</div >
 	);
 };

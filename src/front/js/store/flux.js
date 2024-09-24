@@ -48,15 +48,21 @@ const getState = ({ getStore, getActions, setStore }) => {
 				});
 				setStore({ demo: demo });
 			},
-			deleteSelected: (description) => {
+			handleSelected: (article) => {
 				const store = getStore();
-				setStore({ selected: store.selected.filter(selected => selected[0] !== description) });
+				if(store.selected.length == 5) {
+					alert("Recuerda que tienes un máximo de 5 productos");
+				} else {
+					if(store.selected.includes(article)) {
+						const newArray = store.selected.filter((item)=>{
+							return item.description != article.description;
+						})
+						setStore({selected: newArray})
+					} else {
+						setStore({ selected: [...store.selected, article] });
+					}
+				}	
 			},
-			addSelected: (elemento) => {
-				const store = getStore();
-				setStore({ selected: [...store.selected, elemento] });
-			},
-
 			getStock: () => {
 				const store = getStore();
 				const token = localStorage.getItem("jwt_token");
