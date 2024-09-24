@@ -96,22 +96,47 @@ def serve_any_other_file(path):
     response.cache_control.max_age = 0  # avoid cache memory
     return response
 
-@app.route('/allforms', methods=['GET'])
-#técnico puede ver todos los pedidos
+@app.route('/all_forms', methods=['GET'])
+# técnico puede ver todos los pedidos
+@jwt_required()
 def get_forms():
     try:
-        all_forms = Form.query.allgit()  # Obtiene todos los registros de la tabla Form
-        # Aplica el método to_dict() a cada objeto Form en la lista
-        all_forms_serialize=[]
-        for form in all_forms:
-            all_forms_serialize.append(form.serialize())
+        current_user = get_jwt_identity() #Obtenemos la identidad del usuario(email).
+        user = User.query.filter_by(email=current_user).first() #Buscamos el usuario por su email.
+        if not user:
+            return jsonify({'msg': 'The user does not exist'}), 401
         
-        response_body = {
+        if user.usertype != UserTypeEnum.tecnico: #Verificamos el tipo de usuario.
+            return jsonify({'msg': 'Unauthorized'}), 403
+#Busca el valor del parámetro email en la URL de la solicitud y lo guardamos en la variable email.
+        email = request.args.get('email')
+        if email: #Si se proporcionó un email:
+            user_to_search = User.query.filter_by(email=email).first() #Buscamos el usuario por su email.
+            if not user_to_search: #Si no se encontró un usuario con ese email:
+                return jsonify({'msg': 'User Not Found'}), 404
+#Buscamos los formularios que coincidan con el id del usuario y el email proporcionado(user_to_search):
+            all_forms = Form.query.filter_by(userId=user_to_search.id).all()
+        else:
+            all_forms = Form.query.all()#Si no se proporciona un email obtenemos todos los formularios. 
+        if not all_forms:  # Si no se encuentran formularios:
+            return jsonify({'msg': 'No forms found'}), 404
+        # Aplica el método serialize() a cada objeto Form en la lista
+        all_forms_serialize = [] #Aquí guardaremos los formularios(data).
+        for form in all_forms: #Iteramos sobre cada formulario en la tabla "Form".
+            form_data = form.serialize() #Serializamos cada formulario.
+#Añadimos el nombre y apellido del usuario relacionado al formulario a la llave "user_name" y "user_last_name":
+            form_data['user_name'] = form.user_relationship.firstName 
+            form_data['user_last_name'] = form.user_relationship.lastName
+            all_forms_serialize.append(form_data) #añadimos el formulario serializado a la lista.
+    
+        response_body = { #Devolvemos los formularios serializados
             "data": all_forms_serialize
         }
         return jsonify(response_body), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -537,6 +562,7 @@ def search():
         try:
             # Convierte la cadena enviada en 'types' a un valor del enum StockTypeEnum (ej: 'monitor' -> StockTypeEnum.monitor)
             type_enum = StockTypeEnum[types]
+            
         except KeyError:
             # Si no se reconoce el tipo, devolvemos un error
             return jsonify({'msg': 'invalid type'}), 400
@@ -549,6 +575,7 @@ def search():
     articles_serialize = [article.serialize() for article in results]
     # Devolver la respuesta en formato JSON
     return jsonify({'article': articles_serialize}), 200
+
 
 
 # this only runs if `$ python src/main.py` is executed
