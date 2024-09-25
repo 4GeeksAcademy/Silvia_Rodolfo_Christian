@@ -38,7 +38,7 @@ const getProductsByType = async (type) => {
         return;
     }
     try {
-        const response = await fetch(${apiUrl}/search?type=${type}, { // Pasamos el "type" como parámetro de la URL
+        const response = await fetch('${apiUrl}/search?type=${type}', { // Pasamos el "type" como parámetro de la URL
             method: 'POST', // Método POST según la API definida en el backend
             headers: {
                 "Content-Type": "application/json",
