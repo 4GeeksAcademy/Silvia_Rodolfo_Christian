@@ -5,7 +5,7 @@ import { faPlus, faMinus, faCalendar, faTimesCircle } from '@fortawesome/free-so
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-export const CardPedido = ({ article, onCantidadChange, onDatesChange }) => {
+export const CardPedido = ({ index, article, onCantidadChange, onDatesChange }) => {
     const { store, actions } = useContext(Context);
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
@@ -16,6 +16,7 @@ export const CardPedido = ({ article, onCantidadChange, onDatesChange }) => {
     const incrementarCantidad = () => {
         if (cantidad < article.quantity) {
             setCantidad(cantidad + 1); // Incrementa la cantidad
+            onCantidadChange(index, cantidad + 1);
         }
     };
 
@@ -23,6 +24,7 @@ export const CardPedido = ({ article, onCantidadChange, onDatesChange }) => {
     const decrementarCantidad = () => {
         if (cantidad > 0) {
             setCantidad(cantidad -1); // Decrementa la cantidad
+            onCantidadChange(index, cantidad -1);
         }
     };
 

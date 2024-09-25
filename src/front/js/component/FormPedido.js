@@ -26,7 +26,9 @@ export const FormPedido = () => {
     const token = localStorage.getItem("jwt_token"); //Obtiene el token de autenticación almacenado.
     const selected = store.selected;
 	
-
+    console.log({selected:selected});
+    console.log({pedidos:pedidos});
+    
     // Función para obtener los productos de un tipo seleccionado
     
 const getProductsByType = async (type) => {
@@ -60,40 +62,7 @@ const getProductsByType = async (type) => {
         setPedidos([...pedidos, { descripcion: product.description, cantidad: 1 }]); // Añadimos el producto a pedidos
         setShowModal(false); // Cerramos el modal
     };
-	// Función para obtener los productos de un tipo seleccionado
 	
-	const getProductsByType = async (type) => {
-		console.log('hola');
-		
-		if (!token) {
-			navigate("/login");
-			return;
-		}
-		try {
-			const response = await fetch(`${apiUrl}/search`, {
-				headers: {
-					"Content-Type": "application/json",
-					"Authorization": `Bearer ${token}`
-					
-				},
-				body: JSON.stringify({type:type}),
-				method: 'POST'
-			});
-			if (!response.ok) {
-				throw new Error(`HTTP error! Status: ${response.status}`);
-			}
-			console.log(response);
-			
-			const data = await response.json();
-			console.log(data);
-			setProducts(data.article || []); // Guardamos los productos obtenidos para el tipo seleccionado
-		} catch (error) {
-			console.log("Error en la solicitud", error);
-			alert("Error al obtener los productos del tipo seleccionado");
-		}
-	};
-
-
     // Función para manejar la selección de un tipo de producto
 
     const handleSelectType = (event) => {
@@ -139,9 +108,10 @@ const getProductsByType = async (type) => {
                     "Authorization": `Bearer ${token}` //Autorizamos al usuario a hacer la solicitud
                 },
                 body: JSON.stringify({
-                    initialDate,
-                    finalDate,
-                    quantity,
+                    initialDate:initialDate,
+                    finalDate:finalDate,
+                    quantity:quantity,
+
                 }),
             });
             if (!response.ok) {
@@ -215,8 +185,13 @@ const getProductsByType = async (type) => {
 
     // Función para actualizar la cantidad de un pedido
     const actualizarCantidad = (index, nuevaCantidad) => {
+        console.log(nuevaCantidad, index);
+        
+        
         const nuevosPedidos = [...pedidos];
         nuevosPedidos[index].cantidad = nuevaCantidad; // Actualizamos la cantidad directamente
+
+        console.log(nuevosPedidos);
         setPedidos(nuevosPedidos); // Actualizar el estado con la nueva cantidad
     };
 
@@ -335,7 +310,9 @@ const getProductsByType = async (type) => {
                             <CardPedido
                                 key={index}
                                 article={cart}
-                                onCantidadChange={(nuevaCantidad) => actualizarCantidad(index, nuevaCantidad)} />
+                                index={index}
+                                onDatesChange={handleDatesChange}
+                                onCantidadChange={actualizarCantidad} />
                         ))}
                     </div>
                 </div >
