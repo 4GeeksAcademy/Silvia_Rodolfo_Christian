@@ -81,6 +81,7 @@ const Stock = () => {
                     </div>
                 </div>
 
+
                 {/* Lista de Artículos filtrados según el tipo seleccionado */}
                 {selectedType && (
                     <div className="container mt-4">
