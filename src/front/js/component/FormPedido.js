@@ -178,6 +178,7 @@ export const FormPedido = () => {
 	};
 	// Función para actualizar la cantidad de un pedido
 
+	
 	const actualizarCantidad = (index, nuevaCantidad) => {
 		const nuevosPedidos = [...pedidos];
 		nuevosPedidos[index].cantidad = nuevaCantidad; // Actualizamos la cantidad directamente

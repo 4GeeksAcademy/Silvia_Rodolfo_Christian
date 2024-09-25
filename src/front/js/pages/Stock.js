@@ -11,7 +11,7 @@ const Stock = () => {
 
     const [selectedType, setSelectedType] = useState(""); // Tipo de producto seleccionado
     const [articles, setArticles] = useState([]); // Estado para los artículos obtenidos
-
+   
     //comprueba si hay token y el usertype para ocultar botones
     useEffect(() => {
         const fetchUserType = async () => {
@@ -24,6 +24,7 @@ const Stock = () => {
         };
         fetchUserType();
         actions.getStock();
+        
     }, []);
 
     //dependiendo del usertype el botón va a una página o a otra
@@ -41,13 +42,13 @@ const Stock = () => {
     };
 
     const filteredArticles = selectedType
-    ? articles.filter(article => article.type === selectedType)
-    : articles;
-    
+        ? store.article.filter((article) => article.type === selectedType)
+        : store.article;
+
 
     return (
         <div className="container">
-            <div className="d-flex flex-column align-items-start mt-5 row" style={{ minHeight: "200px" }}>
+            <div className="d-flex flex-column align-items-start mt-5 row" style={{ minHeight: "500px" }}>
                 <div>
                     <h1 className="mb-n1 px-5" style={{ position: "relative", zIndex: 1, fontWeight: "bold" }}>Stock</h1>
                     <img src={linea} className="img-fluid" style={{ zIndex: 0, maxWidth: "100%", height: "auto" }} alt="Linea decorativa" />
@@ -85,7 +86,8 @@ const Stock = () => {
                     <div className="container mt-4">
                         <h3>Productos relacionados: {selectedType}</h3>
                         <div className="row g-3">
-                            {articles.map((article, index) => (
+                            {articles.length > 0 ? (
+                                articles.map((article, index) => (
                                     <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3">
                                         <Article
                                             description={article.description}
@@ -97,7 +99,9 @@ const Stock = () => {
                                         />
                                     </div>
                                 ))
-                            }
+                            ) : (
+                                <p>No hay artículos disponibles.</p>
+                            )}
                         </div>
                     </div>
                 )}
