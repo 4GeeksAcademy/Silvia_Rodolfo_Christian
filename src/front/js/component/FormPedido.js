@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { Context } from "../store/appContext";
 import {useNavigate, useParams } from 'react-router-dom'; //Permite crear enlaces de navegación entre páginas.
 import linea from "./../../img/linea.png";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { CardPedido } from "./CardPedido";
+
 export const FormPedido = () => {
     const { store, actions } = useContext(Context);
     const [search, setSearch] = useState(""); // Estado para el valor del buscador
@@ -159,15 +161,7 @@ export const FormPedido = () => {
 			alert("Error al actualizar el formulario. Inténtalo de nuevo");
 		}
 	}
-	// Función para manejar el clic en el ícono de búsqueda y abrir el modal
-	const handleSelectType = (event) => {
-        const selectedValue = event.target.value;  // Obtener el valor seleccionado en el dropdown
-        setSelectedType(selectedValue);  // Guardar el valor seleccionado en el estado
-        if (selectedValue) {
-            getProductsByType(selectedValue);  // Llamar a la función para obtener los productos del tipo seleccionado
-            setShowModal(true);  // Mostrar el modal con los productos
-        }
-    };
+
 	// Función que cierra el modal y añade el pedido si el usuario confirma
 	const closeModal = (addPedido) => {
 		setShowModal(false); // Cerrar modal
