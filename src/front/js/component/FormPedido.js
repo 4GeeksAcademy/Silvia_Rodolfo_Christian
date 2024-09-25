@@ -25,8 +25,6 @@ export const FormPedido = () => {
     const { detail_id } = useParams(); //Accedemos a los parámetros dinámicos de la URL como "detail_id".
     const token = localStorage.getItem("jwt_token"); //Obtiene el token de autenticación almacenado.
     const selected = store.selected;
-    const productosQuedan = 5 - selected.length;
-    //const [productosQuedan, setProductosQuedan] = useState()
 
 
     // Función para obtener los productos de un tipo seleccionado
@@ -241,7 +239,7 @@ export const FormPedido = () => {
                             </strong></h6>
                         </div>
                     </div>
-                    <p style={{ color: "lightgray" }}>Recuerda que tienes un máximo de 5 productos. Quedan {productosQuedan} pedidos.</p>
+                    <p style={{ color: "lightgray" }}>Recuerda que tienes un máximo de 5 productos. {countPedidos} </p>
                     {/* Barra de búsqueda */}
                     <div className="row mb-4">
                         <div className="col-12 col-md-9">

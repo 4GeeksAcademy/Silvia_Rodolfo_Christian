@@ -10,6 +10,7 @@ const Stock = () => {
     const usertype = store.usertype;
 
     const [selectedType, setSelectedType] = useState(""); // Tipo de producto seleccionado
+    const articles = store.article;
 
    
     //comprueba si hay token y el usertype para ocultar botones
@@ -41,9 +42,10 @@ const Stock = () => {
         setSelectedType(selectedValue);
     };
 
-    const filteredArticles = selectedType
-        ? store.article.filter((article) => article.type === selectedType)
-        : store.article;
+    const filteredArticles = selectedType && articles != []
+        ? articles.filter((article) => article.type === selectedType)
+        : articles;
+        
 
 
     return (
