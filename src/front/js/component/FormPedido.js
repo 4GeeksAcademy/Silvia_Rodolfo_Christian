@@ -181,6 +181,7 @@ const getProductsByType = async (type) => {
         setPedidos(nuevosPedidos); // Actualizar el estado con la nueva cantidad
     };
 
+	
     // Función para el conteo de productos pedidos
     function countPedidos() {
         const totalPedidos = pedidos.reduce((total, pedido) => total + pedido.cantidad, 0);
