@@ -25,35 +25,37 @@ export const FormPedido = () => {
     const { detail_id } = useParams(); //Accedemos a los parámetros dinámicos de la URL como "detail_id".
     const token = localStorage.getItem("jwt_token"); //Obtiene el token de autenticación almacenado.
     const selected = store.selected;
-	
+    const productosQuedan = 5 - selected.length;
+    //const [productosQuedan, setProductosQuedan] = useState()
+
 
     // Función para obtener los productos de un tipo seleccionado
-    
-const getProductsByType = async (type) => {
-    console.log('Fetching products of type:', type); // Agregar log para verificar qué tipo se está enviando
-    if (!token) {
-        navigate("/login");
-        return;
-    }
-    try {
-        const response = await fetch(`${apiUrl}/search?type=${type}`, { // Pasamos el "type" como parámetro de la URL
-            method: 'POST', // Método POST según la API definida en el backend
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}` // Autenticación mediante el token
-            }
-        });
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+
+    const getProductsByType = async (type) => {
+        console.log('Fetching products of type:', type); // Agregar log para verificar qué tipo se está enviando
+        if (!token) {
+            navigate("/login");
+            return;
         }
-        const data = await response.json(); // Parseamos la respuesta
-        console.log("Productos recibidos:", data); // Log de productos recibidos
-        setProducts(data.article || []); // Guardamos los productos obtenidos para el tipo seleccionado
-    } catch (error) {
-        console.log("Error en la solicitud:", error);
-        alert("Error al obtener los productos del tipo seleccionado.");
-    }
-};
+        try {
+            const response = await fetch(`${apiUrl}/search?type=${type}`, { // Pasamos el "type" como parámetro de la URL
+                method: 'POST', // Método POST según la API definida en el backend
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}` // Autenticación mediante el token
+                }
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = await response.json(); // Parseamos la respuesta
+            console.log("Productos recibidos:", data); // Log de productos recibidos
+            setProducts(data.article || []); // Guardamos los productos obtenidos para el tipo seleccionado
+        } catch (error) {
+            console.log("Error en la solicitud:", error);
+            alert("Error al obtener los productos del tipo seleccionado.");
+        }
+    };
 
     // Función que añade el producto seleccionado al pedido
     const addProductToOrder = (product) => {
@@ -166,13 +168,13 @@ const getProductsByType = async (type) => {
     // Función para manejar el clic en el ícono de búsqueda y abrir el modal
     const handleSearchClick = () => {
         if (!selectedType) {
-          alert('Por favor, selecciona un tipo de producto antes de buscar.');
-          return;
+            alert('Por favor, selecciona un tipo de producto antes de buscar.');
+            return;
         }
         // Cargar productos del tipo seleccionado
         getProductsByType(selectedType);
-      };
-    
+    };
+
     // Función para eliminar un pedido de la lista
     const eliminarPedido = (index) => {
         // Filtrar los pedidos eliminando el que tiene el id que recibimos
@@ -187,21 +189,20 @@ const getProductsByType = async (type) => {
         setPedidos(nuevosPedidos); // Actualizar el estado con la nueva cantidad
     };
 
-	
+
     // Función para el conteo de productos pedidos
     function countPedidos() {
         const totalPedidos = pedidos.reduce((total, pedido) => total + pedido.cantidad, 0);
         let maxPedidos = 5;
         let quedanTantosPedidos = maxPedidos - totalPedidos;
+
         if (quedanTantosPedidos === 0) {
             return <span style={{ color: "red" }}>Has alcanzado el máximo de productos por pedir.</span>;
         }
         if (quedanTantosPedidos === 1) {
             return <span style={{ color: "orange" }}>Queda 1 producto.</span>;
         }
-        if (quedanTantosPedidos > 1) {
-            return <span>Quedan {quedanTantosPedidos} productos.</span>;
-        }
+        return <span>Quedan {quedanTantosPedidos} productos.</span>;
     };
 
     // Función para obtener la fecha actual y formatearla a dd.mm.yyyy
@@ -214,7 +215,7 @@ const getProductsByType = async (type) => {
         setCurrentDate(formattedDate); // Guardamos la fecha formateada en el estado
     }, []);
 
-	return (
+    return (
         <div>
             <div>
                 <div className="container mt-auto p-3 d-flex flex-column min-vh-100">
@@ -233,10 +234,14 @@ const getProductsByType = async (type) => {
                             <h6 style={{ color: "#043873" }}><strong>{currentDate}</strong></h6>
                         </div>
                         <div className="col-md-3 text-center">
-                            <h6 style={{ color: "#043873" }}><strong>NAME LASTNAME</strong></h6>
+                            <h6 style={{ color: "#043873" }}><strong>
+                                {store.user && store.user.firstName && store.user.lastName
+                                    ? `${store.user.firstName} ${store.user.lastName}`
+                                    : "Usuario"}
+                            </strong></h6>
                         </div>
                     </div>
-                    <p style={{ color: "lightgray" }}>Recuerda que tienes un máximo de 5 productos. {countPedidos()}</p>
+                    <p style={{ color: "lightgray" }}>Recuerda que tienes un máximo de 5 productos. Quedan {productosQuedan} pedidos.</p>
                     {/* Barra de búsqueda */}
                     <div className="row mb-4">
                         <div className="col-12 col-md-9">
