@@ -22,7 +22,7 @@ export const CardPedido = ({ article, onCantidadChange, onDatesChange }) => {
     // Función para disminuir la cantidad (evitando que sea menor que 1)
     const decrementarCantidad = () => {
         if (quantity > 1) {
-            setCantidad(cantidad + 1); // Decrementa la cantidad
+            setCantidad(cantidad - 1); // Decrementa la cantidad
         }
     };
 

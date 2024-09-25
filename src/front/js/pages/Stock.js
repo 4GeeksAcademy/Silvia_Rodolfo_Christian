@@ -40,10 +40,10 @@ const Stock = () => {
         setSelectedType(selectedValue);
     };
 
-    //filtra los artículos por el stocktype que se busca
     const filteredArticles = selectedType
-        ? store.article.filter(article => article.type === selectedType)
-        : store.article;
+    ? articles.filter(article => article.type === selectedType)
+    : articles;
+    
 
     return (
         <div className="container">
@@ -85,8 +85,7 @@ const Stock = () => {
                     <div className="container mt-4">
                         <h3>Productos relacionados: {selectedType}</h3>
                         <div className="row g-3">
-                            {articles.length > 0 ? (
-                                articles.map((article, index) => (
+                            {articles.map((article, index) => (
                                     <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3">
                                         <Article
                                             description={article.description}
@@ -98,9 +97,7 @@ const Stock = () => {
                                         />
                                     </div>
                                 ))
-                            ) : (
-                                <p>No hay artículos disponibles.</p> // Mensaje si no hay artículos
-                            )}
+                            }
                         </div>
                     </div>
                 )}
