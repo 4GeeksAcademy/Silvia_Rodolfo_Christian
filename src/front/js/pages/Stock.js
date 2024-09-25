@@ -87,7 +87,7 @@ const Stock = () => {
                         <h3>Productos relacionados: {selectedType}</h3>
                         <div className="row g-3">
                             {filteredArticles.length > 0 ? (
-                                filteredArticles.map((article, index) => (
+                                articles.map((article, index) => (
                                     <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3">
                                         <Article
                                             description={article.description}
@@ -109,8 +109,8 @@ const Stock = () => {
                 {/* Lista de Artículos generales filtrada por el tipo seleccionado */}
                 <div className="container mt-5">
                     <div className="row g-3">
-                        {articles.length > 0 ? (
-                            articles.map((article, index) => (
+                        {filteredArticles.length > 0 ? (
+                            filteredArticles.map((article, index) => (
                                 <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3">
                                     <Article
                                         description={article.description}
