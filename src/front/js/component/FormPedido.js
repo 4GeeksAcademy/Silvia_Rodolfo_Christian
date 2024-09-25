@@ -1,11 +1,14 @@
 
-import React, { Component, useState, useEffect } from "react";
-import { Link, useNavigate, useParams } from 'react-router-dom'; //Permite crear enlaces de navegación entre páginas.
+import React, { useContext, useState, useEffect } from "react";
+import { useNavigate, useParams } from 'react-router-dom'; //Permite crear enlaces de navegación entre páginas.
 import linea from "./../../img/linea.png";
+import { Context } from "../store/appContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { CardPedido } from "./CardPedido";
+
 export const FormPedido = () => {
+    const { store, actions } = useContext(Context);
     const [search, setSearch] = useState(""); // Estado para el valor del buscador
     const [pedidos, setPedidos] = useState([]); // Estado para guardar los pedidos (búsquedas)
     const [showModal, setShowModal] = useState(false); // Estado para controlar la visibilidad del modal
@@ -16,11 +19,12 @@ export const FormPedido = () => {
     const [articles, setArticles] = useState([]); // Estado para guardar los artículos obtenidos
     const navigate = useNavigate(); //Para redirigir a otras páginas
     const apiUrl = process.env.BACKEND_URL; // URL base de la API desde las variables de entorno
-    const [initialDate, setInitialDate] = useState(null);
-    const [finalDate, setFinalDate] = useState(null);
+    const [initialDate, setInitialDate] = useState("");
+    const [finalDate, setFinalDate] = useState("");
     const [quantity, setQuantity] = useState(0);
     const { detail_id } = useParams(); //Accedemos a los parámetros dinámicos de la URL como "detail_id".
     const token = localStorage.getItem("jwt_token"); //Obtiene el token de autenticación almacenado.
+    const selected = store.selected;
 	
 
     // Función para obtener los productos de un tipo seleccionado
@@ -51,12 +55,6 @@ const getProductsByType = async (type) => {
     }
 };
 
-
-
-
-
-
-
     // Función que añade el producto seleccionado al pedido
     const addProductToOrder = (product) => {
         setPedidos([...pedidos, { descripcion: product.description, cantidad: 1 }]); // Añadimos el producto a pedidos
@@ -71,6 +69,14 @@ const getProductsByType = async (type) => {
         if (selectedValue) {
             getProductsByType(selectedValue);  // Llamar a la función para obtener los productos del tipo seleccionado
             setShowModal(true);  // Mostrar el modal con los productos
+        }
+    };
+
+    const handleSelectedClick = (product) => {
+        if (selected.some(p => p.description === product.description)) {
+            alert("Este producto ya está en el carrito")
+        } else {
+            actions.handleSelected(product);
         }
     };
 
@@ -271,7 +277,7 @@ const getProductsByType = async (type) => {
                                                 <ul>
                                                     {products.map((product, index) => (
                                                         <li key={index}>
-                                                            <button onClick={() => addProductToOrder(product)}>{product.description}</button>
+                                                            <button onClick={() => handleSelectedClick(product)}>{product.description}</button>
                                                         </li>
                                                     ))}
                                                 </ul>
@@ -290,11 +296,13 @@ const getProductsByType = async (type) => {
                             </button>
                         </div>
                     </div>
-                    {/* Lista de Artículos generados a partir de las búsquedas */}
+                    {/* Lista de Artículos en carrito */}
                     <div className="col-12 mb-3" >
-                        {pedidos.map((pedido, index) => (
-                            <CardPedido key={index} descripcion={pedido.descripcion} cantidad={pedido.cantidad} onDelete={() => eliminarPedido(index)}
-                                onCantidadChange={(nuevaCantidad) => actualizarCantidad(index, nuevaCantidad)} onDatesChange={handleDatesChange} />
+                        {selected.map((cart, index) => (
+                            <CardPedido
+                                key={index}
+                                article={cart}
+                                onCantidadChange={(nuevaCantidad) => actualizarCantidad(index, nuevaCantidad)} />
                         ))}
                     </div>
                 </div >
