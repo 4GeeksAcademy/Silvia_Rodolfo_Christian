@@ -1,3 +1,4 @@
+
 import React, { Component, useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from 'react-router-dom'; //Permite crear enlaces de navegación entre páginas.
 import linea from "./../../img/linea.png";
