@@ -10,7 +10,7 @@ const Stock = () => {
     const usertype = store.usertype;
 
     const [selectedType, setSelectedType] = useState(""); // Tipo de producto seleccionado
-    const [articles, setArticles] = useState([]); // Estado para los artículos obtenidos
+
    
     //comprueba si hay token y el usertype para ocultar botones
     useEffect(() => {
@@ -42,8 +42,8 @@ const Stock = () => {
     };
 
     const filteredArticles = selectedType
-        ? articles.filter((article) => article.type === selectedType)
-        : articles;
+        ? store.article.filter((article) => article.type === selectedType)
+        : store.article;
 
 
     return (
@@ -81,35 +81,10 @@ const Stock = () => {
                     </div>
                 </div>
 
-                {/* Lista de Artículos filtrados según el tipo seleccionado */}
-                {selectedType && (
-                    <div className="container mt-4">
-                        <h3>Productos relacionados: {selectedType}</h3>
-                        <div className="row g-3">
-                            {filteredArticles.length > 0 ? (
-                                articles.map((article, index) => (
-                                    <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3">
-                                        <Article
-                                            description={article.description}
-                                            stocktype={article.stocktype}
-                                            quantity={article.quantity}
-                                            image={article.image}
-                                            usertype={usertype}
-                                            id={article.id}
-                                        />
-                                    </div>
-                                ))
-                            ) : (
-                                <p>No hay artículos disponibles.</p>
-                            )}
-                        </div>
-                    </div>
-                )}
-
                 {/* Lista de Artículos generales filtrada por el tipo seleccionado */}
                 <div className="container mt-5">
                     <div className="row g-3">
-                        {filteredArticles.length > 0 ? (
+                        {(filteredArticles.length > 0) ? (
                             filteredArticles.map((article, index) => (
                                 <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3">
                                     <Article
