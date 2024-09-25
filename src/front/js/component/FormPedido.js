@@ -5,7 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { CardPedido } from "./CardPedido";
 export const FormPedido = () => {
-    const { store, actions } = useContext(Context);
+
+
     const [search, setSearch] = useState(""); // Estado para el valor del buscador
     const [pedidos, setPedidos] = useState([]); // Estado para guardar los pedidos (búsquedas)
     const [showModal, setShowModal] = useState(false); // Estado para controlar la visibilidad del modal
@@ -21,7 +22,13 @@ export const FormPedido = () => {
     const [quantity, setQuantity] = useState(0);
     const { detail_id } = useParams(); //Accedemos a los parámetros dinámicos de la URL como "detail_id".
     const token = localStorage.getItem("jwt_token"); //Obtiene el token de autenticación almacenado.
-	  const selected = store.selected;
+	
+
+	const { store, actions } = useContext(Context);
+	
+	const selected = store.selected;
+
+
 
     
 const getProductsByType = async (type) => {
@@ -31,36 +38,41 @@ const getProductsByType = async (type) => {
         return;
     }
     try {
-        const response = await fetch(${apiUrl}/search?type=${type}, { // Pasamos el "type" como parámetro de la URL
+        const response = await fetch('${apiUrl}/search?type=${type}', { // Pasamos el "type" como parámetro de la URL
             method: 'POST', // Método POST según la API definida en el backend
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer: ${token}` // Autenticación mediante el token
             }
-            const data = await response.json(); // Parseamos la respuesta
-            console.log("Productos recibidos:", data); // Log de productos recibidos
-            setProducts(data.article || []); // Guardamos los productos obtenidos para el tipo seleccionado
-        } catch (error) {
-            console.log("Error en la solicitud:", error);
-            alert("Error al obtener los productos del tipo seleccionado.");
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
-    };
+        const data = await response.json(); // Parseamos la respuesta
+        console.log("Productos recibidos:", data); // Log de productos recibidos
+        setProducts(data.article || []); // Guardamos los productos obtenidos para el tipo seleccionado
+    } catch (error) {
+        console.log("Error en la solicitud:", error);
+        alert("Error al obtener los productos del tipo seleccionado.");
+    }
+};
+
+
+
+
+
+
 
     // Función que añade el producto seleccionado al pedido
     const addProductToOrder = (product) => {
-        if (!selected.includes(product)) {
-            setPedidos([...selected, {
-                description: product.description,
-                quantity: product.quantity,
-                stocktype: product.stocktype,
-                id: product.id
-            }]); // Añadimos el producto a pedidos
-            setShowModal(false); // Cerramos el modal
-        }
+        setPedidos([...pedidos, { descripcion: product.description, cantidad: 1 }]); // Añadimos el producto a pedidos
+        setShowModal(false); // Cerramos el modal
     };
 
     // Función para manejar la selección de un tipo de producto
+
     const handleSelectType = (event) => {
+
         const selectedValue = event.target.value;  // Obtener el valor seleccionado en el dropdown
         setSelectedType(selectedValue);  // Guardar el valor seleccionado en el estado
         if (selectedValue) {
@@ -68,13 +80,6 @@ const getProductsByType = async (type) => {
             setShowModal(true);  // Mostrar el modal con los productos
         }
     };
-
-    const handleSelectedClick = (product) => {
-        if (selected.some(p => p.description === product.description)) {
-            alert("Este producto ya está en el carrito")
-        } else {
-            actions.handleSelected(product);
-        }
 
     // Función para manejar el cambio de fechas
     const handleDatesChange = (start, end) => {
@@ -121,7 +126,6 @@ const getProductsByType = async (type) => {
             alert("Error al crear formulario. Inténtalo de nuevo");
         }
     };
-
 	const updateForm = async () => {
 		if (!token) {
 			navigate('/login');
@@ -182,7 +186,6 @@ const getProductsByType = async (type) => {
 		setPedidos(nuevosPedidos); // Actualizar el estado con la nueva lista
 	};
 	// Función para actualizar la cantidad de un pedido
-
 	const actualizarCantidad = (index, nuevaCantidad) => {
 		const nuevosPedidos = [...pedidos];
 		nuevosPedidos[index].cantidad = nuevaCantidad; // Actualizamos la cantidad directamente
@@ -277,7 +280,7 @@ const getProductsByType = async (type) => {
 												<ul>
 													{products.map((product, index) => (
 														<li key={index}>
-															<button onClick={() => handleSelectedClick(product)}>{product.description}</button>
+															<button onClick={() => addProductToOrder(product)}>{product.description}</button>
 														</li>
 													))}
 												</ul>
@@ -292,21 +295,31 @@ const getProductsByType = async (type) => {
 						</div>
 						<div className="col-12 col-md-3 text-md-end text-center">
                             <button onClick={addForm} type="submit" className="btn btn-primary fw-light align-text-center" style={{ backgroundColor: "#4F9CF9", border: "none", width: "150px" }} >
+
                                 <strong>Order</strong>
                             </button>
                         </div>
-                    </div>
-
-                    {/*Lista de Artículos*/}
-                    <div className="col-12 mb-3" >
-                        {selected.map((cart, index) => (
-                            <CardPedido key={index}
-                                article={cart}
+					</div>
+					{/* Lista de Artículos generados a partir de las búsquedas */}
+					<div className="col-12 mb-3" >
+                        {pedidos.map((pedido, index) => (
+                            <CardPedido key={index} descripcion={pedido.descripcion} cantidad={pedido.cantidad} onDelete={() => eliminarPedido(index)}
                                 onCantidadChange={(nuevaCantidad) => actualizarCantidad(index, nuevaCantidad)} onDatesChange={handleDatesChange} />
                         ))}
                     </div>
-                </div>
-            </div>
-        </div>
-    );
+					{/* Lista de Artículos en carrito */}
+					<div className="col-12 mb-3" >
+						{selected.map((cart, index) => (
+							<CardPedido
+								key={index}
+								description={cart.description}
+								quantity={cart.quantity}
+								onDelete={() => eliminarPedido(index)}
+								onCantidadChange={(nuevaCantidad) => actualizarCantidad(index, nuevaCantidad)} />
+						))}
+					</div>
+				</div >
+			</div>
+		</div>
+	);
 };
