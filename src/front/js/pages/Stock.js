@@ -42,9 +42,9 @@ const Stock = () => {
         setSelectedType(selectedValue);
     };
 
-    // const filteredArticles = selectedType
-    //     ? articles.filter((article) => article.type === selectedType)
-    //     : articles;
+    const filteredArticles = selectedType
+        ? articles.filter((article) => article.type === selectedType)
+        : articles;
 
 
     return (
