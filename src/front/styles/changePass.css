@@ -1,17 +1,13 @@
-/*
-    home.css: This website contains selectors only used in home.css
+.input::placeholder {
+    color: #4F9CF9
+}
 
-    All pages share the styles on index.css but you should create 
-    one more css for each page that will contain the selected used 
-    on that page only (the ones not reused in other pages).
-*/
+.responsive-title {
+    font-size: 80px; /* Tamaño por defecto */
+}
 
 .mb-n1 {
     margin-bottom: -25px !important;
-}
-
-.input::placeholder {
-    color: #4F9CF9
 }
 
 .btn-login {

@@ -73,8 +73,13 @@
 		]
 	},
 	"dependencies": {
+		"@fortawesome/fontawesome-svg-core": "^6.6.0",
+		"@fortawesome/free-solid-svg-icons": "^6.6.0",
+		"@fortawesome/react-fontawesome": "^0.2.2",
+		"cloudinary-react": "^1.8.1",
 		"prop-types": "^15.6.1",
 		"react": "^16.8.4",
+		"react-datepicker": "^7.4.0",
 		"react-dom": "^16.8.4",
 		"react-polyfills": "0.0.1",
 		"react-router-dom": "^6.3.0"
