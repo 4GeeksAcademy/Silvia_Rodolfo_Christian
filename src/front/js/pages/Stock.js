@@ -42,10 +42,11 @@ const Stock = () => {
         setSelectedType(selectedValue);
     };
 
+
     const filteredArticles = selectedType && articles.length > 0
+
         ? articles.filter((article) => article.type === selectedType)
         : articles;
-        
 
 
     return (

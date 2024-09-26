@@ -18,8 +18,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 			article: [],
 			usertype: [],
 			selected: [],
-			user: "", // Añadimos un campo user para almacenar los datos del usuario
-			userInitials: '' // Campo para almacenar las iniciales del usuario
+			user: "" // Almacenamos los datos del usuario
+			
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -48,6 +48,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 				});
 				setStore({ demo: demo });
 			},
+			setSelected: (selectedItems) => {
+                setStore({ selected: selectedItems }); // Actualiza el estado 'selected'
+            },
 			handleSelected: (article) => {
 				const store = getStore();
 				if(store.selected.length == 5) {
@@ -80,9 +83,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 					.catch((err) => { console.error(err) });
 			},
 			getUser: async () => {
-				//obtiene datos de usuario por id
+				// Obtiene datos de usuario por id
 				const store = getStore();
-				const token = localStorage.getItem("jwt_token")
+				const token = localStorage.getItem("jwt_token");
 				try {
 					// Petición para obtener toda la información del usuario
 					const response = await fetch(`${store.apiUrl}/user`, {
@@ -98,13 +101,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 					if (data && data.data) {
 						const user = data.data;
 
-						const firstNameInitial = user.firstName ? user.firstName.charAt(0).toUpperCase() : '';
-						const lastNameInitial = user.lastName ? user.lastName.charAt(0).toUpperCase() : '';
-						const initials = `${firstNameInitial}${lastNameInitial}`;
-
 						setStore({
 							user: user,
-							userInitials: initials,
 							usertype: user.usertype
 						});
 					} else {
@@ -139,4 +137,3 @@ const getState = ({ getStore, getActions, setStore }) => {
 };
 
 export default getState;
-

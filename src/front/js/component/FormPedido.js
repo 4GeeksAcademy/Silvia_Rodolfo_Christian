@@ -1,4 +1,3 @@
-
 import React, { useContext, useState, useEffect } from "react";
 import { useNavigate, useParams } from 'react-router-dom'; //Permite crear enlaces de navegación entre páginas.
 import linea from "./../../img/linea.png";
@@ -25,8 +24,10 @@ export const FormPedido = () => {
     const { detail_id } = useParams(); //Accedemos a los parámetros dinámicos de la URL como "detail_id".
     const token = localStorage.getItem("jwt_token"); //Obtiene el token de autenticación almacenado.
     const selected = store.selected;
-
-
+	
+    console.log({selected:selected});
+    console.log({pedidos:pedidos});
+    
     // Función para obtener los productos de un tipo seleccionado
 
     const getProductsByType = async (type) => {
@@ -60,7 +61,7 @@ export const FormPedido = () => {
         setPedidos([...pedidos, { descripcion: product.description, cantidad: 1 }]); // Añadimos el producto a pedidos
         setShowModal(false); // Cerramos el modal
     };
-
+	
     // Función para manejar la selección de un tipo de producto
 
     const handleSelectType = (event) => {
@@ -73,52 +74,71 @@ export const FormPedido = () => {
     };
 
     const handleSelectedClick = (product) => {
+        // Si el producto ya está en el carrito, no se añade de nuevo
         if (selected.some(p => p.description === product.description)) {
-            alert("Este producto ya está en el carrito")
+            alert("Este producto ya está en el carrito");
         } else {
-            actions.handleSelected(product);
+            // Agregar producto con cantidad inicial de 1
+            actions.handleSelected({ ...product, cantidad: 1 });
         }
     };
+    
 
     // Función para manejar el cambio de fechas
-    const handleDatesChange = (start, end) => {
+    const handleDatesChange = (index,start, end) => {
         setInitialDate(start);
         setFinalDate(end);
+        const nuevosSeleccionados = [...selected];
+        nuevosSeleccionados[index].initialDate = start;
+        console.log(end);
+        
+        nuevosSeleccionados[index].finalDate = end;
+        actions.setSelected(nuevosSeleccionados);
     };
+    // Función para actualizar la cantidad de un pedido
+    const actualizarCantidad = (index, nuevaCantidad) => {
+        const nuevosSeleccionados = [...selected];
+        nuevosSeleccionados[index].cantidad = nuevaCantidad; // Actualizar la cantidad en el estado 'selected'
+        actions.setSelected(nuevosSeleccionados); // Usamos la acción para actualizar el estado global
+    };
+ 
 
     {/* FrontPedido */ }
     const addForm = async (event) => {
         event.preventDefault();
-        console.log("Token:", token);
-        if (!token) { //Si no hay token:
-            navigate('/login'); //Redirige al usuario a la página de inicio de sesión.
-            return; //Termina la ejecución de la función fetchData si no hay un token.
-        }
-        if (!initialDate || !finalDate) { //Validar ambas fechas.
+        if (!initialDate || !finalDate) {
             alert('Por favor selecciona ambas fechas.');
             return;
         }
+    
         try {
             const response = await fetch(`${apiUrl}form`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}` //Autorizamos al usuario a hacer la solicitud
+                    "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    initialDate,
-                    finalDate,
-                    quantity,
-                }),
+                    
+                    currentDate,
+                    details: selected.map(item => ({
+                        stockId: item.id,  // Id del producto
+                        description: item.description,
+                        quantity: item.cantidad,  // La cantidad actualizada
+                        initialDate:item.initialDate,
+                        finalDate: item.finalDate,
+                        stocktype: item.type // El tipo de producto
+                    }))
+                })
             });
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+            
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            
             const data = await response.json();
-            if (data.msg === "Form and details created successfully") {
-                navigate('/stock'); //PREGUNTAR Y MODIFICAR(PÁGINA PRINCIPAL?)
+            if (data.message === "Form and details created successfully") {
+                navigate('/stock');
             } else {
-                alert("Error al crear formulario")
+                alert("Error al crear formulario");
             }
         } catch (error) {
             console.error("Error en la solicitud", error);
@@ -180,12 +200,7 @@ export const FormPedido = () => {
         setPedidos(nuevosPedidos); // Actualizar el estado con la nueva lista
     };
 
-    // Función para actualizar la cantidad de un pedido
-    const actualizarCantidad = (index, nuevaCantidad) => {
-        const nuevosPedidos = [...pedidos];
-        nuevosPedidos[index].cantidad = nuevaCantidad; // Actualizamos la cantidad directamente
-        setPedidos(nuevosPedidos); // Actualizar el estado con la nueva cantidad
-    };
+    
 
 
     // Función para el conteo de productos pedidos
@@ -305,7 +320,9 @@ export const FormPedido = () => {
                             <CardPedido
                                 key={index}
                                 article={cart}
-                                onCantidadChange={(nuevaCantidad) => actualizarCantidad(index, nuevaCantidad)} />
+                                index={index}
+                                onDatesChange={handleDatesChange}
+                                onCantidadChange={actualizarCantidad} />
                         ))}
                     </div>
                 </div >
