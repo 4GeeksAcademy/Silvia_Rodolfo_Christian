@@ -25,8 +25,10 @@ export const FormPedido = () => {
     const { detail_id } = useParams(); //Accedemos a los parámetros dinámicos de la URL como "detail_id".
     const token = localStorage.getItem("jwt_token"); //Obtiene el token de autenticación almacenado.
     const selected = store.selected;
-
-
+	
+    console.log({selected:selected});
+    console.log({pedidos:pedidos});
+    
     // Función para obtener los productos de un tipo seleccionado
 
     const getProductsByType = async (type) => {
@@ -60,7 +62,7 @@ export const FormPedido = () => {
         setPedidos([...pedidos, { descripcion: product.description, cantidad: 1 }]); // Añadimos el producto a pedidos
         setShowModal(false); // Cerramos el modal
     };
-
+	
     // Función para manejar la selección de un tipo de producto
 
     const handleSelectType = (event) => {
@@ -106,9 +108,10 @@ export const FormPedido = () => {
                     "Authorization": `Bearer ${token}` //Autorizamos al usuario a hacer la solicitud
                 },
                 body: JSON.stringify({
-                    initialDate,
-                    finalDate,
-                    quantity,
+                    initialDate:initialDate,
+                    finalDate:finalDate,
+                    quantity:quantity,
+
                 }),
             });
             if (!response.ok) {
@@ -182,8 +185,13 @@ export const FormPedido = () => {
 
     // Función para actualizar la cantidad de un pedido
     const actualizarCantidad = (index, nuevaCantidad) => {
+        console.log(nuevaCantidad, index);
+        
+        
         const nuevosPedidos = [...pedidos];
         nuevosPedidos[index].cantidad = nuevaCantidad; // Actualizamos la cantidad directamente
+
+        console.log(nuevosPedidos);
         setPedidos(nuevosPedidos); // Actualizar el estado con la nueva cantidad
     };
 
@@ -305,7 +313,9 @@ export const FormPedido = () => {
                             <CardPedido
                                 key={index}
                                 article={cart}
-                                onCantidadChange={(nuevaCantidad) => actualizarCantidad(index, nuevaCantidad)} />
+                                index={index}
+                                onDatesChange={handleDatesChange}
+                                onCantidadChange={actualizarCantidad} />
                         ))}
                     </div>
                 </div >

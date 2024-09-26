@@ -359,8 +359,7 @@ def create_form():
 
         # Crear la instancia de Form
         new_form = Form(
-             initialDate=body.get('initialDate'),
-             finalDate=body.get('finalDate'),
+             date=body.get('date'),
              userId=body.get('userId')
          )
         db.session.add(new_form)
@@ -373,7 +372,9 @@ def create_form():
                  stockId=detail['stockId'],
                  description=detail['description'],
                  quantity=detail['quantity'],
-                 type=StockTypeEnum(detail['type'])  # Usamos el Enum para asignar el tipo
+                 initialDate=detail['initialDate'],
+                 finalDate=detail['finalDate'],
+                 type=detail['type']  # Usamos el Enum para asignar el tipo
             )
              db.session.add(new_detail)
 
