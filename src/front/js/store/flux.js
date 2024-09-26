@@ -39,7 +39,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.log("Error loading message from backend", error);
 				}
 			},
-
 			changeColor: (index, color) => {
 				const store = getStore();
 				const demo = store.demo.map((elm, i) => {
@@ -56,7 +55,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				if(store.selected.length == 5) {
 					alert("Recuerda que tienes un máximo de 5 productos");
 				} else {
-					if(store.selected.includes(article)) {
+					if(store.selected.some(p => p.description === article.description)) {
 						const newArray = store.selected.filter((item)=>{
 							return item.description != article.description;
 						})

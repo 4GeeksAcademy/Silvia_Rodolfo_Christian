@@ -73,12 +73,12 @@ const Stock = () => {
                                 onChange={handleSelectType}
                                 required
                             >
-                                <option value="">Selecciona un tipo de producto</option> {/* Opción por defecto */}
-                                <option value="monitor">Monitor</option>
-                                <option value="teclado">Teclado</option>
+                                <option value="">Select a product type</option> {/* Opción por defecto */}
+                                <option value="monitor">Screen</option>
+                                <option value="teclado">Keyboard</option>
                                 <option value="cable">Cable</option>
                                 <option value="mouse">Mouse</option>
-                                <option value="camara">Cámara</option>
+                                <option value="camara">Webcam</option>
                             </select>
                         </div>
                     </div>
@@ -101,7 +101,7 @@ const Stock = () => {
                                 </div>
                             ))
                         ) : (
-                            <p>No hay artículos disponibles.</p>
+                            <p>No items available</p>
                         )}
                     </div>
                 </div>

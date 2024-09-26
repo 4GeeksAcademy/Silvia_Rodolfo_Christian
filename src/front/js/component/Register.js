@@ -56,7 +56,7 @@ const Register = () => {
         <div className="d-flex flex-column flex-md-row vh-100 align-items-center justify-content-center">
             <div className="text-center text-md-start col-12 col-md-6 d-flex flex-column justify-content-center align-items-md-start position-relative">
                 <h1 className="mb-n1 px-md-5 display-4 font-weight-bold" style={{ fontSize: "80px", fontWeight: "bold" }}>Sign up</h1>
-                <img src={linea} className="mt-2mx-md-5 my-2 img-fluid" style={{ zIndex: 0, maxWidth: "100%", height: "auto" }} alt="Linea decorativa" />
+                <img src={linea} className="mt-2mx-md-5 my-2 img-fluid" style={{ zIndex: -1, maxWidth: "100%", height: "auto" }} alt="Linea decorativa" />
                 <h3 className="px-md-5 fw-normal">Book your material</h3>
 
                 {/* Imagen del yeti alineada a la derecha y más cerca */}
