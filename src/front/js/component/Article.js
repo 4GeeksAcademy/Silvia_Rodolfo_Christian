@@ -44,12 +44,11 @@ const Article = ({ description, quantity, stocktype, image, id }) => {
         <p>{stocktype}</p>
         <p>Quantity: {quantity}</p>
 
-
         {usertype === "usuario" && (
           <div className="d-flex align-items-center">
-            <p className="mb-0">Añadir al pedido </p>
-            <div className={`btn ${store.selected.includes(articulo) ? 'active' : ''}`} onClick={handleSelectedClick}>
-              {store.selected.includes(articulo) ? (
+            <p className="mb-0">Add to Cart </p>
+            <div className={`btn ${store.selected.some(p => p.description === description) ? 'active' : ''}`} onClick={handleSelectedClick}>
+              {store.selected.some(p => p.description === description) ? (
                 <i className="fa-solid fa-square-check fa-2xl" style={{ color: "#042649" }} />
               ) : (
                 <i className="fa-regular fa-square-check fa-2xl" style={{ color: "#042649" }} />
