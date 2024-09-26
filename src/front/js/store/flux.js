@@ -19,6 +19,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			usertype: [],
 			selected: [],
 			user: "" // Almacenamos los datos del usuario
+			
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -47,6 +48,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 				});
 				setStore({ demo: demo });
 			},
+			setSelected: (selectedItems) => {
+                setStore({ selected: selectedItems }); // Actualiza el estado 'selected'
+            },
 			handleSelected: (article) => {
 				const store = getStore();
 				if(store.selected.length == 5) {

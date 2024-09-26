@@ -1,30 +1,32 @@
-import React, { useContext, useState } from "react";
-import { Context } from "../store/appContext";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faMinus, faCalendar, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
-import DatePicker from "react-datepicker";
+import React, { useContext, useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCalendar, faPlus, faMinus, faTimesCircle } from "@fortawesome/free-solid-svg-icons";
+import DatePicker from "react-datepicker"; // Asumimos que se está usando react-datepicker
 import "react-datepicker/dist/react-datepicker.css";
+import { Context } from "../store/appContext";
 
 export const CardPedido = ({ index, article, onCantidadChange, onDatesChange }) => {
-    const { store, actions } = useContext(Context);
+    const { actions } = useContext(Context);
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);  // Controla si el calendario está abierto
-    const [cantidad, setCantidad] = useState(0);
+    const [cantidad, setCantidad] = useState(article.cantidad || 1); // Se inicializa con la cantidad del artículo o con 1
 
     // Función para aumentar la cantidad
     const incrementarCantidad = () => {
         if (cantidad < article.quantity) {
-            setCantidad(cantidad + 1); // Incrementa la cantidad
-            onCantidadChange(index, cantidad + 1);
+            const nuevaCantidad = cantidad + 1;
+            setCantidad(nuevaCantidad); // Incrementa la cantidad en el estado local
+            onCantidadChange(index, nuevaCantidad); // Llama a la función del padre para actualizar el pedido
         }
     };
 
     // Función para disminuir la cantidad (evitando que sea menor que 1)
     const decrementarCantidad = () => {
-        if (cantidad > 0) {
-            setCantidad(cantidad -1); // Decrementa la cantidad
-            onCantidadChange(index, cantidad -1);
+        if (cantidad > 1) {
+            const nuevaCantidad = cantidad - 1;
+            setCantidad(nuevaCantidad); // Decrementa la cantidad en el estado local
+            onCantidadChange(index, nuevaCantidad); // Llama a la función del padre para actualizar el pedido
         }
     };
 
@@ -37,18 +39,18 @@ export const CardPedido = ({ index, article, onCantidadChange, onDatesChange }) 
     const handleDateChange = (start, end) => {
         setStartDate(start);
         setEndDate(end);
-        onDatesChange(start, end); // Pasamos las fechas al componente padre
-
+        onDatesChange(index,start, end); // Pasamos las fechas al componente padre
+          
         // Si ambas fechas están seleccionadas, cerramos el calendario
         if (start && end) {
             setIsCalendarOpen(false);  // Cerramos el calendario
         }
+        
     };
 
     return (
         <div className="card mb-3">
             <div className="card-body d-flex flex-wrap justify-content-between align-items-center" style={{ backgroundColor: "#FFE492" }}>
-
                 {/* Descripción del pedido (siempre alineada a la izquierda) */}
                 <span className="fs-5 col-12 col-md-6 mb-2 mb-md-0">{article.description}</span>
 
@@ -62,30 +64,29 @@ export const CardPedido = ({ index, article, onCantidadChange, onDatesChange }) 
                         <FontAwesomeIcon icon={faCalendar} />
                     </button>
                     {isCalendarOpen && (
-                            <div className="position-absolute" style={{ zIndex: 999 }}>
-                                <DatePicker
-                                    selected={startDate}
-                                    onChange={(date) => handleDateChange(date, endDate)}  // Set start date
-                                    selectsStart
-                                    startDate={startDate}
-                                    endDate={endDate}
-                                    placeholderText="Fecha inicial"
-                                />
-                                <DatePicker
-                                    selected={endDate}
-                                    onChange={(date) => {
-                                        setEndDate(date);
-                                        setIsCalendarOpen(false);
-                                    } } // Set end date
-                                    selectsEnd
-                                    startDate={startDate}
-                                    endDate={endDate}
-                                    minDate={startDate}  // La fecha final no puede ser anterior a la inicial
-                                    placeholderText="Fecha final"
-                                />
-                            </div>
-                        )}
-                    
+                        <div className="position-absolute" style={{ zIndex: 999 }}>
+                            <DatePicker
+                                selected={startDate}
+                                onChange={(date) => handleDateChange(date, endDate)}  // Set start date
+                                selectsStart
+                                startDate={startDate}
+                                endDate={endDate}
+                                placeholderText="Fecha inicial"
+                            />
+                            <DatePicker
+                                selected={endDate}
+                                onChange={(date) => handleDateChange(startDate, date)}
+                                //     setEndDate(date);
+                                //     setIsCalendarOpen(false);
+                                // }}  // Set end date
+                                selectsEnd
+                                startDate={startDate}
+                                endDate={endDate}
+                                minDate={startDate}  // La fecha final no puede ser anterior a la inicial
+                                placeholderText="Fecha final"
+                            />
+                        </div>
+                    )}
 
                     {/* Control de cantidad */}
                     <div className="d-flex align-items-center">

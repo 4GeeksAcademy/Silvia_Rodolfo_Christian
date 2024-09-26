@@ -17,7 +17,7 @@ from flask_jwt_extended import create_access_token #Importamos las librerias nec
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_jwt_extended import JWTManager
-from datetime import timedelta #Importamos "timedelta" de datetime para modificar el tiempo de expiración de nuestro token.
+from datetime import timedelta, datetime #Importamos "timedelta" de datetime para modificar el tiempo de expiración de nuestro token.
 from flask_bcrypt import Bcrypt
 
 # from models import Person
@@ -352,21 +352,28 @@ def send_reset_email(email, reset_link):
         raise e  # Esto debería lanzar una excepción si hay un error al enviar el correo
 
 @app.route('/form', methods=['POST'])
+@jwt_required()
 def create_form():
-       
+        
          # Extraer datos del cuerpo de la solicitud
         body = request.get_json(silent=True)
-
+        user= User.query.filter_by(email=get_jwt_identity()).one_or_none()
         # Crear la instancia de Form
+        fecha_obj = datetime.strptime(body.get('currentDate'), "%d/%m/%Y")
+        
         new_form = Form(
-             date=body.get('date'),
-             userId=body.get('userId')
+             
+             date=fecha_obj,
+             userId=user.id
          )
         db.session.add(new_form)
         db.session.commit()  # Necesario para generar el id del form antes de añadir los detalles
-
+        
+        
          # Agregar los DetailForm
-        for detail in body.get('details', []):
+        details=body.get('details', [])
+        for detail in details:
+             
              new_detail = DetailForm(
                  formId=new_form.id,
                  stockId=detail['stockId'],
@@ -374,7 +381,7 @@ def create_form():
                  quantity=detail['quantity'],
                  initialDate=detail['initialDate'],
                  finalDate=detail['finalDate'],
-                 type=detail['type']  # Usamos el Enum para asignar el tipo
+                 stocktype=StockTypeEnum[detail['stocktype']]  # Usamos el Enum para asignar el tipo
             )
              db.session.add(new_detail)
 
@@ -385,7 +392,8 @@ def create_form():
         return jsonify({
              "message": "Form and details created successfully",
              "form": new_form.serialize(),
-             "details": [detail.serialize() for detail in new_form.form_relationship]  # Devolver los detalles del form
+             
+             "details": [detail.serialize() for detail in new_form.detailform_relationship]  # Devolver los detalles del form
          }), 201
 
 @app.route('/stock', methods=['GET'])

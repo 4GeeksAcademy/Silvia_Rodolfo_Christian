@@ -69,6 +69,7 @@ class Form(db.Model):
     date=db.Column(db.Date, nullable=False)
     userId = db.Column(db.Integer, db.ForeignKey('user.id'),nullable=False)
     user_relationship =db.relationship("User")
+    detailform_relationship =db.relationship("DetailForm",back_populates='form')
     
     def __repr__(self):
         return f'<form:{self.id},Date:{self.date},User:{self.userId}>'
@@ -84,7 +85,7 @@ class DetailForm(db.Model):
     __tablename__='detailForm'
     id = db.Column(db.Integer, primary_key=True)
     formId = db.Column(db.Integer, db.ForeignKey('form.id'),nullable=False)
-    form_relationship =db.relationship("Form")
+    form =db.relationship("Form",back_populates='detailform_relationship')
     stockId = db.Column(db.Integer, db.ForeignKey('stock.id'),nullable=False)
     stock_relationship =db.relationship("Stock")
     description = db.Column(db.String(30), nullable=False)
