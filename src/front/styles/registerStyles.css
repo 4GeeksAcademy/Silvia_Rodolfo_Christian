@@ -1,18 +1,8 @@
-/*
-    home.css: This website contains selectors only used in home.css
-
-    All pages share the styles on index.css but you should create 
-    one more css for each page that will contain the selected used 
-    on that page only (the ones not reused in other pages).
-*/
-
-.mb-n1 {
-    margin-bottom: -25px !important;
-}
-
 .input::placeholder {
     color: #4F9CF9
 }
+
+
 
 .btn-login {
     box-shadow: 0 0 20px rgba(0, 123, 255, 0.5);
@@ -23,6 +13,7 @@
     right: 0px;
     bottom: 0;
     z-index: -1;
+    
 }
 
 .yeti-img {
