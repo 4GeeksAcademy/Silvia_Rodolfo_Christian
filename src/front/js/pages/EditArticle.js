@@ -114,7 +114,7 @@ const EditArticle = () => {
                         <Image
                             //'cloudName' es el nombre de la cuenta de cloudinary
                             //'publicID' viene dado en la imagen que se sube
-                            className="mt-3" cloudName="dohlrocq4" publicId={imageUrl} />
+                            className="m-2" cloudName="dohlrocq4" publicId={imageUrl} />
 
                         <form onSubmit={(e) => { e.preventDefault(); editArticle(id); }}>
                             <div className="card-body">
