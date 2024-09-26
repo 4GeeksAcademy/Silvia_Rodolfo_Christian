@@ -112,7 +112,7 @@ export const FormPedido = () => {
         }
     
         try {
-            const response = await fetch(`${apiUrl}form`, {
+            const response = await fetch(`${apiUrl}/form`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -122,6 +122,7 @@ export const FormPedido = () => {
                     
                     currentDate,
                     details: selected.map(item => ({
+                        formId: orderRandomNumber,
                         stockId: item.id,  // Id del producto
                         description: item.description,
                         quantity: item.cantidad,  // La cantidad actualizada
@@ -218,6 +219,8 @@ export const FormPedido = () => {
         return <span>Quedan {quedanTantosPedidos} productos.</span>;
     };
 
+    const orderRandomNumber = Math.floor(1000 + Math.random() * 9000);
+
     // Función para obtener la fecha actual y formatearla a dd.mm.yyyy
     useEffect(() => {
         const today = new Date();
@@ -241,7 +244,7 @@ export const FormPedido = () => {
                     {/* Información de la orden */}
                     <div className="row justify-content-center mb-4">
                         <div className="col-md-3 text-center">
-                            <h6 style={{ color: "#043873" }}><strong>Order #XXXXXX</strong></h6> {/* -------------------- Conectar el número de Order con la BBDD*/}
+                            <h6 style={{ color: "#043873" }}><strong>Order #{orderRandomNumber}</strong></h6>
                         </div>
                         <div className="col-md-3 text-center">
                             <h6 style={{ color: "#043873" }}><strong>{currentDate}</strong></h6>
