@@ -12,7 +12,8 @@ const Register = () => {
     const [confirmPassword, setConfirmPassword] = useState("");
     const navigate = useNavigate();
     const apiUrl = process.env.BACKEND_URL;
-
+    
+   
     const signUp = async (event) => { //Función que se ejecuta cuando el usuario envía el formulario.
         event.preventDefault(); //Evita que el formulario se envíe de manera predeterminada, lo cual recargaría la página.
 
