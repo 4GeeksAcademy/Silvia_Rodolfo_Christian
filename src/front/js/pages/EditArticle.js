@@ -25,7 +25,7 @@ const EditArticle = () => {
     const loadArticle = async () => {
         //petición GET al servidor para obtener los datos del artículo con el id
         try {
-            const response = await fetch(`${store.apiUrl}/stock/${id}`);
+            const response = await fetch(`${store.apiUrl}/stock_api/${id}`);
             console.log(response);
 
             if (!response.ok) {
