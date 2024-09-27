@@ -13,7 +13,9 @@ const Search = () => {
       return;
     }
     try {
-      const response = await fetch(`/search`, {
+
+      const response = await fetch(`${apiUrl}/search`, {
+
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
