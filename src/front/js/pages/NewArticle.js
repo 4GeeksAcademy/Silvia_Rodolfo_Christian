@@ -56,7 +56,7 @@ const NewArticle = () => {
       };
       console.log(articleData);
 
-      const response = await fetch(`${apiUrl}/stock`, {
+      const response = await fetch(`${apiUrl}/stock_api`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

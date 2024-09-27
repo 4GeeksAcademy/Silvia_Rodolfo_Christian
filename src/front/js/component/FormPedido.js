@@ -156,7 +156,7 @@ export const FormPedido = () => {
             return;
         }
         try {
-            const response = await fetch(`${apiUrl}form/${detail_id}`, {
+            const response = await fetch(`${apiUrl}/form/${detail_id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
