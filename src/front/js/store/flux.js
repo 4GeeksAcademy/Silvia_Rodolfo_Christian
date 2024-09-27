@@ -68,7 +68,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			getStock: () => {
 				const store = getStore();
 				const token = localStorage.getItem("jwt_token");
-				fetch(`${store.apiUrl}/stock`, {
+				fetch(`${store.apiUrl}/stock_api`, {
 					method: 'GET',
 					headers: {
 						"Content-Type": "application/json",
@@ -115,7 +115,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			deleteArticle: (id) => {
 				const store = getStore();
 				const actions = getActions();
-				fetch(`${store.apiUrl}/stock/${id}`, {
+				fetch(`${store.apiUrl}/stock_api/${id}`, {
 					method: "DELETE",
 					headers: {
 						'Content-Type': 'application/json',

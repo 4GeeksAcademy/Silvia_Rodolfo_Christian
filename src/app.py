@@ -396,7 +396,7 @@ def create_form():
              "details": [detail.serialize() for detail in new_form.detailform_relationship]  # Devolver los detalles del form
          }), 201
 
-@app.route('/stock', methods=['GET'])
+@app.route('/stock_api', methods=['GET'])
 @jwt_required()
 def get_stock():
    
@@ -434,7 +434,7 @@ def get_stock():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
-@app.route('/stock', methods=['POST'])
+@app.route('/stock_api', methods=['POST'])
 def create_stock():
    
     body = request.get_json(silent=True)
@@ -474,7 +474,7 @@ def create_stock():
     #return jsonify(new_article.serialize()), 201
     return jsonify({'msg': 'Artículo creado con éxito'}), 200
     
-@app.route('/stock/<int:id>', methods=['GET'])
+@app.route('/stock_api/<int:id>', methods=['GET'])
 def get_single_article(id):
     single_article = Stock.query.get(id) 
     if not single_article:
@@ -482,7 +482,7 @@ def get_single_article(id):
     return jsonify({'msg': 'Este es el artículo que buscas', 
                     'data': single_article.serialize()}), 200
 
-@app.route('/stock/<int:id>', methods=['PUT'])
+@app.route('/stock_api/<int:id>', methods=['PUT'])
 def edit_article(id):
     body = request.get_json(silent=True)
     if body is None:
@@ -501,7 +501,7 @@ def edit_article(id):
     db.session.commit()
     return jsonify({'msg': f'El artículo con id {id} ha sido modificado'}), 200
 
-@app.route('/stock/<int:id>', methods=['DELETE'])
+@app.route('/stock_api/<int:id>', methods=['DELETE'])
 def delete_article(id):
     article = Stock.query.get(id)
     if not article:
@@ -510,7 +510,7 @@ def delete_article(id):
     db.session.commit()
     return jsonify({'msg': f'El artículo con id {id} ha sido eliminado'}), 200
 
-@app.route('/stock/available', methods=['GET'])
+@app.route('/stock_api/available', methods=['GET'])
 def get_available_stock():
     try:
         # Filtrar los stocks que tengan quantity mayor a 0
