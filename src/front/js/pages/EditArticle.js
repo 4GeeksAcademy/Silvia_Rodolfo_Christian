@@ -75,7 +75,7 @@ const EditArticle = () => {
                 image: uploadedImageUrl // URL de Cloudinary
             };
 
-            const response = await fetch(`${store.apiUrl}/stock/${id}`, {
+            const response = await fetch(`${store.apiUrl}/stock_api/${id}`, {
                 method: "PUT",
                 body: JSON.stringify(articleData),
                 headers: {
